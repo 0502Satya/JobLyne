@@ -6,6 +6,13 @@ from django.db.models import Q
 from .models import Jobs, JobSeekers, JobSeekerSkills, CustomUser
 from .serializers import JobSerializer
 
+from rest_framework.pagination import PageNumberPagination
+
+class JobPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class JobListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -17,7 +24,8 @@ class JobListView(APIView):
         salary_max = request.query_params.get('salary_max', None)
         employment_type = request.query_params.get('employment_type', '')
         
-        jobs = Jobs.objects.all().order_by('-posted_at')
+        # Optimize queries with select_related to eliminate N+1 database hits
+        jobs = Jobs.objects.all().select_related('company', 'location', 'job_category', 'industry').order_by('-posted_at')
         
         if query:
             jobs = jobs.filter(
@@ -53,10 +61,18 @@ class JobListView(APIView):
         if employment_type:
             jobs = jobs.filter(employment_type__icontains=employment_type)
 
-        serializer = JobSerializer(jobs, many=True)
+        # Apply DRF pagination
+        paginator = JobPagination()
+        page = paginator.paginate_queryset(jobs, request)
+        
+        if page is not None:
+            serializer = JobSerializer(page, many=True)
+            response_data = serializer.data
+        else:
+            serializer = JobSerializer(jobs, many=True)
+            response_data = serializer.data
         
         # Add match score logic if user is a candidate
-        response_data = serializer.data
         if request.user.is_authenticated and request.user.account_type == 'CANDIDATE':
             try:
                 job_seeker = JobSeekers.objects.get(user=request.user)
@@ -81,6 +97,8 @@ class JobListView(APIView):
             except JobSeekers.DoesNotExist:
                 pass
 
+        if page is not None:
+            return paginator.get_paginated_response(response_data)
         return Response(response_data)
 
 class JobDetailView(APIView):

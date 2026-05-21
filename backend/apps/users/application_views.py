@@ -29,14 +29,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             application = Applications.objects.create(
                 job=job,
                 job_seeker=job_seeker,
-                status='PENDING',
-                applied_at=None # Or auto_now_add if we specify in model
+                status='PENDING'
             )
-            # Actually models.py has no auto_now_add for applied_at. 
-            # Let's fix that or set it manually
-            from django.utils import timezone
-            application.applied_at = timezone.now()
-            application.save()
 
             serializer = self.get_serializer(application)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -58,16 +58,28 @@ The JobLyne Team
 
 def calculate_profile_completeness(user):
     """
-    Calculates the profile completeness score for a candidate.
+    Calculates the profile completeness score for a candidate in exactly 1 optimized DB query.
     """
-    from .models import JobSeekers, CandidateExperience, CandidateEducation, JobSeekerSkills
+    from django.db.models import Exists, OuterRef
+    from .models import (
+        JobSeekers, CandidateExperience, CandidateEducation, JobSeekerSkills,
+        CandidateProjects, CandidateCertifications, CandidateLanguages, CandidatePortfolioLinks
+    )
     
     if user.account_type != 'CANDIDATE':
         return 0
         
-    try:
-        job_seeker = JobSeekers.objects.get(user=user)
-    except JobSeekers.DoesNotExist:
+    job_seeker = JobSeekers.objects.filter(user=user).annotate(
+        has_experience=Exists(CandidateExperience.objects.filter(job_seeker=OuterRef('pk'))),
+        has_education=Exists(CandidateEducation.objects.filter(job_seeker=OuterRef('pk'))),
+        has_skills=Exists(JobSeekerSkills.objects.filter(job_seeker=OuterRef('pk'))),
+        has_projects=Exists(CandidateProjects.objects.filter(job_seeker=OuterRef('pk'))),
+        has_certifications=Exists(CandidateCertifications.objects.filter(job_seeker=OuterRef('pk'))),
+        has_languages=Exists(CandidateLanguages.objects.filter(job_seeker=OuterRef('pk'))),
+        has_portfolio_links=Exists(CandidatePortfolioLinks.objects.filter(job_seeker=OuterRef('pk')))
+    ).select_related('user').first()
+    
+    if not job_seeker:
         return 0
         
     score = 0
@@ -75,8 +87,8 @@ def calculate_profile_completeness(user):
     # Basic Info & Photo (20%)
     if job_seeker.headline: score += 5
     if job_seeker.summary: score += 5
-    if job_seeker.phone or user.phone: score += 5
-    if user.profile_photo_url: score += 5
+    if job_seeker.phone or (job_seeker.user and job_seeker.user.phone): score += 5
+    if job_seeker.user and job_seeker.user.profile_photo_url: score += 5
     
     # Career Details (10%)
     if job_seeker.notice_period: score += 2
@@ -86,29 +98,29 @@ def calculate_profile_completeness(user):
     if job_seeker.work_mode: score += 2
     
     # Experience (20%)
-    if CandidateExperience.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_experience:
         score += 20
     elif job_seeker.experience_years == 0: # Fresher counts as complete if marked
         score += 20
         
     # Education (15%)
-    if CandidateEducation.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_education:
         score += 15
         
     # Skills (15%)
-    if JobSeekerSkills.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_skills:
         score += 15
         
     # Projects & Certifications (10%)
-    if CandidateProjects.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_projects:
         score += 5
-    if CandidateCertifications.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_certifications:
         score += 5
         
     # Languages & Portfolio (10%)
-    if CandidateLanguages.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_languages:
         score += 5
-    if CandidatePortfolioLinks.objects.filter(job_seeker=job_seeker).exists():
+    if job_seeker.has_portfolio_links:
         score += 5
         
     return score

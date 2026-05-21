@@ -5,9 +5,9 @@ from django.conf import settings
 
 def verify_google_token(token):
     """
-    Verifies a Google token (ID token or Access token) and returns user information.
+    Verifies a Google token (ID token) and returns user information.
+    Restricts authorization strictly to audience-validated ID tokens.
     """
-    # 1. Try as ID Token first (default for most libraries)
     try:
         client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
@@ -20,25 +20,7 @@ def verify_google_token(token):
             'uid': idinfo.get('sub')
         }
     except Exception:
-        # 2. Fallback: Try as Access Token by calling Google UserInfo API
-        try:
-            response = requests.get(
-                'https://www.googleapis.com/oauth2/v3/userinfo',
-                params={'access_token': token}
-            )
-            if response.status_code == 200:
-                data = response.json()
-                return {
-                    'email': data.get('email'),
-                    'first_name': data.get('given_name'),
-                    'last_name': data.get('family_name'),
-                    'picture': data.get('picture'),
-                    'provider': 'google',
-                    'uid': data.get('sub')
-                }
-        except Exception:
-            pass
-    return None
+        return None
 
 def verify_linkedin_token(access_token):
     """

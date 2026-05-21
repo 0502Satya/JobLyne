@@ -28,6 +28,7 @@ def get_tokens_for_user(user):
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
 
     def post(self, request, *args, **kwargs):
         serializer = UserSignupSerializer(data=request.data)
@@ -54,6 +55,7 @@ class SignupView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'login'
 
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
@@ -83,6 +85,7 @@ class LoginView(APIView):
 
 class CompanySignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
 
     def post(self, request, *args, **kwargs):
         serializer = CompanySignupSerializer(data=request.data)
@@ -108,6 +111,7 @@ class CompanySignupView(APIView):
 
 class RecruiterSignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
     def post(self, request, *args, **kwargs):
         serializer = RecruiterSignupSerializer(data=request.data)
         if serializer.is_valid():
@@ -249,6 +253,7 @@ class SocialLoginView(APIView):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'otp'
 
     def post(self, request, *args, **kwargs):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -260,29 +265,46 @@ class VerifyOTPView(APIView):
 
         try:
             user = CustomUser.objects.get(email=email)
-            otp_record = EmailVerificationOTP.objects.filter(user=user, otp_code=otp_code).latest('created_at')
-            
-            # Check for expiry (e.g., 10 minutes)
-            from django.utils import timezone
-            if (timezone.now() - otp_record.created_at).total_seconds() > 600:
-                return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Success
-            user.is_verified = True
-            user.is_active = True
-            user.save()
-            
-            # Cleanup OTPs for this user
-            EmailVerificationOTP.objects.filter(user=user).delete()
-            
-            tokens = get_tokens_for_user(user)
-            user_data = UserResponseSerializer(user).data
-            
-            return Response({
-                'message': 'Email verified successfully.',
-                'user': user_data,
-                'tokens': tokens
-            }, status=status.HTTP_200_OK)
-
-        except (CustomUser.DoesNotExist, EmailVerificationOTP.DoesNotExist):
+        except CustomUser.DoesNotExist:
             return Response({'error': 'Invalid OTP or email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            otp_record = EmailVerificationOTP.objects.filter(user=user).latest('created_at')
+        except EmailVerificationOTP.DoesNotExist:
+            return Response({'error': 'No active OTP found for this email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check lockout
+        if otp_record.attempts >= 5:
+            return Response({'error': 'This OTP is locked due to too many failed attempts. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check for expiry (e.g., 10 minutes)
+        from django.utils import timezone
+        if (timezone.now() - otp_record.created_at).total_seconds() > 600:
+            return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the code matches
+        if otp_record.otp_code != otp_code:
+            otp_record.attempts += 1
+            otp_record.save()
+            remaining = 5 - otp_record.attempts
+            if remaining <= 0:
+                return Response({'error': 'Too many failed attempts. This OTP has been locked. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error': f'Invalid OTP code. {remaining} attempts remaining.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Success
+        user.is_verified = True
+        user.is_active = True
+        user.save()
+        
+        # Cleanup OTPs for this user
+        EmailVerificationOTP.objects.filter(user=user).delete()
+        
+        tokens = get_tokens_for_user(user)
+        user_data = UserResponseSerializer(user).data
+        
+        return Response({
+            'message': 'Email verified successfully.',
+            'user': user_data,
+            'tokens': tokens
+        }, status=status.HTTP_200_OK)

@@ -10,8 +10,8 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const pathname = url.pathname;
 
-  // Mock session check - looks for a 'jwt_access' cookie
-  const isLoggedIn = request.cookies.has('jwt_access') || request.cookies.has('joblyne_session');
+  // Secure session check - relies strictly on JWT tokens
+  const isLoggedIn = request.cookies.has('jwt_access') || request.cookies.has('jwt_refresh');
 
   // List of paths that don't need a login (Auth pages)
   const isAuthPage = pathname.startsWith('/auth/signin') || 

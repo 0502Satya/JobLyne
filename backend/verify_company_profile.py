@@ -1,6 +1,13 @@
 import urllib.request
 import json
 import time
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+django.setup()
+
+from apps.users.models import CustomUser
 
 BASE_URL = "http://127.0.0.1:8000/api/auth/"
 
@@ -56,6 +63,17 @@ if not reg_res:
     print("Registration failed.")
     exit(1)
 print("Registration successful.")
+
+# Activate user directly via ORM since they are registered and inactive by default
+try:
+    user = CustomUser.objects.get(email=email)
+    user.is_verified = True
+    user.is_active = True
+    user.save()
+    print("User successfully verified and activated via ORM.")
+except CustomUser.DoesNotExist:
+    print(f"Error: User with email {email} was not found in the database.")
+    exit(1)
 
 # 2. Login
 print("\n--- Logging in ---")

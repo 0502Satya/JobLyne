@@ -33,7 +33,7 @@ export default function CompanyDashboardPage() {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-primary font-bold">
             <span className="material-symbols-outlined text-3xl">hub</span>
-            <span className="text-xl">SkillSync</span>
+            <span className="text-xl">JobLyne</span>
           </Link>
           <div className="h-6 w-px bg-border hidden md:block"></div>
           <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Organization</span>

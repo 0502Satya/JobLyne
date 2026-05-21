@@ -13,7 +13,7 @@ export default function CompanySigninPage() {
 
   const handleSignin = (e: React.FormEvent) => {
     e.preventDefault();
-    document.cookie = "joblyne_session=true; path=/; max-age=86400; SameSite=Lax";
+    document.cookie = "joblyne_session=true; path=/; max-age=86400; SameSite=Lax" + (typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "");
     router.push("/");
   };
 

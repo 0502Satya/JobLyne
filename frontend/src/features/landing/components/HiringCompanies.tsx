@@ -1,5 +1,5 @@
 /**
- * This section shows some names of famous companies that use SkillSync.
+ * This section shows some names of famous companies that use JobLyne.
  * It's just to show that the platform is trusted by big names.
  */
 export default function HiringCompanies() {

@@ -31,7 +31,7 @@ export default function DashboardHeader({
           <div className="text-primary size-8 flex items-center justify-center">
             <span className="material-symbols-outlined text-3xl">hub</span>
           </div>
-          <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">SkillSync</h2>
+          <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">JobLyne</h2>
         </Link>
 
         {/* Search Bar */}

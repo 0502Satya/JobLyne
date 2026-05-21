@@ -23,9 +23,23 @@ import PersonalInfoSection from "@/features/dashboard/components/profile/Persona
 import CareerProfileSection from "@/features/dashboard/components/profile/CareerProfileSection";
 import QuickActionButtons from "@/features/dashboard/components/profile/QuickActionButtons";
 
+interface Profile {
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  experience?: any[];
+  education?: any[];
+  projects?: any[];
+  certifications?: any[];
+  skills?: string[];
+  social_links?: Record<string, string>;
+  [key: string]: any;
+}
+
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [originalProfile, setOriginalProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [originalProfile, setOriginalProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -36,7 +50,7 @@ export default function ProfilePage() {
       const data = await getCandidateProfileAction();
       if (!data.error) {
         setProfile(data);
-        setOriginalProfile(JSON.parse(JSON.stringify(data)));
+        setOriginalProfile(structuredClone(data));
       }
       setLoading(false);
     }
@@ -44,7 +58,8 @@ export default function ProfilePage() {
   }, []);
 
   const handleChange = (field: string, value: any) => {
-    setProfile((prev: any) => {
+    setProfile((prev) => {
+      if (!prev) return null;
       const updated = { ...prev, [field]: value };
       const isDifferent = JSON.stringify(updated) !== JSON.stringify(originalProfile);
       setHasUnsavedChanges(isDifferent);
@@ -53,10 +68,11 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    if (!profile) return;
     setIsSaving(true);
     const result = await updateCandidateProfileAction(profile);
     if (result.success) {
-      setOriginalProfile(JSON.parse(JSON.stringify(profile)));
+      setOriginalProfile(structuredClone(profile));
       setHasUnsavedChanges(false);
       setToast({ message: "Profile updated successfully!", type: "success" });
     } else {
@@ -66,12 +82,46 @@ export default function ProfilePage() {
   };
 
   const handleDiscard = () => {
-    setProfile(JSON.parse(JSON.stringify(originalProfile)));
-    setHasUnsavedChanges(false);
-    setToast({ message: "Changes discarded", type: "success" });
+    if (originalProfile) {
+      setProfile(structuredClone(originalProfile));
+      setHasUnsavedChanges(false);
+      setToast({ message: "Changes discarded", type: "success" });
+    }
   };
 
-  if (loading && !profile) return null;
+  if (loading && !profile) {
+    return (
+      <main className="flex-1 overflow-y-auto px-4 py-8 md:px-10 md:py-12 h-[calc(100vh-73px)] custom-scrollbar animate-pulse text-text bg-slate-50/50 dark:bg-slate-950/20">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Header Skeleton */}
+          <div className="flex flex-wrap items-center justify-between mb-10 gap-6">
+            <div className="space-y-3">
+              <div className="h-10 w-48 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+              <div className="h-4 w-72 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+            </div>
+            <div className="h-12 w-32 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-12">
+            {/* Left column skeleton */}
+            <div className="space-y-12">
+              <div className="h-64 bg-slate-200 dark:bg-slate-800 rounded-[28px]"></div>
+              <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+              <div className="space-y-8 pt-10">
+                <div className="h-48 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+                <div className="h-48 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+              </div>
+            </div>
+            {/* Right sidebar skeleton */}
+            <div className="hidden xl:block space-y-8">
+              <div className="h-64 bg-slate-200 dark:bg-slate-800 rounded-[28px]"></div>
+              <div className="h-48 bg-slate-200 dark:bg-slate-800 rounded-[28px]"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 overflow-y-auto px-4 py-8 md:px-10 md:py-12 h-[calc(100vh-73px)] custom-scrollbar">
