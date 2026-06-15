@@ -34,5 +34,11 @@ ENV PATH=/root/.local/bin:$PATH \
 
 EXPOSE 8000
 
-# Startup command running the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Startup command running the Django application under Gunicorn
+CMD ["gunicorn", "core.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--timeout", "120", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-"]
+

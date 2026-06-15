@@ -1,53 +1,90 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { API_BASE_URL } from "./config";
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+export async function setAuthCookies(
+  tokens: { access: string; refresh: string },
+  accountType?: string
+) {
+  const cookieStore = await cookies();
+  const isProduction = process.env.NODE_ENV === 'production';
+  const base = { httpOnly: true, secure: isProduction, sameSite: 'lax' as const, path: '/' };
+
+  cookieStore.set('jwt_access',       tokens.access,  { ...base, maxAge: 3600 });
+  cookieStore.set('jwt_refresh',      tokens.refresh, { ...base, maxAge: 604800 });
+  cookieStore.set('joblyne_session',  'true',         { ...base, maxAge: 604800 });
+  if (accountType) {
+    cookieStore.set('joblyne_role', accountType,      { ...base, maxAge: 604800 });
+  }
+}
+
+let refreshPromise: Promise<string | null> | null = null;
 
 export async function refreshAccessToken() {
-  const cookieStore = await cookies();
-  const refreshToken = cookieStore.get("jwt_refresh")?.value;
-  if (!refreshToken) return null;
+  if (refreshPromise) {
+    return refreshPromise;
+  }
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/auth/token/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh: refreshToken }),
-    });
+  refreshPromise = (async () => {
+    try {
+      const cookieStore = await cookies();
+      const refreshToken = cookieStore.get("jwt_refresh")?.value;
+      if (!refreshToken) return null;
 
-    if (!res.ok) return null;
-    const data = await res.json();
-    
-    if (data.access) {
-      cookieStore.set("jwt_access", data.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour
+      const res = await fetch(`${API_BASE_URL}/api/auth/token/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh: refreshToken }),
       });
+
+      if (!res.ok) {
+        cookieStore.delete("jwt_access");
+        cookieStore.delete("jwt_refresh");
+        cookieStore.delete("joblyne_session");
+        cookieStore.delete("joblyne_role");
+        return null;
+      }
+      const data = await res.json();
       
-      if (data.refresh) {
-        cookieStore.set("jwt_refresh", data.refresh, {
+      if (data.access) {
+        cookieStore.set("jwt_access", data.access, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60, // 1 hour
         });
+        
+        if (data.refresh) {
+          cookieStore.set("jwt_refresh", data.refresh, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+          });
+        }
+        return data.access;
       }
-      return data.access; // Return the new token directly
+      cookieStore.delete("jwt_access");
+      cookieStore.delete("jwt_refresh");
+      cookieStore.delete("joblyne_session");
+      cookieStore.delete("joblyne_role");
+      return null;
+    } catch (err) {
+      return null;
+    } finally {
+      refreshPromise = null;
     }
-    return null;
-  } catch (err) {
-    return null;
-  }
+  })();
+
+  return refreshPromise;
 }
 
 export async function authenticatedFetch(url: string, options: RequestInit = {}) {
   const cookieStore = await cookies();
-  let token = cookieStore.get("jwt_access")?.value;
+  let token: string | null | undefined = cookieStore.get("jwt_access")?.value;
 
   // 1. If no token, attempt immediate refresh
   if (!token) {

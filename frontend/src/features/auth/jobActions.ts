@@ -1,6 +1,7 @@
 "use server";
 
-import { API_BASE_URL, authenticatedFetch } from "./apiClient";
+import { authenticatedFetch } from "./apiClient";
+import { API_BASE_URL } from "./config";
 
 export async function getJobsAction(params: { 
   query?: string; 
@@ -9,6 +10,7 @@ export async function getJobsAction(params: {
   salary_min?: string; 
   salary_max?: string; 
   employment_type?: string; 
+  my_jobs?: string;
 } = {}) {
   const searchParams = new URLSearchParams();
   if (params.query) searchParams.append("query", params.query);
@@ -17,9 +19,10 @@ export async function getJobsAction(params: {
   if (params.salary_min) searchParams.append("salary_min", params.salary_min);
   if (params.salary_max) searchParams.append("salary_max", params.salary_max);
   if (params.employment_type) searchParams.append("employment_type", params.employment_type);
+  if (params.my_jobs) searchParams.append("my_jobs", params.my_jobs);
   
   const queryString = searchParams.toString();
-  const url = `${API_BASE_URL}/api/auth/jobs/${queryString ? `?${queryString}` : ""}`;
+  const url = `${API_BASE_URL}/api/jobs/${queryString ? `?${queryString}` : ""}`;
 
   try {
     const res = await authenticatedFetch(url);
@@ -33,7 +36,7 @@ export async function getJobsAction(params: {
 
 export async function getJobDetailAction(jobId: string) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/jobs/${jobId}/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/${jobId}/`);
 
     if (!res.ok) return { error: "Failed to fetch job details" };
     return await res.json();
@@ -44,7 +47,7 @@ export async function getJobDetailAction(jobId: string) {
 
 export async function getSavedJobsAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/saved-jobs/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/saved-jobs/`);
 
     if (!res.ok) return { error: "Failed to fetch saved jobs" };
     return await res.json();
@@ -55,7 +58,7 @@ export async function getSavedJobsAction() {
 
 export async function saveJobAction(jobId: string) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/saved-jobs/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/saved-jobs/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +76,7 @@ export async function saveJobAction(jobId: string) {
 
 export async function unsaveJobAction(jobId: string) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/saved-jobs/${jobId}/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/saved-jobs/${jobId}/`, {
       method: "DELETE",
     });
 
@@ -86,7 +89,7 @@ export async function unsaveJobAction(jobId: string) {
 
 export async function getCompanyProfileAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/company/profile/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/company/profile/`);
 
     if (!res.ok) {
       if (res.status === 401) return { error: "Not authenticated" };
@@ -101,7 +104,7 @@ export async function getCompanyProfileAction() {
 
 export async function updateCompanyProfileAction(data: any) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/company/profile/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/company/profile/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

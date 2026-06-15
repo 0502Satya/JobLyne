@@ -15,23 +15,22 @@ export default function JobFeed() {
   const query = searchParams?.get("query") || "";
   const location = searchParams?.get("location") || "";
 
-  const loadJobs = async () => {
-    setLoading(true);
-    try {
-      const data = await getJobsAction({ query, location });
-      if (data && !data.error) {
-        setJobs(Array.isArray(data) ? data : (data.results || []));
-      } else {
-        setJobs([]);
-      }
-    } catch (err) {
-      console.error("JobFeed Load Failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadJobs = async () => {
+      setLoading(true);
+      try {
+        const data = await getJobsAction({ query, location });
+        if (data && !data.error) {
+          setJobs(Array.isArray(data) ? data : (data.results || []));
+        } else {
+          setJobs([]);
+        }
+      } catch (err) {
+        console.error("JobFeed Load Failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadJobs();
   }, [query, location]);
 

@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import { Profile } from "@/types/profile";
 
 interface ProfileInfoCardProps {
-  profile: any;
+  profile: Profile | null;
   onEdit: () => void;
 }
 
@@ -12,95 +13,110 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2)
     : "NA";
 
+  const handleDownloadResume = () => {
+    if (profile?.resume_file_url) {
+      window.open(profile.resume_file_url, "_blank");
+    } else {
+      alert("No resume file uploaded yet.");
+    }
+  };
+
   return (
-    <div className="relative bg-white rounded-[32px] p-6 sm:p-10 shadow-xl shadow-slate-200/40 mb-8 overflow-hidden border border-slate-100">
-      {/* Background Gradient Accents */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-40 -mt-40 blur-[80px]"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-stat-blue/5 rounded-full -ml-32 -mb-32 blur-[80px]"></div>
- 
-      <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 lg:gap-16">
-        {/* Avatar Section */}
-        <div className="relative shrink-0">
-          <div className="w-32 h-40 sm:w-40 sm:h-48 rounded-[36px] bg-white p-1 shadow-2xl shadow-slate-200 overflow-hidden group border border-slate-50">
-            <div className="w-full h-full bg-slate-100 rounded-[32px] flex items-center justify-center overflow-hidden">
-              {profile?.profile_photo_url ? (
-                <img src={profile.profile_photo_url} alt={profile.full_name} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary to-accent-gradient flex items-center justify-center text-white text-3xl sm:text-4xl font-black italic">
-                  {initials}
-                </div>
-              )}
-            </div>
-          </div>
-          <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all transform hover:scale-110 active:scale-95 group/btn">
-            <span className="material-symbols-outlined text-xl font-bold transition-transform group-hover/btn:rotate-12">photo_camera</span>
-          </button>
-        </div>
- 
-        {/* Info Section */}
-        <div className="flex-1 min-w-0">
-          <div className="text-center md:text-left mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-3 leading-[1.1]">{profile?.full_name || "Alex Thompson"}</h1>
-            <p className="text-base sm:text-lg font-bold text-slate-500 leading-snug">
-               {profile?.current_designation || "Senior Product Designer"} <span className="text-slate-300 font-light mx-2">at</span> <span className="text-primary">{profile?.current_company || "Google"}</span>
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-6 mb-8">
-             <div className="flex items-center gap-3 text-xs font-bold text-slate-500 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-slate-100/50">
-                   <span className="material-symbols-outlined text-base">phone_iphone</span>
-                </div>
-                <span className="truncate">{profile?.phone || "(05) 323 7289"}</span>
-             </div>
-             <div className="flex items-center gap-3 text-xs font-bold text-slate-500 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-slate-100/50">
-                   <span className="material-symbols-outlined text-base">mail</span>
-                </div>
-                <span className="truncate">{profile?.email || "ems@gmail.com"}</span>
-             </div>
-             <div className="flex items-center gap-3 text-xs font-bold text-slate-500 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-slate-100/50">
-                   <span className="material-symbols-outlined text-base">link</span>
-                </div>
-                <span className="truncate">{profile?.portfolio_url || "portfolio.URL"}</span>
-             </div>
-             <div className="flex items-center gap-3 text-xs font-bold text-slate-500 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-slate-100/50">
-                   <span className="material-symbols-outlined text-base">public</span>
-                </div>
-                <span className="truncate">{profile?.linkedin || "LinkedIn"}</span>
-             </div>
-          </div>
-
-          <button 
-            onClick={onEdit}
-            className="w-full md:w-auto px-8 bg-slate-50 hover:bg-slate-100 text-slate-600 font-black text-[10px] uppercase tracking-widest py-3 rounded-xl border border-slate-100 transition-all flex items-center justify-center gap-3 group"
-          >
-            Edit Profile
-            <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-1">arrow_forward</span>
-          </button>
+    <div className="relative bg-card rounded-2xl shadow-sm mb-6 overflow-hidden border border-border">
+      <div className="h-28 sm:h-32 bg-primary relative w-full border-b border-border overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_35%),linear-gradient(135deg,rgb(var(--color-primary)),#084b51)]" />
+        <div className="absolute right-6 top-5 hidden sm:flex items-center gap-2 rounded-lg bg-white/10 dark:bg-black/20 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white/95 backdrop-blur">
+          <span className="material-symbols-outlined text-sm">verified</span>
+          Candidate profile
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 mt-8 pt-8 sm:mt-12 sm:pt-10 border-t border-slate-50">
-         <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-primary/5 text-primary rounded-xl font-bold text-[10px] sm:text-xs ring-1 ring-primary/10 transition-all hover:bg-primary/10">
-            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">work_history</span>
-            {profile?.experience_years ? `${profile.experience_years}+ Yrs` : "Fresher"}
-         </div>
-         <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-[10px] sm:text-xs ring-1 ring-indigo-100 transition-all hover:bg-indigo-100/50">
-            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">stars</span>
-            {profile?.projects?.length || 5} Projects
-         </div>
-         <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-violet-50 text-violet-600 rounded-xl font-bold text-[10px] sm:text-xs ring-1 ring-violet-100 transition-all hover:bg-violet-100/50">
-            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">verified</span>
-            {profile?.certifications?.length || 8} Certs
-         </div>
-         <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-stat-blue/5 text-stat-blue rounded-xl font-bold text-[10px] sm:text-xs ring-1 ring-stat-blue/10 transition-all hover:bg-stat-blue/10">
-            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">location_on</span>
-            {profile?.location || "Remote"}
-         </div>
+      <div className="px-6 pb-6 sm:px-8 sm:pb-8 relative">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-5 mt-[-40px] md:mt-[-48px]">
+          <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 lg:gap-6 min-w-0">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-card p-1 shadow-md overflow-hidden shrink-0 border border-border">
+              <div className="w-full h-full rounded-full bg-bg flex items-center justify-center overflow-hidden">
+                {profile?.profile_photo_url ? (
+                  <img src={profile.profile_photo_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-extrabold shadow-inner">
+                    {initials}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-2 md:pt-12 min-w-0">
+              <div className="flex items-center justify-center md:justify-start gap-1.5 mb-1 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-black text-text tracking-tight break-words">{profile?.full_name || "Alex Thompson"}</h1>
+                <span className="material-symbols-outlined text-primary text-lg font-black" title="Verified Profile">verified</span>
+              </div>
+              <p className="text-sm font-semibold text-text/80 mb-3 break-words">
+                {profile?.headline || profile?.current_designation || "Add a professional headline"}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-xs font-semibold text-muted">
+                {profile?.location && (
+                  <div className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm text-muted/80">location_on</span>
+                    <span>{profile.location}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm text-muted/80">work_history</span>
+                  <span>{profile?.experience_years ? `${profile.experience_years} yrs experience` : "Fresher"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                  <span>
+                    {profile?.work_mode && Array.isArray(profile.work_mode) && profile.work_mode.length > 0
+                      ? `Open to ${profile.work_mode.join(" & ").toLowerCase()}`
+                      : profile?.work_mode && typeof profile.work_mode === "string"
+                        ? `Open to ${profile.work_mode.toLowerCase()}`
+                        : "Open to remote & hybrid"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                {(profile?.skills || []).slice(0, 4).map((skill) => (
+                  <span key={skill} className="inline-flex h-7 items-center rounded-lg bg-primary/10 dark:bg-primary/20 px-3 text-xs font-bold text-primary">
+                    {skill}
+                  </span>
+                ))}
+                {profile?.resume_file_url && (
+                  <span className="inline-flex h-7 items-center gap-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 px-3 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="material-symbols-outlined text-sm">description</span>
+                    Resume ready
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-2.5 pt-0 md:pt-12 w-full md:w-auto shrink-0 justify-center">
+            <button
+              onClick={handleDownloadResume}
+              className="flex-1 md:flex-none px-4 py-2.5 bg-card text-text font-bold text-xs rounded-lg border border-border hover:bg-bg transition-all shadow-sm flex items-center justify-center gap-1.5 min-h-[40px] cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">download</span>
+              Resume
+            </button>
+            <button
+              onClick={onEdit}
+              className="flex-1 md:flex-none px-4 py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-1.5 min-h-[40px] cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">edit</span>
+              Edit profile
+            </button>
+          </div>
+        </div>
+
+        {(profile?.bio || profile?.summary) && (
+          <div className="mt-6 pt-5 border-t border-border text-sm text-muted leading-relaxed font-medium break-words">
+            {profile.bio || profile.summary}
+          </div>
+        )}
       </div>
     </div>
   );

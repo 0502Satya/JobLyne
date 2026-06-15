@@ -1,6 +1,6 @@
 # 🌐 JobLyne (SkillSync)
 
-JobLyne (SkillSync) is a high-performance, multi-sided career platform and skill-matching engine built using a modern **Next.js** frontend and a robust **Django REST Framework** backend. It features subdomain routing (e.g., `recruiter.localhost:3000`, `company.localhost:3000`), secure JSON Web Token (JWT) credentials, Google OAuth integration, transactional ORM database operations, and real-time OTP validation.
+JobLyne (SkillSync) is a high-performance, multi-sided career platform and skill-matching engine built using a modern **Next.js** frontend and a robust **Django REST Framework** backend. It features subdomain routing (e.g., `recruiter.localhost:3000`, `company.localhost:3000`), secure JSON Web Token (JWT) credentials, Google OAuth integration, transactional ORM database operations, real-time OTP validation, and a print-optimized candidate resume generator.
 
 ---
 
@@ -63,13 +63,13 @@ cd Skillsynk
    *Required variables:*
    - `SECRET_KEY`: Django cryptographic key.
    - `DATABASE_URL`: Connection string to your PostgreSQL instance.
+   - `JWT_SECRET`: Shared symmetric key used to sign and verify JSON Web Tokens (must match frontend's `JWT_SECRET`). Generate using: `python -c "import secrets; print(secrets.token_hex(32))"`
    - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: OAuth sign-in credentials.
    - `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`: SMTP email delivery.
 
-5. **Run Migrations & Seed Mock Data:**
+5. **Run Migrations:**
    ```bash
    python manage.py migrate
-   python seed_jobs.py
    ```
 
 6. **Fire up the REST Server:**
@@ -106,8 +106,9 @@ cd Skillsynk
    *Required variables:*
    - `NEXT_PUBLIC_API_URL`: Local API endpoint (defaults to `http://127.0.0.1:8000`).
    - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: Google OAuth consumer key for client-side authentication.
+   - `JWT_SECRET`: Shared symmetric key used to decode JSON Web Tokens in Next.js middleware (must match backend's `JWT_SECRET`).
 
-5. **Launch development server (Turbopack):**
+5. **Launch development server:**
    ```bash
    npm run dev
    ```
@@ -115,16 +116,18 @@ cd Skillsynk
 
 ---
 
-## 🧪 Verification & Integration Scripts
+## 🧪 Verification & Integration Testing
 
-The backend includes test scripts to verify platform health:
-- **General Auth Signups**: Run `.\venv\Scripts\python test_api.py` to verify candidate registration and OTP initialization workflows.
-- **Enterprise Company Flow**: Run `.\venv\Scripts\python verify_company_profile.py` to run an end-to-end verification (Sign-up -> Direct database verification simulation -> Session login -> Read Profile -> Profile edit PATCH operations).
+The backend includes test suites to verify platform health:
+- **Django Unit Tests**: Run the full suite of domain-specific tests via:
+  ```bash
+  python manage.py test apps
+  ```
 
 ---
 
 ## 🔒 Security & Best Practices
 
 - **Strict Environment Governance**: Never check `.env` or `.env.local` files into version control. Ensure all new keys are mapped into both the relevant settings config and their corresponding `.env.example` templates.
+- **Symmetric JWT Signature**: Always generate a secure 32-byte hex key for `JWT_SECRET` in production to protect access tokens against validation attacks.
 - **Cookie Security**: Next.js Server Actions manage cookie storage using `httpOnly`, `secure` (in production), and `sameSite: "lax"` policies to prevent Cross-Site Scripting (XSS) vulnerability risks.
-

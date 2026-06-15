@@ -1,10 +1,11 @@
 "use server";
 
-import { API_BASE_URL, authenticatedFetch } from "./apiClient";
+import { authenticatedFetch } from "./apiClient";
+import { API_BASE_URL } from "./config";
 
 export async function getCandidateProfileAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/candidate/profile/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/candidate/profile/`);
 
     if (!res.ok) {
       if (res.status === 401) return { error: "Not authenticated" };
@@ -19,7 +20,7 @@ export async function getCandidateProfileAction() {
 
 export async function updateCandidateProfileAction(data: any) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/candidate/profile/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/candidate/profile/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +41,7 @@ export async function updateCandidateProfileAction(data: any) {
 
 export async function applyToJobAction(jobId: string) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/applications/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +59,7 @@ export async function applyToJobAction(jobId: string) {
 
 export async function getDashboardStatsAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/applications/stats/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/stats/`);
 
     if (!res.ok) return { error: "Failed to fetch stats" };
     return await res.json();
@@ -69,7 +70,7 @@ export async function getDashboardStatsAction() {
 
 export async function getActionPlanAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/candidate/action-plan/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/candidate/action-plan/`);
 
     if (!res.ok) return { error: "Failed to fetch action plan" };
     return await res.json();
@@ -80,7 +81,7 @@ export async function getActionPlanAction() {
 
 export async function getApplicationsAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/applications/`);
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/`);
 
     if (!res.ok) return { error: "Failed to fetch applications" };
     return await res.json();

@@ -83,7 +83,7 @@ export default function GeneralsSection({ data, onChange }: GeneralsSectionProps
             <button 
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-tighter text-primary hover:text-primary-dark transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-tighter text-primary hover:text-primary-dark transition-colors p-3 min-h-[44px] flex items-center justify-center"
             >
               {showPassword ? "HIDE" : "SHOW"}
             </button>
@@ -101,7 +101,7 @@ export default function GeneralsSection({ data, onChange }: GeneralsSectionProps
             <button 
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-tighter text-primary hover:text-primary-dark transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-tighter text-primary hover:text-primary-dark transition-colors p-3 min-h-[44px] flex items-center justify-center"
             >
               {showConfirmPassword ? "HIDE" : "SHOW"}
             </button>

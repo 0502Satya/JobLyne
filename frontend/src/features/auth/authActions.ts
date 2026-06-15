@@ -2,7 +2,8 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { API_BASE_URL } from "./apiClient";
+import { API_BASE_URL } from "./config";
+import { setAuthCookies, authenticatedFetch } from "./apiClient";
 
 export async function signupAction(prevState: any, formData: FormData) {
   const email = formData.get("email") as string;
@@ -51,40 +52,7 @@ export async function signupAction(prevState: any, formData: FormData) {
 
     // On successful signup (if verification was skipped or disabled), tokens are returned. Store them.
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      // Session cookie for Navbar detection
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
-
+      await setAuthCookies(data.tokens, data.user?.account_type);
       // Redirect after successfully setting cookies
       redirect("/dashboard");
     }
@@ -148,40 +116,7 @@ export async function companySignupAction(prevState: any, formData: FormData) {
 
     // On successful signup, tokens are returned. Store them.
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      // Session cookie for Navbar detection
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
-      
+      await setAuthCookies(data.tokens, data.user?.account_type);
       return { success: true, redirect: "/dashboard" };
     }
 
@@ -234,40 +169,8 @@ export async function recruiterSignupAction(prevState: any, formData: FormData) 
     }
 
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60,
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
-
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
-
-      redirect("/dashboard");
+      await setAuthCookies(data.tokens, data.user?.account_type);
+      return { success: true };
     }
 
     return { success: true };
@@ -301,39 +204,7 @@ export async function loginAction(prevState: any, formData: FormData) {
 
     // Success, store tokens in HttpOnly cookies
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      // Session cookie for Navbar detection
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
+      await setAuthCookies(data.tokens, data.user?.account_type);
     }
 
   } catch (err: any) {
@@ -342,8 +213,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     };
   }
 
-  // Redirect to dashboard internally via Next route
-  redirect("/dashboard");
+  return { success: true };
 }
 
 export async function socialLoginAction(provider: "google" | "linkedin", token: string) {
@@ -363,39 +233,7 @@ export async function socialLoginAction(provider: "google" | "linkedin", token: 
     }
 
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-      
-      // Legacy session cookie for Navbar detection
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
+      await setAuthCookies(data.tokens, data.user?.account_type);
     }
 
     return { success: true };
@@ -424,45 +262,14 @@ export async function verifyOtpAction(prevState: any, formData: FormData) {
     }
 
     if (data.tokens) {
-      const cookieStore = await cookies();
-      cookieStore.set("jwt_access", data.tokens.access, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60,
-      });
-
-      cookieStore.set("jwt_refresh", data.tokens.refresh, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
-
-      cookieStore.set("joblyne_session", "true", {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      if (data.user?.account_type) {
-        cookieStore.set("joblyne_role", data.user.account_type, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-      }
+      await setAuthCookies(data.tokens, data.user?.account_type);
     }
 
   } catch (err) {
     return { error: "Unable to connect to the server." };
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
 
 export async function logoutAction() {
@@ -473,3 +280,58 @@ export async function logoutAction() {
   cookieStore.delete("joblyne_role");
   redirect("/auth/signin");
 }
+
+export async function getUserProfileAction() {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/profile/`);
+    if (!res.ok) return { error: "Failed to fetch user profile" };
+    return await res.json();
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function updateUserProfileAction(data: any) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/profile/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const responseData = await res.json();
+    if (!res.ok) return { error: responseData.error || "Failed to update profile details" };
+    return responseData;
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function getRecruiterProfileAction() {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/recruiter/profile/`);
+    if (!res.ok) return { error: "Failed to fetch recruiter profile" };
+    return await res.json();
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function updateRecruiterProfileAction(data: any) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/recruiter/profile/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const responseData = await res.json();
+    if (!res.ok) return { error: responseData.error || "Failed to update recruiter details" };
+    return responseData;
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+

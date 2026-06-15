@@ -2,19 +2,33 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { loginAction } from "@/features/auth/actions";
 
 /**
  * High-fidelity Specialized Sign In for Companies.
  * Features a tabbed interface to switch between roles.
  */
 export default function CompanySigninPage() {
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
-  const handleSignin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    document.cookie = "joblyne_session=true; path=/; max-age=86400; SameSite=Lax" + (typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "");
-    router.push("/");
+    setIsPending(true);
+    setError(null);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const res = await loginAction(null, formData);
+      if (res?.error) {
+        setError(res.error);
+      } else if (res?.success) {
+        window.location.href = "/dashboard";
+        return;
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    }
+    setIsPending(false);
   };
 
   return (
@@ -47,17 +61,24 @@ export default function CompanySigninPage() {
             <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm italic">Access your professional workspace</p>
           </div>
 
-
           <div className="space-y-6">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg flex items-center gap-3 text-red-600 dark:text-red-400">
+                <span className="material-symbols-outlined text-sm">error</span>
+                <p className="text-xs font-semibold">{error}</p>
+              </div>
+            )}
 
-            <form onSubmit={handleSignin} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Email Address</label>
                 <input 
+                  name="email"
                   className="w-full rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-4 py-3 h-12 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-white"
                   placeholder="name@company.com" 
                   type="email" 
                   required 
+                  disabled={isPending}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -66,10 +87,12 @@ export default function CompanySigninPage() {
                   <Link href="#" className="text-[10px] font-bold text-primary hover:underline">Forgot Password?</Link>
                 </div>
                 <input 
+                  name="password"
                   className="w-full rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-4 py-3 h-12 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-white"
                   placeholder="••••••••" 
                   type="password" 
                   required 
+                  disabled={isPending}
                 />
               </div>
               
@@ -78,8 +101,8 @@ export default function CompanySigninPage() {
                 <label htmlFor="remember" className="text-xs text-slate-600 dark:text-slate-400 cursor-pointer italic">Keep me signed in for 30 days</label>
               </div>
 
-              <button className="w-full py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-black rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-[0.98] mt-4" type="submit">
-                Sign Into Account
+              <button disabled={isPending} className="w-full py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-black rounded-2xl shadow-xl hover:opacity-90 disabled:opacity-50 transition-all active:scale-[0.98] mt-4" type="submit">
+                {isPending ? "Signing In..." : "Sign Into Account"}
               </button>
             </form>
           </div>
@@ -93,7 +116,7 @@ export default function CompanySigninPage() {
       </main>
 
       <footer className="px-6 md:px-20 py-8 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 text-[10px] font-bold uppercase tracking-widest flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors">
-        <p>© 2024 JobLyne Inc. All rights reserved.</p>
+        <p>© 2026 JobLyne Inc. All rights reserved.</p>
         <div className="flex gap-8 italic">
           <Link className="hover:text-primary" href="#">Privacy</Link>
           <Link className="hover:text-primary" href="#">Terms</Link>

@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💻 JobLyne Next.js Frontend
 
-## Getting Started
+The frontend of JobLyne is built with **Next.js 15 (App Router)**, **React 19**, and **Tailwind CSS v4**. It implements subdomain routing for recruiters and employers and connects to the Django REST API backend.
 
-First, run the development server:
+---
+
+## 🛠️ Tech Stack & Features
+
+- **Framework**: Next.js 15 (App Router, Server Actions)
+- **Styling**: Tailwind CSS v4
+- **State Management**: React Hooks & Server Action handlers
+- **Authentication**: Google OAuth 2.0 & JWT-based authentication
+- **Features**:
+  - **Three-Column Candidate Profile**: With left Scrollspy navigation, right SVG completeness indicator, and central forms.
+  - **Dedicated Resume Preview**: Located at `/dashboard/resume-preview`, styled specifically for A4 standard printing and automatic PDF rendering when `?print=true` is present.
+  - **Subdomain Routing Middleware**: Subdomains map to `/recruiter`, `/company`, or candidate dashboards natively.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Installation
+
+1. Install npm packages:
+   ```bash
+   npm install
+   ```
+
+2. **Windows compilation wrapper** (Tailwind CSS v4 uses `lightningcss` which requires a native MSVC wrapper on Windows):
+   ```bash
+   npm install lightningcss-win32-x64-msvc
+   ```
+
+---
+
+### 2. Environment Variables
+
+Create `.env.local` inside this directory:
+```bash
+copy .env.example .env.local
+```
+
+Fill in the required variables:
+- `NEXT_PUBLIC_API_URL`: Backend REST API base URL (defaults to `http://127.0.0.1:8000`).
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: OAuth credentials for client side login.
+- `JWT_SECRET`: The symmetric JWT signing key (must match Django settings). Generate using:
+  ```bash
+  python -c "import secrets; print(secrets.token_hex(32))"
+  ```
+
+---
+
+### 3. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) (or the port specified) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Build for Production
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This compiles TypeScript definitions and checks static page generation constraints.

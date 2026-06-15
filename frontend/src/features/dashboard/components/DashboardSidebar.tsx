@@ -14,9 +14,12 @@ const sidebarLinks = [
   { name: "Dashboard", icon: "dashboard", href: "/dashboard", filled: true },
   { name: "My Applications", icon: "work", href: "/dashboard/applications" },
   { name: "Saved Jobs", icon: "bookmark", href: "/dashboard/saved-jobs" },
+  { name: "Messages", icon: "chat", href: "/dashboard/messages" },
+  { name: "Job Alerts", icon: "notifications_active", href: "/dashboard/alerts" },
   { name: "My Learning", icon: "school", href: "/dashboard/learning" },
   { name: "Resume Services", icon: "description", href: "/dashboard/services" },
 ];
+
 
 export default function DashboardSidebar({ profile, stats }: DashboardSidebarProps) {
   const pathname = usePathname();

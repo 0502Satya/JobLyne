@@ -5,9 +5,24 @@ from django.conf import settings
 
 def verify_google_token(token):
     """
-    Verifies a Google token (ID token) and returns user information.
-    Restricts authorization strictly to audience-validated ID tokens.
+    Verifies a Google token (either ID token or Access token) and returns user information.
+    Restricts authorization strictly to audience-validated ID tokens or verified Access tokens.
+    Supports local mock tokens starting with 'mock_' during development.
     """
+    if settings.DEBUG and token.startswith('mock_'):
+        email = token.replace('mock_', '')
+        if '@' not in email:
+            email = f"{email}@example.com"
+        return {
+            'email': email,
+            'first_name': 'MockGoogle',
+            'last_name': 'User',
+            'picture': '',
+            'provider': 'google',
+            'uid': f"mock-google-uid-{email}"
+        }
+
+    # Only accept ID tokens with strict audience validation
     try:
         client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
@@ -22,12 +37,48 @@ def verify_google_token(token):
     except Exception:
         return None
 
+
 def verify_linkedin_token(access_token):
     """
     Verifies a LinkedIn access token and returns user information.
-    Uses the 'me' and 'emailAddress' endpoints.
+    Validates token audience via token introspection if client credentials are provided.
+    Supports local mock tokens starting with 'mock_' during development.
     """
+    if settings.DEBUG and access_token.startswith('mock_'):
+        email = access_token.replace('mock_', '')
+        if '@' not in email:
+            email = f"{email}@example.com"
+        return {
+            'email': email,
+            'first_name': 'MockLinkedIn',
+            'last_name': 'User',
+            'provider': 'linkedin',
+            'uid': f"mock-linkedin-uid-{email}"
+        }
+
     try:
+        client_id = getattr(settings, 'LINKEDIN_CLIENT_ID', None)
+        client_secret = getattr(settings, 'LINKEDIN_CLIENT_SECRET', None)
+        
+        # If client credentials are provided, introspect to validate audience
+        if client_id and client_secret:
+            introspect_res = requests.post(
+                'https://www.linkedin.com/oauth/v2/introspect',
+                data={
+                    'token': access_token,
+                    'client_id': client_id,
+                    'client_secret': client_secret,
+                },
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+            if introspect_res.status_code == 200:
+                introspect_data = introspect_res.json()
+                # Check that the token is active and matches our client_id
+                if not introspect_data.get('active') or introspect_data.get('client_id') != client_id:
+                    return None
+            else:
+                return None
+
         # Get basic profile info
         profile_res = requests.get(
             'https://api.linkedin.com/v2/me',
@@ -56,3 +107,4 @@ def verify_linkedin_token(access_token):
         }
     except Exception:
         return None
+

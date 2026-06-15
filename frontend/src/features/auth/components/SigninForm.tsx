@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useState } from "react";
 import { loginAction } from "@/features/auth/actions";
 import Link from "next/link";
 
@@ -9,15 +9,34 @@ import Link from "next/link";
  * Wired to Django backend via Next.js Server Actions for secure HttpOnly cookie management.
  */
 export default function SigninForm({ role = "Candidate" }: { role?: string }) {
-  // React 19 hook for Server Actions
-  const [state, formAction, isPending] = useActionState(loginAction, null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    setError(null);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const res = await loginAction(null, formData);
+      if (res?.error) {
+        setError(res.error);
+      } else if (res?.success) {
+        window.location.href = "/dashboard";
+        return;
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    }
+    setIsPending(false);
+  };
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Render Server Errors */}
-      {state?.error && (
+      {error && (
         <div className="bg-error/10 text-error p-3 rounded-lg text-sm mb-4 border border-error/20">
-          {state.error}
+          {error}
         </div>
       )}
       
