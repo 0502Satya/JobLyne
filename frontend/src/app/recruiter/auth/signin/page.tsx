@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { loginAction } from "@/features/auth/actions";
 
 /**
@@ -10,7 +9,27 @@ import { loginAction } from "@/features/auth/actions";
  * Features a tabbed interface to switch between roles.
  */
 export default function RecruiterSigninPage() {
-  const [state, formAction, isPending] = useActionState(loginAction, null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    setError(null);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const res = await loginAction(null, formData);
+      if (res?.error) {
+        setError(res.error);
+      } else if (res?.success) {
+        window.location.href = "/dashboard";
+        return;
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    }
+    setIsPending(false);
+  };
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors flex flex-col">
@@ -42,7 +61,6 @@ export default function RecruiterSigninPage() {
             <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm italic">Access your professional workspace</p>
           </div>
 
-
           <div className="space-y-6">
             <button className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-[#0A66C2] text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:bg-[#0954a1] transition-all group active:scale-[0.98]">
               <svg className="size-5 fill-current" viewBox="0 0 24 24">
@@ -57,14 +75,14 @@ export default function RecruiterSigninPage() {
               <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
             </div>
 
-            {state?.error && (
+            {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg flex items-center gap-3 text-red-600 dark:text-red-400">
                 <span className="material-symbols-outlined text-sm">error</span>
-                <p className="text-xs font-semibold">{state.error}</p>
+                <p className="text-xs font-semibold">{error}</p>
               </div>
             )}
 
-            <form action={formAction} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Work Email</label>
                 <input 
@@ -73,6 +91,7 @@ export default function RecruiterSigninPage() {
                   placeholder="name@company.com" 
                   type="email" 
                   required 
+                  disabled={isPending}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -86,6 +105,7 @@ export default function RecruiterSigninPage() {
                   placeholder="••••••••" 
                   type="password" 
                   required 
+                  disabled={isPending}
                 />
               </div>
               

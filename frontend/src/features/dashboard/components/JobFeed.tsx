@@ -4,28 +4,35 @@ import React, { useEffect, useState } from "react";
 import { getJobsAction, applyToJobAction, saveJobAction, unsaveJobAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function JobFeed() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState<string | null>(null);
 
-  const loadJobs = async () => {
-    try {
-      const data = await getJobsAction();
-      if (data && !data.error) {
-        setJobs(data);
-      }
-    } catch (err) {
-      console.error("JobFeed Load Failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const searchParams = useSearchParams();
+  const query = searchParams?.get("query") || "";
+  const location = searchParams?.get("location") || "";
 
   useEffect(() => {
+    const loadJobs = async () => {
+      setLoading(true);
+      try {
+        const data = await getJobsAction({ query, location });
+        if (data && !data.error) {
+          setJobs(Array.isArray(data) ? data : (data.results || []));
+        } else {
+          setJobs([]);
+        }
+      } catch (err) {
+        console.error("JobFeed Load Failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadJobs();
-  }, []);
+  }, [query, location]);
 
   const handleApply = async (jobId: string) => {
     setApplying(jobId);

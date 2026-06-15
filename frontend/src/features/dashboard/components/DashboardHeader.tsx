@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import UserMenu from "@/features/auth/components/UserMenu";
+import NotificationCenter from "./NotificationCenter";
+import ThemeToggle from "@/shared/ui/ThemeToggle";
 
 interface DashboardHeaderProps {
   initials?: string;
@@ -31,7 +33,7 @@ export default function DashboardHeader({
           <div className="text-primary size-8 flex items-center justify-center">
             <span className="material-symbols-outlined text-3xl">hub</span>
           </div>
-          <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">SkillSync</h2>
+          <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">JobLyne</h2>
         </Link>
 
         {/* Search Bar */}
@@ -64,10 +66,8 @@ export default function DashboardHeader({
 
         {/* User Actions */}
         <div className="flex gap-3 items-center">
-          <button className="flex items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-bg text-muted hover:bg-border/20 transition-colors">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
-          
+          <NotificationCenter />
+          <ThemeToggle />
           <UserMenu initials={initials} profileImage={profileImage} />
         </div>
       </div>

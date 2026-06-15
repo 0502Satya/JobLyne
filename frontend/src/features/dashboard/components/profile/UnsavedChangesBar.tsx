@@ -18,13 +18,13 @@ export default function UnsavedChangesBar({ isVisible, onSave, onDiscard }: Unsa
       <div className="flex items-center gap-3">
         <button 
           onClick={onDiscard}
-          className="text-amber-100 hover:text-white underline text-xs transition-colors"
+          className="text-amber-100 hover:text-white underline text-xs transition-colors px-3 py-2.5 min-h-[44px] flex items-center justify-center"
         >
           Discard
         </button>
         <button 
           onClick={onSave}
-          className="bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-lg hover:bg-amber-50 transition-colors"
+          className="bg-white text-amber-600 text-xs font-bold px-5 py-2 rounded-xl hover:bg-amber-50 transition-colors min-h-[44px] flex items-center justify-center shadow-md active:scale-95"
         >
           Save now
         </button>

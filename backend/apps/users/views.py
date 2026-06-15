@@ -1,24 +1,30 @@
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import authenticate
-from .serializers import (
-    UserSignupSerializer, UserResponseSerializer, 
-    CompanySignupSerializer, CompanyProfileSerializer,
-    CandidateProfileSerializer, SocialAuthSerializer,
-    RecruiterSignupSerializer, VerifyOTPSerializer
-)
-from .models import Companies, AdvertiserAccounts, JobSeekers, CustomUser, Recruiters, EmailVerificationOTP
-from .social_auth_utils import verify_google_token, verify_linkedin_token
-from .utils import send_otp_email
+from django.utils import timezone
+import hashlib
 import random
 import string
 
+from apps.users.serializers import (
+    UserSignupSerializer, UserResponseSerializer, 
+    CompanySignupSerializer, SocialAuthSerializer,
+    RecruiterSignupSerializer, VerifyOTPSerializer,
+    UserProfileSerializer
+)
+from apps.users.models import CustomUser, EmailVerificationOTP
+from apps.companies.models import Companies, Recruiters
+from apps.candidates.models import JobSeekers
+from apps.commerce.models import AdvertiserAccounts
+from apps.users.social_auth_utils import verify_google_token, verify_linkedin_token
+from apps.users.utils import send_otp_email
+
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-    # Add custom claims
     refresh['role'] = user.account_type
     
     return {
@@ -26,21 +32,23 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 
+def hash_otp(otp_code: str) -> str:
+    return hashlib.sha256(otp_code.encode()).hexdigest()
+
 class SignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
 
     def post(self, request, *args, **kwargs):
         serializer = UserSignupSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             
-            # Generate OTP
             otp_code = ''.join(random.choices(string.digits, k=6))
-            EmailVerificationOTP.objects.create(user=user, otp_code=otp_code)
+            otp_hash = hash_otp(otp_code)
+            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
             
-            # Send OTP email
             send_otp_email(user.email, otp_code)
-            
             user_data = UserResponseSerializer(user).data
             
             return Response({
@@ -51,9 +59,9 @@ class SignupView(APIView):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'login'
 
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
@@ -62,7 +70,6 @@ class LoginView(APIView):
         if not email or not password:
             return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Authenticate user
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
@@ -80,26 +87,24 @@ class LoginView(APIView):
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
 class CompanySignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
 
     def post(self, request, *args, **kwargs):
         serializer = CompanySignupSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             
-            # Generate OTP
             otp_code = ''.join(random.choices(string.digits, k=6))
-            EmailVerificationOTP.objects.create(user=user, otp_code=otp_code)
+            otp_hash = hash_otp(otp_code)
+            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
             
-            # Send OTP email
             send_otp_email(user.email, otp_code)
-            
             user_data = UserResponseSerializer(user).data
             
             return Response({
-                'message': 'Company and admin registered. Please verify your email with the OTP sent.',
+                'message': 'Company registered. Please verify your email with the OTP sent.',
                 'user': user_data,
                 'requires_verification': True
             }, status=status.HTTP_201_CREATED)
@@ -108,18 +113,18 @@ class CompanySignupView(APIView):
 
 class RecruiterSignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'signup'
+
     def post(self, request, *args, **kwargs):
         serializer = RecruiterSignupSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             
-            # Generate OTP
             otp_code = ''.join(random.choices(string.digits, k=6))
-            EmailVerificationOTP.objects.create(user=user, otp_code=otp_code)
+            otp_hash = hash_otp(otp_code)
+            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
             
-            # Send OTP email
             send_otp_email(user.email, otp_code)
-            
             user_data = UserResponseSerializer(user).data
             
             return Response({
@@ -130,67 +135,9 @@ class RecruiterSignupView(APIView):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CompanyProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_company(self, user):
-        try:
-            # Find company linked to this user
-            adv_account = AdvertiserAccounts.objects.get(user=user)
-            return adv_account.company
-        except AdvertiserAccounts.DoesNotExist:
-            return None
-
-    def get(self, request):
-        company = self.get_company(request.user)
-        if not company:
-            return Response({"error": "No company associated with this user."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CompanyProfileSerializer(company)
-        return Response(serializer.data)
-
-    def patch(self, request):
-        company = self.get_company(request.user)
-        if not company:
-            return Response({"error": "No company associated with this user."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CompanyProfileSerializer(company, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CandidateProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_job_seeker(self, user):
-        try:
-            return JobSeekers.objects.get(user=user)
-        except JobSeekers.DoesNotExist:
-            return None
-
-    def get(self, request):
-        job_seeker = self.get_job_seeker(request.user)
-        if not job_seeker:
-            return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CandidateProfileSerializer(job_seeker)
-        return Response(serializer.data)
-
-    def patch(self, request):
-        job_seeker = self.get_job_seeker(request.user)
-        if not job_seeker:
-            return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CandidateProfileSerializer(job_seeker, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class SocialLoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'login'
 
     def post(self, request, *args, **kwargs):
         serializer = SocialAuthSerializer(data=request.data)
@@ -224,13 +171,11 @@ class SocialLoginView(APIView):
             user.set_unusable_password()
             user.save()
         else:
-            # If user exists, ensure they are verified (social verified)
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
 
         if created:
-            # Create JobSeeker profile
             full_name = f"{user_info.get('first_name', '')} {user_info.get('last_name', '')}".strip()
             JobSeekers.objects.create(
                 user=user,
@@ -249,6 +194,7 @@ class SocialLoginView(APIView):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'otp'
 
     def post(self, request, *args, **kwargs):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -260,29 +206,59 @@ class VerifyOTPView(APIView):
 
         try:
             user = CustomUser.objects.get(email=email)
-            otp_record = EmailVerificationOTP.objects.filter(user=user, otp_code=otp_code).latest('created_at')
-            
-            # Check for expiry (e.g., 10 minutes)
-            from django.utils import timezone
-            if (timezone.now() - otp_record.created_at).total_seconds() > 600:
-                return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Success
-            user.is_verified = True
-            user.is_active = True
-            user.save()
-            
-            # Cleanup OTPs for this user
-            EmailVerificationOTP.objects.filter(user=user).delete()
-            
-            tokens = get_tokens_for_user(user)
-            user_data = UserResponseSerializer(user).data
-            
-            return Response({
-                'message': 'Email verified successfully.',
-                'user': user_data,
-                'tokens': tokens
-            }, status=status.HTTP_200_OK)
-
-        except (CustomUser.DoesNotExist, EmailVerificationOTP.DoesNotExist):
+        except CustomUser.DoesNotExist:
             return Response({'error': 'Invalid OTP or email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            otp_record = EmailVerificationOTP.objects.filter(user=user).latest('created_at')
+        except EmailVerificationOTP.DoesNotExist:
+            return Response({'error': 'No active OTP found for this email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if otp_record.attempts >= 5:
+            return Response({'error': 'This OTP is locked due to too many failed attempts. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if (timezone.now() - otp_record.created_at).total_seconds() > 600:
+            return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        otp_hash_attempt = hash_otp(otp_code)
+        if otp_record.otp_hash != otp_hash_attempt:
+            otp_record.attempts += 1
+            otp_record.save()
+            remaining = 5 - otp_record.attempts
+            if remaining <= 0:
+                return Response({'error': 'Too many failed attempts. This OTP has been locked. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error': f'Invalid OTP code. {remaining} attempts remaining.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.is_verified = True
+        user.is_active = True
+        user.save()
+        
+        EmailVerificationOTP.objects.filter(user=user).delete()
+        
+        tokens = get_tokens_for_user(user)
+        user_data = UserResponseSerializer(user).data
+        
+        return Response({
+            'message': 'Email verified successfully.',
+            'user': user_data,
+            'tokens': tokens
+        }, status=status.HTTP_200_OK)
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_scope = 'token_refresh'
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

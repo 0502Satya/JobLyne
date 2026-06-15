@@ -17,7 +17,7 @@ export default function SignupPage() {
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-2 text-primary font-bold text-2xl group">
             <span className="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">hub</span>
-            <span>SkillSync</span>
+            <span>JobLyne</span>
           </Link>
           <h1 className="text-2xl font-black text-text tracking-tight">Create an account</h1>
           <p className="text-muted text-sm">Join the network of top talent and top companies.</p>

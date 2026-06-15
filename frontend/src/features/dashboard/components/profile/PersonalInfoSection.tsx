@@ -1,84 +1,553 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
+import { Profile } from "@/types/profile";
 
 interface PersonalInfoSectionProps {
-  profile: any;
-  onEdit: () => void;
+  profile: Profile | null;
+  onChange: <K extends keyof Profile>(field: K, value: Profile[K]) => void;
 }
 
-export default function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProps) {
-  const details = [
-    { label: "Date of Birth", value: profile?.date_of_birth || "Add Date", icon: "cake" },
-    { label: "Gender", value: profile?.gender || "Add Gender", icon: "person" },
-    { label: "Marital Status", value: profile?.marital_status || "Add Status", icon: "favorite" },
-    { label: "Hometown", value: profile?.hometown || "Add Hometown", icon: "home" },
-    { label: "Pincode", value: profile?.pincode || "Add Pincode", icon: "pin_drop" },
-    { label: "Category", value: profile?.category || "General", icon: "category" },
-  ];
+export default function PersonalInfoSection({ profile, onChange }: PersonalInfoSectionProps) {
+  // Crop Tool Modal state
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffset, setCropOffset] = useState({ x: 0, y: 0 });
+  const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
+
+  // Resume state
+  const [resumeFile, setResumeFile] = useState<string | null>(profile?.resume_file_url ? "Resume uploaded" : null);
+  const [parsingProgress, setParsingProgress] = useState(0);
+  const [isParsing, setIsParsing] = useState(false);
+
+  // Edit Mode state
+  const [isEditing, setIsEditing] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+
+  // Photo Crop/Zoom Handler
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const url = URL.createObjectURL(e.target.files[0]);
+      setTempPhotoUrl(url);
+      setShowCropModal(true);
+    }
+  };
+
+  const handleApplyCrop = () => {
+    if (tempPhotoUrl) {
+      onChange("profile_photo_url", tempPhotoUrl);
+      setShowCropModal(false);
+    }
+  };
+
+  // Resume drag & drop
+  const handleResumeDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processResume(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleResumeFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processResume(e.target.files[0]);
+    }
+  };
+
+  const processResume = (file: File) => {
+    setIsParsing(true);
+    setParsingProgress(10);
+    const interval = setInterval(() => {
+      setParsingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsParsing(false);
+          setResumeFile(file.name);
+          onChange("resume_file_url", URL.createObjectURL(file));
+          // Pre-populate professional headline from file name as helper
+          if (!profile?.headline) {
+            onChange("headline", `${file.name.replace(/\.[^/.]+$/, "")} Expert`);
+          }
+          return 100;
+        }
+        return prev + 30;
+      });
+    }, 400);
+  };
+
+  const isComplete = !!(profile?.first_name && profile?.last_name && profile?.email && profile?.phone);
 
   return (
-    <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-slate-200/50 mb-8 border border-slate-100">
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500">
-            <span className="material-symbols-outlined text-2xl font-black">person</span>
+    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="personal">
+      {/* Card Header */}
+      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
+            <span className="material-symbols-outlined text-xl">person</span>
           </div>
           <div>
-            <h3 className="text-xl font-black text-slate-800 tracking-tight leading-none mb-1">Personal Details</h3>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Basic info and preferences</p>
+            <h3 className="text-base font-bold text-text leading-tight font-display">Personal Details & Resume</h3>
+            <p className="text-xs text-muted mt-0.5 font-display">Your professional contact and identity details</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-            <button 
-                onClick={onEdit}
-                className="px-6 py-2.5 bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white hover:text-primary transition-all border border-slate-100 flex items-center gap-2"
-            >
-                <span className="material-symbols-outlined text-sm font-black">edit</span>
-                Edit
-            </button>
-            <button className="px-6 py-2.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary hover:text-white transition-all border border-primary/10">
-                Save
-            </button>
+          <button
+            type="button"
+            onClick={() => setIsEditing(!isEditing)}
+            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
+          >
+            <span className="material-symbols-outlined text-sm font-bold">
+              {isEditing ? "check" : "edit"}
+            </span>
+            {isEditing ? "Done" : "Edit"}
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-        {details.map((detail, i) => (
-          <div key={i} className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.1em]">
-               <span className="material-symbols-outlined text-[14px] text-amber-500/60">{detail.icon}</span>
-               {detail.label}
+      {/* Card Body */}
+      <div className="p-5 sm:p-6 bg-card space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-8">
+          {/* Left Column: Photo & Resume Drop */}
+          <div className="flex flex-col items-center gap-6">
+            {/* Profile Photo */}
+            <div className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-border shadow-xs bg-bg flex items-center justify-center">
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="material-symbols-outlined text-3xl text-muted/60">add_a_photo</span>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-0 bg-slate-900/60 text-white opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-[10px] font-bold cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base mb-1">edit</span>
+                Upload Photo
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoUpload}
+                accept="image/*"
+                className="hidden"
+              />
             </div>
-            <div className="text-[15px] font-black text-slate-700 ml-6">{detail.value}</div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Languages */}
-      <div className="mt-12 pt-10 border-t border-slate-50">
-         <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-500">
-               <span className="material-symbols-outlined text-sm font-black">translate</span>
-            </div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Languages Known</span>
-         </div>
-         <div className="flex flex-wrap gap-3">
-            {profile?.languages?.map((lang: any, i: number) => (
-               <div key={i} className="group flex items-center gap-3 pl-4 pr-1 py-1 bg-white border border-slate-100 rounded-[14px] shadow-sm hover:border-primary/20 transition-all">
-                  <span className="text-xs font-black text-slate-600">{lang.name}</span>
-                  <div className="px-3 py-1 bg-primary/5 text-primary text-[9px] font-black uppercase rounded-lg">
-                    {lang.proficiency}
+
+            {/* Resume Upload Box */}
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleResumeDrop}
+              className="w-full border border-dashed border-border hover:border-primary/50 transition-all rounded-xl p-4 text-center cursor-pointer bg-bg/50 hover:bg-bg/90"
+              onClick={() => resumeInputRef.current?.click()}
+            >
+              <span className="material-symbols-outlined text-xl text-primary/80 mb-1 block">upload_file</span>
+              <span className="text-xs font-semibold text-text block mb-0.5">Drag Resume Here</span>
+              <span className="text-[10px] text-muted block">PDF, DOC or DOCX (Max 5MB)</span>
+              <input
+                type="file"
+                ref={resumeInputRef}
+                onChange={handleResumeFileSelect}
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+              />
+              {isParsing && (
+                <div className="mt-3 space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold text-primary uppercase tracking-wide">
+                    <span>Parsing...</span>
+                    <span>{parsingProgress}%</span>
                   </div>
-               </div>
-            )) || (
-                <button onClick={onEdit} className="px-5 py-2.5 bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white border border-dashed border-slate-200 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">add</span>
-                    Add Languages
-                </button>
+                  <div className="w-full bg-border h-1 rounded-full overflow-hidden">
+                    <div className="bg-primary h-full transition-all duration-350" style={{ width: `${parsingProgress}%` }}></div>
+                  </div>
+                </div>
+              )}
+              {resumeFile && !isParsing && (
+                <div className="mt-3 flex items-center justify-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 py-1.5 px-2 rounded-lg border border-emerald-500/20 truncate">
+                  <span className="material-symbols-outlined text-xs">check_circle</span>
+                  <span className="truncate">{resumeFile}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Details Info Form or Readonly View */}
+          <div className="min-w-0">
+            {isEditing ? (
+              /* EDIT MODE */
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">First Name</label>
+                    <input
+                      type="text"
+                      value={profile?.first_name || ""}
+                      onChange={(e) => onChange("first_name", e.target.value)}
+                      placeholder="John"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Middle Name</label>
+                    <input
+                      type="text"
+                      value={profile?.middle_name || ""}
+                      onChange={(e) => onChange("middle_name", e.target.value)}
+                      placeholder="David"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Last Name</label>
+                    <input
+                      type="text"
+                      value={profile?.last_name || ""}
+                      onChange={(e) => onChange("last_name", e.target.value)}
+                      placeholder="Doe"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-muted mb-1.5">Professional Headline</label>
+                  <input
+                    type="text"
+                    value={profile?.headline || ""}
+                    onChange={(e) => onChange("headline", e.target.value)}
+                    placeholder="e.g. Senior Frontend Architect | React & TypeScript specialist"
+                    className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Email Address</label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={profile?.email || ""}
+                        onChange={(e) => onChange("email", e.target.value)}
+                        placeholder="john.doe@example.com"
+                        className="w-full pl-3.5 pr-20 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                      />
+                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-xs font-bold">check_circle</span> Verified
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Phone Number</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={profile?.phone || ""}
+                        onChange={(e) => onChange("phone", e.target.value)}
+                        placeholder="+1 (555) 019-2834"
+                        className="w-full pl-3.5 pr-20 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                      />
+                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-xs font-bold">check_circle</span> Verified
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Date of Birth</label>
+                    <input
+                      type="date"
+                      value={profile?.date_of_birth || ""}
+                      onChange={(e) => onChange("date_of_birth", e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Gender</label>
+                    <select
+                      value={profile?.gender || ""}
+                      onChange={(e) => onChange("gender", e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                      <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Nationality</label>
+                    <input
+                      type="text"
+                      value={profile?.nationality || ""}
+                      onChange={(e) => onChange("nationality", e.target.value)}
+                      placeholder="Canadian"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Current Location</label>
+                    <input
+                      type="text"
+                      value={profile?.location || ""}
+                      onChange={(e) => onChange("location", e.target.value)}
+                      placeholder="Vancouver, BC"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Hometown</label>
+                    <input
+                      type="text"
+                      value={profile?.hometown || ""}
+                      onChange={(e) => onChange("hometown", e.target.value)}
+                      placeholder="Toronto"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted mb-1.5">Pincode</label>
+                    <input
+                      type="text"
+                      value={profile?.pincode || ""}
+                      onChange={(e) => onChange("pincode", e.target.value)}
+                      placeholder="V6B 1A1"
+                      className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-3 border-t border-border/40">
+                  <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Websites & Portfolios</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-muted mb-1">Portfolio</label>
+                      <input
+                        type="text"
+                        value={profile?.social_links?.portfolio || ""}
+                        onChange={(e) => {
+                          const links = { ...(profile?.social_links || {}), portfolio: e.target.value };
+                          onChange("social_links", links);
+                        }}
+                        placeholder="https://johndoe.dev"
+                        className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-muted mb-1">LinkedIn</label>
+                      <input
+                        type="text"
+                        value={profile?.social_links?.linkedin || ""}
+                        onChange={(e) => {
+                          const links = { ...(profile?.social_links || {}), linkedin: e.target.value };
+                          onChange("social_links", links);
+                        }}
+                        placeholder="https://linkedin.com/in/johndoe"
+                        className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-muted mb-1">GitHub</label>
+                      <input
+                        type="text"
+                        value={profile?.social_links?.github || ""}
+                        onChange={(e) => {
+                          const links = { ...(profile?.social_links || {}), github: e.target.value };
+                          onChange("social_links", links);
+                        }}
+                        placeholder="https://github.com/johndoe"
+                        className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* READONLY VIEW MODE */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">First Name</span>
+                  <span className="font-semibold text-text">{profile?.first_name || "Not specified"}</span>
+                </div>
+                {profile?.middle_name && (
+                  <div>
+                    <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Middle Name</span>
+                    <span className="font-semibold text-text">{profile.middle_name}</span>
+                  </div>
+                )}
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Last Name</span>
+                  <span className="font-semibold text-text">{profile?.last_name || "Not specified"}</span>
+                </div>
+                <div className="md:col-span-2">
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Professional Headline</span>
+                  <span className="font-semibold text-text break-words block">{profile?.headline || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Email Address</span>
+                  <span className="font-semibold text-text flex items-center gap-1.5">
+                    {profile?.email || "Not specified"}
+                    {profile?.email && (
+                      <span className="material-symbols-outlined text-sm text-emerald-500 font-bold" title="Verified">check_circle</span>
+                    )}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Phone Number</span>
+                  <span className="font-semibold text-text flex items-center gap-1.5">
+                    {profile?.phone || "Not specified"}
+                    {profile?.phone && (
+                      <span className="material-symbols-outlined text-sm text-emerald-500 font-bold" title="Verified">check_circle</span>
+                    )}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Date of Birth</span>
+                  <span className="font-semibold text-text">{profile?.date_of_birth || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Gender</span>
+                  <span className="font-semibold text-text">{profile?.gender || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Nationality</span>
+                  <span className="font-semibold text-text">{profile?.nationality || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Current Location</span>
+                  <span className="font-semibold text-text">{profile?.location || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Hometown</span>
+                  <span className="font-semibold text-text">{profile?.hometown || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Pincode</span>
+                  <span className="font-semibold text-text">{profile?.pincode || "Not specified"}</span>
+                </div>
+
+                {/* Websites & Portfolios Row */}
+                <div className="md:col-span-2 lg:col-span-3 pt-5 border-t border-border/60">
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-3">Websites & Portfolios</span>
+                  <div className="flex flex-wrap gap-3">
+                    {profile?.social_links?.portfolio && (
+                      <a
+                        href={profile.social_links.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-primary rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
+                      >
+                        <span className="material-symbols-outlined text-sm">link</span>
+                        Portfolio Website
+                      </a>
+                    )}
+                    {profile?.social_links?.linkedin && (
+                      <a
+                        href={profile.social_links.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-[#0A66C2] rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
+                      >
+                        <span className="material-symbols-outlined text-sm">work</span>
+                        LinkedIn Profile
+                      </a>
+                    )}
+                    {profile?.social_links?.github && (
+                      <a
+                        href={profile.social_links.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-text rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
+                      >
+                        <span className="material-symbols-outlined text-sm">code</span>
+                        GitHub Profile
+                      </a>
+                    )}
+                    {!profile?.social_links?.portfolio && !profile?.social_links?.linkedin && !profile?.social_links?.github && (
+                      <span className="text-xs text-muted italic">No websites or social profiles linked yet.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
-         </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Image Cropper Modal */}
+      {showCropModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[200] flex items-center justify-center p-4">
+          <div className="bg-card rounded-2xl p-6 max-w-sm w-full space-y-5 shadow-lg border border-border">
+            <div>
+              <h4 className="text-base font-bold text-text tracking-tight font-display">Adjust Profile Picture</h4>
+              <p className="text-xs text-muted mt-1 font-display">Position and zoom your photo to look your best.</p>
+            </div>
+
+            {/* Cropper viewport mock */}
+            <div className="w-full aspect-square rounded-xl overflow-hidden bg-bg border border-border flex items-center justify-center relative">
+              <div className="absolute inset-4 rounded-full border border-white/80 border-dashed z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]"></div>
+              {tempPhotoUrl && (
+                <img
+                  src={tempPhotoUrl}
+                  alt="Crop preview"
+                  className="max-w-none transition-transform"
+                  style={{
+                    transform: `scale(${cropZoom}) translate(${cropOffset.x}px, ${cropOffset.y}px)`,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Zoom Slider */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold text-muted uppercase">
+                <span>Zoom</span>
+                <span>{cropZoom.toFixed(1)}x</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.1"
+                value={cropZoom}
+                onChange={(e) => setCropZoom(parseFloat(e.target.value))}
+                className="w-full accent-primary"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCropModal(false)}
+                className="flex-1 py-2.5 text-text hover:bg-bg bg-card font-bold text-xs rounded-lg transition-all min-h-[44px] border border-border cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleApplyCrop}
+                className="flex-1 py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/95 transition-all min-h-[44px] shadow-sm cursor-pointer"
+              >
+                Apply Crop
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

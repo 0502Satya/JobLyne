@@ -1,0 +1,8 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+scripts/
+apps/users/generated_models.py
+.git/
+.env

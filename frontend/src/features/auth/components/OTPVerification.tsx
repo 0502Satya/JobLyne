@@ -14,6 +14,12 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
   const [timer, setTimer] = useState(600); // 10 minutes
 
   useEffect(() => {
+    if (state?.success) {
+      window.location.href = "/dashboard";
+    }
+  }, [state]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setTimer((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
