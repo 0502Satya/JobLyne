@@ -48,6 +48,8 @@ yarn-error.log*
 
 # Environment & Sensitive
 .env*
+backend/.env
+frontend/.env.local
 !.env.template
 !.env.example
 *.pem

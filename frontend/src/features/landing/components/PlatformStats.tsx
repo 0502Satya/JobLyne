@@ -1,6 +1,6 @@
 /**
  * This section shows some big numbers about the platform.
- * It helps build trust by showing how many people and companies use SkillSync.
+ * It helps build trust by showing how many people and companies use JobLyne.
  */
 export default function PlatformStats() {
     const stats = [

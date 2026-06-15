@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SkillSync - Your AI-Powered Career Intelligence Platform",
-  description: "SkillSync helps teams find skill gaps, plan growth, and track success with precision.",
+  title: "JobLyne - Your AI-Powered Career Intelligence Platform",
+  description: "JobLyne helps teams find skill gaps, plan growth, and track success with precision.",
 };
 
 /**

@@ -50,7 +50,7 @@ export default function ProfileHeader({ onSave, onDiscard, isDark, toggleDark }:
         
         <button 
           onClick={onSave}
-          className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-primary/20 flex items-center gap-1.5"
+          className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-sm shadow-primary/20 flex items-center gap-1.5"
         >
           <span className="material-symbols-outlined text-base">save</span> Save Changes
         </button>

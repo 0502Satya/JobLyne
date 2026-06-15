@@ -22,11 +22,12 @@ export default function Hero() {
                     </h1>
 
                     {/* The search box for jobs and locations */}
-                    <div className="bg-surface p-2 rounded-2xl shadow-2xl border border-border flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
+                    <form action="/dashboard" method="GET" className="bg-surface p-2 rounded-2xl shadow-2xl border border-border flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
                         {/* Input for Job titles */}
                         <div className="flex-1 flex items-center px-4 py-3 gap-3 border-b md:border-b-0 md:border-r border-border">
                             <span className="material-symbols-outlined text-muted">search</span>
                             <input
+                                name="query"
                                 className="w-full bg-transparent border-none focus:ring-0 text-text placeholder:text-muted outline-none"
                                 placeholder="Job title, keywords, or company"
                                 type="text"
@@ -36,16 +37,17 @@ export default function Hero() {
                         <div className="flex-1 flex items-center px-4 py-3 gap-3">
                             <span className="material-symbols-outlined text-muted">location_on</span>
                             <input
+                                name="location"
                                 className="w-full bg-transparent border-none focus:ring-0 text-text placeholder:text-muted outline-none"
                                 placeholder="Location"
                                 type="text"
                             />
                         </div>
                         {/* The blue button to start the search */}
-                        <button className="bg-btn-primary text-surface font-bold px-8 py-4 rounded-xl hover:bg-btn-primary-hover transition-all">
+                        <button type="submit" className="bg-btn-primary text-surface font-bold px-8 py-4 rounded-xl hover:bg-btn-primary-hover transition-all">
                             Find Jobs
                         </button>
-                    </div>
+                    </form>
 
                     {/* Some common job titles as suggestions */}
                     <p className="mt-6 text-muted text-sm">

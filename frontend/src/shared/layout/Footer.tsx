@@ -17,7 +17,7 @@ export default function Footer() {
                                     <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
                                 </svg>
                             </div>
-                            <span className="text-xl font-bold text-text tracking-tight">SkillSync</span>
+                            <span className="text-xl font-bold text-text tracking-tight">JobLyne</span>
                         </div>
                         <p className="text-muted text-sm mb-6 max-w-xs leading-relaxed font-medium transition-colors">
                             One Stop Solution For Your Career Intelligence.
@@ -79,7 +79,7 @@ export default function Footer() {
 
                 {/* Simple copyright line at the very bottom */}
                 <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-xs text-muted">© 2026 SkillSync AI Inc. All rights reserved.</p>
+                    <p className="text-xs text-muted">© 2026 JobLyne AI Inc. All rights reserved.</p>
                     <div className="flex items-center gap-6">
                         <button className="text-xs text-muted flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">language</span>

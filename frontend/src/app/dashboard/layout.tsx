@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
 import DashboardSidebar from "@/features/dashboard/components/DashboardSidebar";
 import { getCandidateProfileAction, getDashboardStatsAction } from "@/features/auth/actions";
@@ -10,6 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,12 @@ export default function DashboardLayout({
         getDashboardStatsAction()
       ]);
 
-      if (!profileData.error) setProfile(profileData);
+      if (profileData.error) {
+        window.location.href = "/auth/signin";
+        return;
+      }
+
+      setProfile(profileData);
       if (!statsData.error) setStats(statsData);
 
       setLoading(false);
@@ -41,6 +48,8 @@ export default function DashboardLayout({
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2)
     : "AL";
 
+  const isProfilePage = pathname === "/dashboard/profile";
+
   return (
     <div className="bg-bg min-h-screen flex flex-col w-full overflow-x-hidden">
       <DashboardHeader
@@ -50,12 +59,14 @@ export default function DashboardLayout({
       />
 
       <div className="flex flex-1 w-full max-w-[1440px] mx-auto">
-        <DashboardSidebar 
-          profile={profile}
-          stats={stats}
-        />
+        {!isProfilePage && (
+          <DashboardSidebar 
+            profile={profile}
+            stats={stats}
+          />
+        )}
 
-        <main className="flex-1 p-6 md:p-10 overflow-x-hidden">
+        <main className={`flex-1 overflow-x-hidden ${isProfilePage ? "p-0" : "p-6 md:p-10"}`}>
           {children}
         </main>
       </div>

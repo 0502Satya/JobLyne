@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Button } from "@/shared/ui";
 import ThemeToggle from "@/shared/ui/ThemeToggle";
 
+const RECRUITER_URL = process.env.NEXT_PUBLIC_RECRUITER_URL || "http://recruiter.localhost:3000";
+const COMPANY_URL = process.env.NEXT_PUBLIC_COMPANY_URL || "http://company.localhost:3000";
+
 /**
  * The navigation bar at the top of the page.
  * It stays at the top when you scroll (sticky).
@@ -32,13 +35,13 @@ export default function Navbar() {
                                 />
                             </svg>
                         </div>
-                        <span className="text-lg sm:text-xl font-black tracking-tighter text-text">SkillSync</span>
+                        <span className="text-lg sm:text-xl font-black tracking-tighter text-text">JobLyne</span>
                     </Link>
                     <nav className="hidden md:flex items-center gap-6">
-                        <Link href="#" className="text-sm font-bold text-muted hover:text-primary transition-colors">Jobs</Link>
-                        <Link href="#" className="text-sm font-bold text-muted hover:text-primary transition-colors">Courses</Link>
-                        <Link href="#" className="text-sm font-bold text-muted hover:text-primary transition-colors">Recruiters</Link>
-                        <Link href="#" className="text-sm font-bold text-muted hover:text-primary transition-colors">Institutes</Link>
+                        <Link href="/dashboard" className="text-sm font-bold text-muted hover:text-primary transition-colors">Jobs</Link>
+                        <Link href="/dashboard/jobs" className="text-sm font-bold text-muted hover:text-primary transition-colors">Courses</Link>
+                        <Link href={`${RECRUITER_URL}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Recruiters</Link>
+                        <Link href={`${COMPANY_URL}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Institutes</Link>
                     </nav>
                 </div>
 
@@ -75,23 +78,23 @@ export default function Navbar() {
             {isMenuOpen && (
                 <div className="sm:hidden absolute top-full left-0 w-full bg-surface border-b border-border shadow-xl py-6 px-4 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-300 z-50">
                     <nav className="flex flex-col gap-4">
-                        <Link onClick={() => setIsMenuOpen(false)} href="#" className="text-base font-bold text-text py-3 border-b border-border/50">Jobs</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href="#" className="text-base font-bold text-text py-3 border-b border-border/50">Courses</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href="#" className="text-base font-bold text-text py-3 border-b border-border/50">Recruiters</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href="#" className="text-base font-bold text-text py-3">Institutes</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href="/dashboard" className="text-base font-bold text-text py-3 border-b border-border/50">Jobs</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href="/dashboard/jobs" className="text-base font-bold text-text py-3 border-b border-border/50">Courses</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${RECRUITER_URL}/auth/signin`} className="text-base font-bold text-text py-3 border-b border-border/50">Recruiters</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${COMPANY_URL}/auth/signin`} className="text-base font-bold text-text py-3">Institutes</Link>
                     </nav>
 
                     <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                         <AuthActions isMobile={true} />
                         <div className="grid grid-cols-2 gap-3 mt-2">
                            <Link 
-                                href="http://recruiter.localhost:3000/auth/signin"
+                                href={`${RECRUITER_URL}/auth/signin`}
                                 className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
                             >
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">Recruiter</span>
                             </Link>
                             <Link 
-                                href="http://company.localhost:3000/auth/signin"
+                                href={`${COMPANY_URL}/auth/signin`}
                                 className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
                             >
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">Company</span>
@@ -180,14 +183,14 @@ function EmployerDropdown() {
             >
                 <div className="bg-surface border border-border rounded-2xl shadow-2xl p-2 overflow-hidden">
                     <Link 
-                        href="http://recruiter.localhost:3000/auth/signin"
+                        href={`${RECRUITER_URL}/auth/signin`}
                         className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
                     >
                         <span className="text-sm font-black group-hover:text-primary transition-colors">Recruiter Portal</span>
                         <span className="text-[10px] text-slate-500 font-bold">Find and vet top talent quickly.</span>
                     </Link>
                     <Link 
-                        href="http://company.localhost:3000/auth/signin"
+                        href={`${COMPANY_URL}/auth/signin`}
                         className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group border-t border-slate-100 dark:border-slate-800/50"
                     >
                         <span className="text-sm font-black group-hover:text-primary transition-colors">Company Login</span>

@@ -1,14 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { logoutAction } from "@/features/auth/actions";
+import { logoutAction, getRecruiterProfileAction } from "@/features/auth/actions";
 
 /**
  * Specialized Dashboard for Recruiters.
  * Focused on candidate pipelines and sourcing metrics.
  */
 export default function RecruiterDashboardPage() {
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      const data = await getRecruiterProfileAction();
+      if (!data.error) {
+        setProfile(data);
+      }
+    }
+    fetchProfile();
+  }, []);
+
   return (
     <div className="min-h-screen bg-bg text-text transition-colors">
       
@@ -17,18 +29,47 @@ export default function RecruiterDashboardPage() {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-primary font-bold">
             <span className="material-symbols-outlined text-3xl">hub</span>
-            <span className="text-xl">SkillSync</span>
+            <span className="text-xl">JobLyne</span>
           </Link>
           <div className="h-6 w-px bg-border hidden md:block"></div>
           <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Recruiter Portal</span>
         </div>
         <div className="flex items-center gap-4">
-          <button className="p-2 text-muted hover:text-primary transition-colors">
+          <button className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center">
             <span className="material-symbols-outlined">search</span>
           </button>
+          <Link 
+            href="/recruiter/billing" 
+            className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            title="Billing & Wallet"
+          >
+            <span className="material-symbols-outlined">credit_card</span>
+          </Link>
+          <Link 
+            href="/recruiter/settings" 
+            className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            title="Settings"
+          >
+            <span className="material-symbols-outlined">settings</span>
+          </Link>
           <div className="flex items-center gap-3">
-             <div className="size-10 bg-primary rounded-full flex items-center justify-center text-surface font-bold">AB</div>
-             <button onClick={() => logoutAction()} className="text-xs font-bold text-muted hover:text-red-500 transition-colors uppercase tracking-wider">Logout</button>
+             {profile?.profile_photo_url ? (
+               <img 
+                 src={profile.profile_photo_url} 
+                 alt="Avatar" 
+                 className="size-10 rounded-full object-cover border border-border"
+               />
+             ) : (
+               <div className="size-10 bg-primary rounded-full flex items-center justify-center text-surface font-bold">
+                 {profile?.first_name ? profile.first_name.substring(0, 2).toUpperCase() : "RC"}
+               </div>
+             )}
+             <button 
+               onClick={() => logoutAction()} 
+               className="text-xs font-bold text-muted hover:text-red-500 transition-colors uppercase tracking-wider min-h-[44px] px-2 flex items-center"
+             >
+               Logout
+             </button>
           </div>
         </div>
       </header>
@@ -37,8 +78,12 @@ export default function RecruiterDashboardPage() {
         
         {/* Welcome Section */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-black tracking-tight text-text">Recruiter Dashboard</h1>
-          <p className="text-muted">Manage your candidate pipelines and sourcing performance.</p>
+          <h1 className="text-3xl font-black tracking-tight text-text">
+            Welcome back, {profile?.first_name || "Recruiter"}!
+          </h1>
+          <p className="text-muted">
+            Manage your candidate pipelines and sourcing performance{profile?.agency_name ? ` at ${profile.agency_name}` : ""}.
+          </p>
         </div>
 
         <section className="grid grid-cols-1 md:grid-cols-4 gap-6">

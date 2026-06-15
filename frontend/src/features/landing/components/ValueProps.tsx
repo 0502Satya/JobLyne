@@ -1,5 +1,5 @@
 /**
- * This section lists the main benefits of using SkillSync.
+ * This section lists the main benefits of using JobLyne.
  * Each benefit is shown inside a nice rounded card.
  */
 export default function ValueProps() {
@@ -35,7 +35,7 @@ export default function ValueProps() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* The main title of this section */}
                 <div className="text-center mb-16 px-4">
-                    <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-text mb-4 tracking-tight">The SkillSync Advantage</h2>
+                    <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-text mb-4 tracking-tight">The JobLyne Advantage</h2>
                     <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed">Everything you need to grow your career in one place.</p>
                 </div>
 

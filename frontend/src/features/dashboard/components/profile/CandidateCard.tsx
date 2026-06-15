@@ -30,7 +30,7 @@ export default function CandidateCard({
             )}
           </div>
         </div>
-        <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center border-4 border-white shadow-lg hover:scale-110 transition-transform">
+        <button className="absolute -bottom-2 -right-2 w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center border-4 border-white shadow-lg hover:scale-110 transition-transform">
           <span className="material-symbols-outlined text-xl">camera_alt</span>
         </button>
       </div>

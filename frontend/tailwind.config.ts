@@ -34,8 +34,8 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Outfit", "sans-serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-inter)", "sans-serif"],
       }
     },
   },
