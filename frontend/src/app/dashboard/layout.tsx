@@ -24,7 +24,9 @@ export default function DashboardLayout({
       ]);
 
       if (profileData.error) {
-        window.location.href = "/auth/signin";
+        // Clear invalid/unauthorized session cookies to prevent infinite redirect loop
+        const { logoutAction } = await import("@/features/auth/actions");
+        await logoutAction();
         return;
       }
 
