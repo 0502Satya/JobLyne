@@ -5,16 +5,31 @@ import Link from "next/link";
 import { Button } from "@/shared/ui";
 import ThemeToggle from "@/shared/ui/ThemeToggle";
 
-const RECRUITER_URL = process.env.NEXT_PUBLIC_RECRUITER_URL || "http://recruiter.localhost:3000";
-const COMPANY_URL = process.env.NEXT_PUBLIC_COMPANY_URL || "http://company.localhost:3000";
-
-/**
- * The navigation bar at the top of the page.
- * It stays at the top when you scroll (sticky).
- * It has the logo, links, and buttons like 'Log in' and 'Get Started'.
- */
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [recruiterUrl, setRecruiterUrl] = React.useState("/recruiter");
+    const [companyUrl, setCompanyUrl] = React.useState("/company");
+
+    React.useEffect(() => {
+        // Resolve URLs dynamically in browser to avoid environment variable baking issues
+        const getUrl = (subdomain: "recruiter" | "company") => {
+            const envVar = subdomain === "recruiter" 
+                ? process.env.NEXT_PUBLIC_RECRUITER_URL 
+                : process.env.NEXT_PUBLIC_COMPANY_URL;
+            if (envVar) return envVar;
+
+            const host = window.location.host;
+            const protocol = window.location.protocol;
+            const cleanHost = host.replace(/^(recruiter\.|company\.)/, "");
+            if (cleanHost.includes("localhost") || cleanHost.includes("127.0.0.1")) {
+                return `${protocol}//${subdomain}.${cleanHost}`;
+            }
+            return `https://${subdomain}.${cleanHost}`;
+        };
+
+        setRecruiterUrl(getUrl("recruiter"));
+        setCompanyUrl(getUrl("company"));
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border bg-surface/80 backdrop-blur-md transition-colors overflow-visible">
@@ -40,8 +55,8 @@ export default function Navbar() {
                     <nav className="hidden md:flex items-center gap-6">
                         <Link href="/dashboard" className="text-sm font-bold text-muted hover:text-primary transition-colors">Jobs</Link>
                         <Link href="/dashboard/jobs" className="text-sm font-bold text-muted hover:text-primary transition-colors">Courses</Link>
-                        <Link href={`${RECRUITER_URL}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Recruiters</Link>
-                        <Link href={`${COMPANY_URL}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Institutes</Link>
+                        <Link href={`${recruiterUrl}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Recruiters</Link>
+                        <Link href={`${companyUrl}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Institutes</Link>
                     </nav>
                 </div>
 
@@ -58,7 +73,7 @@ export default function Navbar() {
                     <div className="hidden sm:flex items-center gap-2 border-l border-border pl-4 ml-2">
                         <AuthActions isMobile={false} />
                         <div className="h-6 w-px bg-border mx-2 hidden lg:block"></div>
-                        <EmployerDropdown />
+                        <EmployerDropdown recruiterUrl={recruiterUrl} companyUrl={companyUrl} />
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -80,21 +95,21 @@ export default function Navbar() {
                     <nav className="flex flex-col gap-4">
                         <Link onClick={() => setIsMenuOpen(false)} href="/dashboard" className="text-base font-bold text-text py-3 border-b border-border/50">Jobs</Link>
                         <Link onClick={() => setIsMenuOpen(false)} href="/dashboard/jobs" className="text-base font-bold text-text py-3 border-b border-border/50">Courses</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${RECRUITER_URL}/auth/signin`} className="text-base font-bold text-text py-3 border-b border-border/50">Recruiters</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${COMPANY_URL}/auth/signin`} className="text-base font-bold text-text py-3">Institutes</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${recruiterUrl}/auth/signin`} className="text-base font-bold text-text py-3 border-b border-border/50">Recruiters</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${companyUrl}/auth/signin`} className="text-base font-bold text-text py-3">Institutes</Link>
                     </nav>
 
                     <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                         <AuthActions isMobile={true} />
                         <div className="grid grid-cols-2 gap-3 mt-2">
                            <Link 
-                                href={`${RECRUITER_URL}/auth/signin`}
+                                href={`${recruiterUrl}/auth/signin`}
                                 className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
                             >
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">Recruiter</span>
                             </Link>
                             <Link 
-                                href={`${COMPANY_URL}/auth/signin`}
+                                href={`${companyUrl}/auth/signin`}
                                 className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
                             >
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">Company</span>
@@ -161,7 +176,7 @@ function AuthActions({ isMobile }: { isMobile?: boolean }) {
 /**
  * Dropdown for recruiter and company portals. (Desktop only)
  */
-function EmployerDropdown() {
+function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; companyUrl: string }) {
     const [isOpen, setIsOpen] = React.useState(false);
 
     return (
@@ -183,14 +198,14 @@ function EmployerDropdown() {
             >
                 <div className="bg-surface border border-border rounded-2xl shadow-2xl p-2 overflow-hidden">
                     <Link 
-                        href={`${RECRUITER_URL}/auth/signin`}
+                        href={`${recruiterUrl}/auth/signin`}
                         className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
                     >
                         <span className="text-sm font-black group-hover:text-primary transition-colors">Recruiter Portal</span>
                         <span className="text-[10px] text-slate-500 font-bold">Find and vet top talent quickly.</span>
                     </Link>
                     <Link 
-                        href={`${COMPANY_URL}/auth/signin`}
+                        href={`${companyUrl}/auth/signin`}
                         className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group border-t border-slate-100 dark:border-slate-800/50"
                     >
                         <span className="text-sm font-black group-hover:text-primary transition-colors">Company Login</span>
@@ -201,3 +216,4 @@ function EmployerDropdown() {
         </div>
     );
 }
+
