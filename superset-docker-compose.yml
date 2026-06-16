@@ -1,0 +1,152 @@
+# Production-oriented compose file for INTILLO_BI (Superset-based)
+# Modified to run behind Host Nginx
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    env_file:
+      - path: docker/.env
+        required: true
+      - path: docker/.env-local
+        required: true
+    volumes:
+      - db_home:/var/lib/postgresql/data
+      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  superset:
+    build:
+      context: .
+      target: lean
+      args:
+        DEV_MODE: "false"
+        BUILD_TRANSLATIONS: "false"
+    restart: unless-stopped
+    env_file:
+      - path: docker/.env
+        required: true
+      - path: docker/.env-local
+        required: true
+    environment:
+      SUPERSET_ENV: production
+      FLASK_DEBUG: "false"
+      SUPERSET_CONFIG_PATH: /app/docker/pythonpath_prod/superset_config.py
+    command:
+      - gunicorn
+      - --bind
+      - 0.0.0.0:8088
+      - --workers
+      - "${SERVER_WORKER_AMOUNT:-2}"
+      - --threads
+      - "${SERVER_THREADS_AMOUNT:-20}"
+      - --timeout
+      - "${GUNICORN_TIMEOUT:-120}"
+      - --keep-alive
+      - "${GUNICORN_KEEPALIVE:-5}"
+      - --limit-request-line
+      - "0"
+      - --limit-request-field_size
+      - "0"
+      - superset.app:create_app()
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:8088:8088"
+    volumes:
+      - superset_home:/app/superset_home
+      - ./docker/pythonpath_prod:/app/docker/pythonpath_prod:ro
+
+  superset-init:
+    build:
+      context: .
+      target: lean
+      args:
+        DEV_MODE: "false"
+        BUILD_TRANSLATIONS: "false"
+    env_file:
+      - path: docker/.env
+        required: true
+      - path: docker/.env-local
+        required: true
+    environment:
+      SUPERSET_ENV: production
+      FLASK_DEBUG: "false"
+      SUPERSET_CONFIG_PATH: /app/docker/pythonpath_prod/superset_config.py
+    command: ["/app/docker/docker-init.sh"]
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    volumes:
+      - superset_home:/app/superset_home
+      - ./docker/pythonpath_prod:/app/docker/pythonpath_prod:ro
+    healthcheck:
+      disable: true
+
+  superset-worker:
+    build:
+      context: .
+      target: lean
+      args:
+        DEV_MODE: "false"
+        BUILD_TRANSLATIONS: "false"
+    restart: unless-stopped
+    env_file:
+      - path: docker/.env
+        required: true
+      - path: docker/.env-local
+        required: true
+    environment:
+      SUPERSET_ENV: production
+      SUPERSET_CONFIG_PATH: /app/docker/pythonpath_prod/superset_config.py
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    volumes:
+      - superset_home:/app/superset_home
+      - ./docker/pythonpath_prod:/app/docker/pythonpath_prod:ro
+    healthcheck:
+      disable: true
+
+  superset-worker-beat:
+    build:
+      context: .
+      target: lean
+      args:
+        DEV_MODE: "false"
+        BUILD_TRANSLATIONS: "false"
+    restart: unless-stopped
+    env_file:
+      - path: docker/.env
+        required: true
+      - path: docker/.env-local
+        required: true
+    environment:
+      SUPERSET_ENV: production
+      SUPERSET_CONFIG_PATH: /app/docker/pythonpath_prod/superset_config.py
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    volumes:
+      - superset_home:/app/superset_home
+      - ./docker/pythonpath_prod:/app/docker/pythonpath_prod:ro
+    healthcheck:
+      disable: true
+
+volumes:
+  superset_home:
+    external: false
+  db_home:
+    external: false
+  redis:
+    external: false
