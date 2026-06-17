@@ -19,31 +19,33 @@ export async function middleware(request: NextRequest) {
 
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
-    throw new Error('JWT_SECRET environment variable is required');
+    console.error('JWT_SECRET environment variable is missing! Protected routes will be inaccessible.');
   }
-  const secret = new TextEncoder().encode(jwtSecret);
+  const secret = jwtSecret ? new TextEncoder().encode(jwtSecret) : null;
 
-  if (token) {
-    try {
-      await jwtVerify(token, secret);
-      isLoggedIn = true;
-    } catch {
-      // Access token invalid/expired, check refresh token
-      if (refreshToken) {
-        try {
-          await jwtVerify(refreshToken, secret);
-          isLoggedIn = true;
-        } catch {
-          isLoggedIn = false;
+  if (secret) {
+    if (token) {
+      try {
+        await jwtVerify(token, secret);
+        isLoggedIn = true;
+      } catch {
+        // Access token invalid/expired, check refresh token
+        if (refreshToken) {
+          try {
+            await jwtVerify(refreshToken, secret);
+            isLoggedIn = true;
+          } catch {
+            isLoggedIn = false;
+          }
         }
       }
-    }
-  } else if (refreshToken) {
-    try {
-      await jwtVerify(refreshToken, secret);
-      isLoggedIn = true;
-    } catch {
-      isLoggedIn = false;
+    } else if (refreshToken) {
+      try {
+        await jwtVerify(refreshToken, secret);
+        isLoggedIn = true;
+      } catch {
+        isLoggedIn = false;
+      }
     }
   }
 
@@ -156,7 +158,13 @@ export async function middleware(request: NextRequest) {
 
   // If logged in and on an auth page, redirect to dashboard
   if (isLoggedIn && isAuthPage) {
-    url.pathname = '/dashboard';
+    if (userRole === 'COMPANY') {
+      url.pathname = '/';
+    } else if (userRole === 'RECRUITER') {
+      url.pathname = '/dashboard';
+    } else {
+      url.pathname = '/dashboard';
+    }
     return NextResponse.redirect(url);
   }
 

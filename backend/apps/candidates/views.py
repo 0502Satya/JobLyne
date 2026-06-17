@@ -166,4 +166,20 @@ class CandidateComparisonView(APIView):
         )
 
         serializer = CandidateProfileSerializer(seekers, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+
+        from apps.companies.models import CreditAuditLogs
+        unlocked_ids = set(
+            CreditAuditLogs.objects.filter(
+                user=request.user,
+                action_type="UNLOCK_CANDIDATE"
+            ).values_list('reference_id', flat=True)
+        )
+
+        for candidate_data in data:
+            candidate_id = candidate_data.get('id')
+            if candidate_id not in unlocked_ids:
+                candidate_data['phone'] = None
+                candidate_data['whatsapp_number'] = None
+
+        return Response(data)

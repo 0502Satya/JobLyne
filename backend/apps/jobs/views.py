@@ -152,11 +152,10 @@ class JobListView(APIView):
                 adv_account = AdvertiserAccounts.objects.get(user=request.user)
                 company = adv_account.company
             except AdvertiserAccounts.DoesNotExist:
-                company = Companies.objects.create(
-                    name=f"{request.user.email.split('@')[0]} Company",
-                    industry="Technology"
+                return Response(
+                    {"error": "No advertiser account associated with this company user. Please complete company profile onboarding first."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
-                AdvertiserAccounts.objects.create(user=request.user, company=company)
         elif request.user.account_type == 'RECRUITER':
             try:
                 recruiter = Recruiters.objects.get(user=request.user)
@@ -208,7 +207,10 @@ class JobListView(APIView):
         if skills_list:
             for skill_name in skills_list:
                 if skill_name:
-                    skill, _ = Skills.objects.get_or_create(name=skill_name)
+                    clean_name = skill_name.strip()
+                    skill = Skills.objects.filter(name__iexact=clean_name).first()
+                    if not skill:
+                        skill = Skills.objects.create(name=clean_name)
                     JobSkills.objects.create(job=job, skill=skill, is_required=True)
 
         serializer = JobSerializer(job)
@@ -418,6 +420,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         if not interview_time:
             return Response({"error": "interview_schedule date-time is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+        prev_status = application.status
         application.interview_schedule = interview_time
         application.status = 'INTERVIEW'
         application.save()
@@ -425,7 +428,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         from apps.jobs.models import ApplicationStatusHistory
         ApplicationStatusHistory.objects.create(
             application=application,
-            previous_status=application.status,
+            previous_status=prev_status,
             new_status='INTERVIEW',
             changed_by_user=user,
             changed_at=timezone.now(),

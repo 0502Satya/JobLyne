@@ -6,17 +6,22 @@ class JobSerializer(serializers.ModelSerializer):
     company_logo = serializers.CharField(source='company.logo_url', read_only=True)
     skills = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    applicant_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Jobs
         fields = [
             'id', 'title', 'company_name', 'company_logo', 'description', 
             'requirements', 'location', 'employment_type', 'experience_required',
-            'salary_min', 'salary_max', 'currency', 'posted_at', 'status', 'skills'
+            'salary_min', 'salary_max', 'currency', 'posted_at', 'status', 'skills',
+            'applicant_count'
         ]
 
     def get_skills(self, obj):
         return [link.skill.name for link in obj.job_skills_job.all() if link.skill]
+
+    def get_applicant_count(self, obj):
+        return obj.applications_job.count()
 
     def get_location(self, obj):
         if obj.location:

@@ -22,7 +22,10 @@ export default function RecruiterSigninPage() {
       if (res?.error) {
         setError(res.error);
       } else if (res?.success) {
-        window.location.href = "/dashboard";
+        const role = res.role;
+        if (role === 'COMPANY') window.location.href = '/company';
+        else if (role === 'RECRUITER') window.location.href = '/recruiter/dashboard';
+        else window.location.href = '/dashboard';
         return;
       }
     } catch (err) {

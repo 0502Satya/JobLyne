@@ -91,6 +91,7 @@ class Applications(models.Model):
 
     class Meta:
         db_table = 'applications'
+        unique_together = [['job', 'job_seeker']]
         indexes = [
             models.Index(fields=['status']),
             models.Index(fields=['job_seeker', 'status']),

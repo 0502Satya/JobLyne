@@ -1,3 +1,4 @@
+import uuid
 import hashlib
 from rest_framework import status
 from rest_framework.views import APIView
@@ -12,6 +13,21 @@ from apps.companies.models import Companies, Recruiters
 from apps.commerce.models import AdvertiserAccounts
 from apps.companies.serializers import CompanyProfileSerializer, RecruiterProfileSerializer
 from apps.users.pagination import StandardPagination
+from django.db import IntegrityError, transaction
+
+def get_or_create_recruiter(user, agency_name):
+    try:
+        return Recruiters.objects.get(user=user)
+    except Recruiters.DoesNotExist:
+        try:
+            with transaction.atomic():
+                recruiter, _ = Recruiters.objects.get_or_create(
+                    user=user,
+                    defaults={"agency_name": agency_name}
+                )
+                return recruiter
+        except IntegrityError:
+            return Recruiters.objects.get(user=user)
 
 def get_gradient_for_id(seeker_id: str) -> str:
     """
@@ -138,8 +154,10 @@ def parse_boolean_query(query_str):
                 
         if eval_stack:
             return eval_stack[0]
-    except Exception:
-        pass
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error parsing boolean query '{query_str}': {str(e)}", exc_info=True)
         
     return get_term_q(query_str)
 
@@ -154,10 +172,7 @@ class RecruiterDashboardDataView(APIView):
         fname = getattr(request.user, 'first_name', '') or ''
         lname = getattr(request.user, 'last_name', '') or ''
         agency_name = f"{fname} {lname}".strip() or agency_default
-        recruiter, _ = Recruiters.objects.get_or_create(
-            user=request.user,
-            defaults={"agency_name": agency_name}
-        )
+        recruiter = get_or_create_recruiter(request.user, agency_name)
 
         query = request.query_params.get('query', '')
         seekers = JobSeekers.objects.filter(
@@ -279,10 +294,7 @@ class RecruiterCandidateActionView(APIView):
         fname = getattr(request.user, 'first_name', '') or ''
         lname = getattr(request.user, 'last_name', '') or ''
         agency_name = f"{fname} {lname}".strip() or agency_default
-        recruiter, _ = Recruiters.objects.get_or_create(
-            user=request.user,
-            defaults={"agency_name": agency_name}
-        )
+        recruiter = get_or_create_recruiter(request.user, agency_name)
 
         candidate_id = request.data.get('candidate_id')
         action = request.data.get('action')
@@ -310,13 +322,14 @@ class RecruiterCandidateActionView(APIView):
                 job_seeker=seeker,
                 defaults={"status": "PENDING"}
             )
+            prev_status = 'PENDING' if created else app.status
             app.status = 'INTERVIEW'
             app.interview_schedule = timezone.now() + timezone.timedelta(days=2)
             app.save()
 
             ApplicationStatusHistory.objects.create(
                 application=app,
-                previous_status='PENDING' if created else app.status,
+                previous_status=prev_status,
                 new_status='INTERVIEW',
                 changed_by_user=request.user,
                 changed_at=timezone.now(),
@@ -482,18 +495,18 @@ class CompanyTeamListView(APIView):
             })
         return Response(members_data)
 
-    def delete(self, request):
+    def delete(self, request, member_id=None):
         if request.user.account_type != 'COMPANY' or not request.user.company:
             return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         if request.user.team_role not in ['ADMIN', 'HIRING_MANAGER']:
             return Response({"error": "Only admins and hiring managers can manage team members."}, status=status.HTTP_403_FORBIDDEN)
 
-        member_id = request.data.get('member_id')
-        if not member_id:
+        mid = member_id or request.data.get('member_id')
+        if not mid:
             return Response({"error": "member_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            member = User.objects.get(id=member_id, company=request.user.company)
+            member = User.objects.get(id=mid, company=request.user.company)
         except User.DoesNotExist:
             return Response({"error": "Member not found in your company."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -549,15 +562,21 @@ class CompanyTeamInviteView(APIView):
         if existing_user and existing_user.company:
             return Response({"error": "User with this email is already a member of a company."}, status=status.HTTP_400_BAD_REQUEST)
 
+        invited_at = timezone.now()
+        expires_at = invited_at + timezone.timedelta(days=7)
         invite, created = CompanyTeamInvitations.objects.update_or_create(
             company=request.user.company,
             invited_email=email,
             defaults={
                 'role': role,
                 'status': 'PENDING',
-                'invited_at': timezone.now()
+                'invited_at': invited_at,
+                'expires_at': expires_at
             }
         )
+
+        from apps.users.utils import send_team_invite_email
+        send_team_invite_email(email, request.user.company.name or "JobLyne Team", role)
 
         return Response({
             "message": "Team invitation sent successfully.",
@@ -566,7 +585,8 @@ class CompanyTeamInviteView(APIView):
                 "invited_email": invite.invited_email,
                 "role": invite.role,
                 "status": invite.status,
-                "invited_at": invite.invited_at
+                "invited_at": invite.invited_at,
+                "expires_at": invite.expires_at
             }
         })
 
@@ -579,6 +599,9 @@ class AcceptTeamInvitationView(APIView):
         invite = CompanyTeamInvitations.objects.filter(invited_email=email, status='PENDING').first()
         if not invite:
             return Response({"error": "No pending invitation found for your email address."}, status=status.HTTP_404_NOT_FOUND)
+
+        if invite.expires_at and invite.expires_at < timezone.now():
+            return Response({"error": "This invitation has expired. Please request a new invitation."}, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
             # Update user company and role
@@ -631,10 +654,7 @@ class RecruiterProfileView(APIView):
         fname = getattr(user, 'first_name', '') or ''
         lname = getattr(user, 'last_name', '') or ''
         agency_name = f"{fname} {lname}".strip() or agency_default
-        recruiter, _ = Recruiters.objects.get_or_create(
-            user=user,
-            defaults={"agency_name": agency_name}
-        )
+        recruiter = get_or_create_recruiter(user, agency_name)
         return recruiter
 
     def get(self, request):

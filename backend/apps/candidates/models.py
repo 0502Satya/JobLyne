@@ -44,7 +44,7 @@ class JobSeekers(models.Model):
     desired_titles = models.TextField(null=True, blank=True)
     work_mode = models.JSONField(null=True, blank=True) # e.g. ["Remote", "Hybrid"]
     preferred_locations = models.JSONField(null=True, blank=True) # e.g. ["New York", "London"]
-    is_open_to_opportunities = models.BooleanField(default=True)
+    is_open_to_opportunities = models.BooleanField(default=True, db_index=True)
     nationality = models.CharField(max_length=255, null=True, blank=True)
     preferred_company_size = models.CharField(max_length=100, null=True, blank=True)
     open_to_relocation = models.BooleanField(default=False)
@@ -174,3 +174,4 @@ class CandidateShortlists(models.Model):
 
     class Meta:
         db_table = 'candidate_shortlists'
+        unique_together = [['recruiter', 'job_seeker']]

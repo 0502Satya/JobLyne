@@ -180,12 +180,12 @@ class CompanySignupSerializer(serializers.Serializer):
     def create(self, validated_data):
         with transaction.atomic():
             company, _ = Companies.objects.update_or_create(
-                name=validated_data['company_name'],
+                cin_number=validated_data['cin_number'],
                 defaults={
+                    'name': validated_data['company_name'],
                     'industry': validated_data.get('industry', ''),
                     'website': validated_data.get('website', ''),
                     'tax_id': validated_data.get('tax_id') or '',
-                    'cin_number': validated_data['cin_number'],
                     'gstin_number': validated_data['gstin_number']
                 }
             )
