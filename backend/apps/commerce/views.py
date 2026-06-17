@@ -106,24 +106,27 @@ class WalletBalanceView(APIView):
         except ValueError:
             return Response({"error": "Invalid deposit amount. Must be a positive number."}, status=status.HTTP_400_BAD_REQUEST)
 
-        wallet, created = Wallets.objects.get_or_create(
-            user=request.user,
-            defaults={
-                "wallet_type": "recruiter",
-                "balance": 250.00,
-                "currency": "USD"
-            }
-        )
-        if created:
-            WalletTransactions.objects.create(
-                wallet=wallet,
-                transaction_type="deposit",
-                amount=250.00,
-                reference_type="initial_seed",
-                status="success"
-            )
-
         with transaction.atomic():
+            wallet, created = Wallets.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    "wallet_type": "recruiter",
+                    "balance": 250.00,
+                    "currency": "USD"
+                }
+            )
+            # Lock the wallet row to prevent concurrent modifications
+            wallet = Wallets.objects.select_for_update().get(pk=wallet.pk)
+
+            if created:
+                WalletTransactions.objects.create(
+                    wallet=wallet,
+                    transaction_type="deposit",
+                    amount=250.00,
+                    reference_type="initial_seed",
+                    status="success"
+                )
+
             wallet.balance = float(wallet.balance) + amount
             wallet.save()
 
@@ -177,20 +180,22 @@ class SubscriptionViewSet(viewsets.ViewSet):
             {"name": "Pro Headhunter", "price": 149.00, "features": {"cv_unlocks": 50, "job_postings": 15}},
             {"name": "Agency Elite", "price": 399.00, "features": {"cv_unlocks": 200, "job_postings": 50}},
         ]
-        for p in plans_to_seed:
-            SubscriptionPlans.objects.get_or_create(
-                name=p["name"],
-                defaults={
-                    "price": p["price"],
-                    "features": p["features"],
-                    "currency": "USD",
-                    "billing_cycle": "monthly",
-                    "role_type": "recruiter",
-                    "is_active": True
-                }
-            )
-
         available_plans = SubscriptionPlans.objects.filter(is_active=True).order_by('price')
+        if not available_plans.exists():
+            for p in plans_to_seed:
+                SubscriptionPlans.objects.get_or_create(
+                    name=p["name"],
+                    defaults={
+                        "price": p["price"],
+                        "features": p["features"],
+                        "currency": "USD",
+                        "billing_cycle": "monthly",
+                        "role_type": "recruiter",
+                        "is_active": True
+                    }
+                )
+            available_plans = SubscriptionPlans.objects.filter(is_active=True).order_by('price')
+
         active_sub = Subscriptions.objects.filter(user=request.user, status="active").first()
         invoices = Invoices.objects.filter(user=request.user).order_by('-issued_at')[:10]
 
@@ -220,10 +225,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
             }
         )
 
-        if float(wallet.balance) < float(plan.price):
-            return Response({"error": f"Insufficient wallet balance. You need ${plan.price:.2f} but only have ${wallet.balance:.2f}."}, status=status.HTTP_400_BAD_REQUEST)
-
         with transaction.atomic():
+            # Lock the wallet row to prevent concurrent modifications
+            wallet = Wallets.objects.select_for_update().get(pk=wallet.pk)
+
+            if float(wallet.balance) < float(plan.price):
+                raise ValidationError(detail={"error": f"Insufficient wallet balance. You need ${plan.price:.2f} but only have ${wallet.balance:.2f}."})
+
             wallet.balance = float(wallet.balance) - float(plan.price)
             wallet.save()
 

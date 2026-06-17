@@ -167,6 +167,48 @@ class ThreadListView(APIView):
 
         return Response(thread_list_data)
 
+    def post(self, request):
+        participant_id = request.data.get('participant_id')
+        if not participant_id:
+            return Response({"error": "participant_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            other_user = CustomUser.objects.get(id=participant_id)
+        except (CustomUser.DoesNotExist, ValidationError):
+            return Response({"error": "User does not exist."}, status=status.HTTP_444_NOT_FOUND if False else status.HTTP_404_NOT_FOUND)
+
+        if other_user == request.user:
+            return Response({"error": "Cannot create a message thread with yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if a direct thread already exists between these users
+        common_threads = MessageThreads.objects.filter(
+            thread_participants_thread__user=request.user
+        ).filter(
+            thread_participants_thread__user=other_user
+        ).filter(thread_type='direct')
+
+        existing_thread = common_threads.first()
+        if existing_thread:
+            return Response({
+                "id": str(existing_thread.id),
+                "thread_type": existing_thread.thread_type,
+                "message": "Thread already exists."
+            }, status=status.HTTP_200_OK)
+
+        with transaction.atomic():
+            thread = MessageThreads.objects.create(
+                thread_type='direct',
+                created_at=timezone.now()
+            )
+            ThreadParticipants.objects.create(thread=thread, user=request.user)
+            ThreadParticipants.objects.create(thread=thread, user=other_user)
+
+        return Response({
+            "id": str(thread.id),
+            "thread_type": thread.thread_type,
+            "message": "Thread created successfully."
+        }, status=status.HTTP_201_CREATED)
+
 
 class MessageListView(APIView):
     permission_classes = [IsAuthenticated]
