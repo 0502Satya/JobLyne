@@ -165,18 +165,21 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
 
         # Handle Skills (optimized to avoid deleting/recreating active links)
         if skills_data is not None:
-            existing_links = {link.skill.name: link for link in JobSeekerSkills.objects.filter(job_seeker=instance).select_related('skill')}
-            keep_skills = set(skills_data)
+            keep_skills = {skill_name.strip() for skill_name in skills_data if skill_name}
+            existing_links = {link.skill.name.lower(): link for link in JobSeekerSkills.objects.filter(job_seeker=instance).select_related('skill') if link.skill}
             
             # Delete links that are no longer requested
-            for name, link in list(existing_links.items()):
-                if name not in keep_skills:
+            keep_skills_lower = {s.lower() for s in keep_skills}
+            for name_lower, link in list(existing_links.items()):
+                if name_lower not in keep_skills_lower:
                     link.delete()
             
             # Add missing links
             for skill_name in keep_skills:
-                if skill_name not in existing_links:
-                    skill, _ = Skills.objects.get_or_create(name=skill_name)
+                if skill_name.lower() not in existing_links:
+                    skill = Skills.objects.filter(name__iexact=skill_name).first()
+                    if not skill:
+                        skill = Skills.objects.create(name=skill_name)
                     JobSeekerSkills.objects.create(job_seeker=instance, skill=skill)
             
         # Invalidate profile completeness cache

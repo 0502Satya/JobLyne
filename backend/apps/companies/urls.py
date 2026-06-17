@@ -8,6 +8,7 @@ from .views import (
 urlpatterns = [
     path('company/profile/', CompanyProfileView.as_view(), name='company_profile'),
     path('company/team/', CompanyTeamListView.as_view(), name='company_team_list'),
+    path('company/team/<uuid:member_id>/', CompanyTeamListView.as_view(), name='company_team_remove'),
     path('company/team/invite/', CompanyTeamInviteView.as_view(), name='company_team_invite'),
     path('company/team/accept/', AcceptTeamInvitationView.as_view(), name='company_team_accept'),
     path('company/public/<uuid:company_id>/', PublicCompanyProfileView.as_view(), name='public_company_profile'),

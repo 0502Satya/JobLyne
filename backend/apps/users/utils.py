@@ -52,6 +52,48 @@ The JobLyne Team
         return True
     except Exception as e:
         logger.error(f"Error sending OTP email to {user_email}: {str(e)}")
-        print(f"--- FAILED TO SEND EMAIL TO {user_email}. OTP: {otp_code} ---")
-        print(f"Error details: {str(e)}")
         return False
+
+def send_team_invite_email(invited_email, company_name, invite_role):
+    """
+    Sends a team invitation email to the invitee.
+    """
+    subject = f'Invitation to join {company_name} on JobLyne'
+    message = f"""
+Hi,
+
+You have been invited to join {company_name} on JobLyne as a {invite_role}.
+
+Please sign up or log in to JobLyne using this email address ({invited_email}) to accept the invitation.
+
+Best regards,
+The JobLyne Team
+"""
+    html_message = f"""
+<div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px;">
+    <h2 style="color: #135bec; text-align: center;">JobLyne Team Invitation</h2>
+    <hr style="border: 0; border-top: 1px solid #e1e4e8; margin: 20px 0;">
+    <p>Hi,</p>
+    <p>You have been invited to join <strong>{company_name}</strong> on JobLyne as a <strong>{invite_role}</strong>.</p>
+    <p>Please sign up or log in to JobLyne using this email address (<strong>{invited_email}</strong>) to accept the invitation.</p>
+    <hr style="border: 0; border-top: 1px solid #e1e4e8; margin: 20px 0;">
+    <p style="font-size: 12px; color: #6a737d; text-align: center;">
+        &copy; {datetime.now().year} JobLyne. All rights reserved.
+    </p>
+</div>
+"""
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [invited_email],
+            fail_silently=False,
+            html_message=html_message
+        )
+        logger.info(f"Team invite email sent to {invited_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Error sending team invite email to {invited_email}: {str(e)}")
+        return False
+

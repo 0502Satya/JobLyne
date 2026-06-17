@@ -144,7 +144,7 @@ class JobLyneMessagingSecurityTests(TestCase):
         )
         
         # Create a thread between user1 and user2
-        self.thread = MessageThreads.objects.create()
+        self.thread = MessageThreads.objects.create(thread_type='direct')
         ThreadParticipants.objects.create(thread=self.thread, user=self.user1)
         ThreadParticipants.objects.create(thread=self.thread, user=self.user2)
         
@@ -181,3 +181,43 @@ class JobLyneMessagingSecurityTests(TestCase):
         url = reverse('mark_thread_read', kwargs={"thread_id": self.thread.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
+
+    def test_create_thread_success(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('thread_list')
+        response = self.client.post(url, {"participant_id": str(self.user3.id)})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["thread_type"], "direct")
+        self.assertIn("id", response.data)
+
+        # Check participants
+        thread_id = response.data["id"]
+        participants = ThreadParticipants.objects.filter(thread_id=thread_id).values_list('user_id', flat=True)
+        self.assertEqual(len(participants), 2)
+        self.assertIn(self.user1.id, participants)
+        self.assertIn(self.user3.id, participants)
+
+    def test_create_thread_duplicate_returns_existing(self):
+        # Already has direct thread between user1 and user2
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('thread_list')
+        response = self.client.post(url, {"participant_id": str(self.user2.id)})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], str(self.thread.id))
+        self.assertEqual(response.data["message"], "Thread already exists.")
+
+    def test_create_thread_with_self_fails(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('thread_list')
+        response = self.client.post(url, {"participant_id": str(self.user1.id)})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("yourself", response.data["error"])
+
+    def test_create_thread_nonexistent_user_fails(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('thread_list')
+        import uuid
+        random_id = uuid.uuid4()
+        response = self.client.post(url, {"participant_id": str(random_id)})
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("does not exist", response.data["error"])

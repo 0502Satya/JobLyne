@@ -70,11 +70,23 @@ class LoginView(APIView):
         if not email or not password:
             return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            user_obj = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            user_obj = None
+
+        if user_obj and user_obj.failed_login_attempts and user_obj.failed_login_attempts >= 10:
+            return Response({'error': 'Account is locked due to too many failed login attempts. Please contact support.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
             if not user.is_active:
                 return Response({'error': 'This account is inactive.'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            if user.failed_login_attempts != 0:
+                user.failed_login_attempts = 0
+                user.save(update_fields=['failed_login_attempts'])
             
             tokens = get_tokens_for_user(user)
             user_data = UserResponseSerializer(user).data
@@ -85,6 +97,12 @@ class LoginView(APIView):
                 'tokens': tokens
             }, status=status.HTTP_200_OK)
         else:
+            if user_obj:
+                attempts = user_obj.failed_login_attempts or 0
+                user_obj.failed_login_attempts = attempts + 1
+                user_obj.save(update_fields=['failed_login_attempts'])
+                if user_obj.failed_login_attempts >= 10:
+                    return Response({'error': 'Account is locked due to too many failed login attempts. Please contact support.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CompanySignupView(APIView):
@@ -261,4 +279,33 @@ class UserProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ResendOTPView(APIView):
+    permission_classes = [AllowAny]
+    throttle_scope = 'otp'
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'If the email exists, a new OTP has been sent.'}, status=status.HTTP_200_OK)
+
+        if user.is_verified and user.is_active:
+            return Response({'error': 'This email has already been verified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Invalidate old OTPs
+        EmailVerificationOTP.objects.filter(user=user).delete()
+
+        # Generate new OTP
+        otp_code = ''.join(random.choices(string.digits, k=6))
+        otp_hash = hash_otp(otp_code)
+        EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
+
+        send_otp_email(user.email, otp_code)
+
+        return Response({'message': 'If the email exists, a new OTP has been sent.'}, status=status.HTTP_200_OK)
 

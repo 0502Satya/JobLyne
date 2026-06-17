@@ -117,12 +117,13 @@ export async function companySignupAction(prevState: any, formData: FormData) {
     // On successful signup, tokens are returned. Store them.
     if (data.tokens) {
       await setAuthCookies(data.tokens, data.user?.account_type);
-      return { success: true, redirect: "/dashboard" };
+      redirect("/company");
     }
 
     return { success: true };
 
   } catch (err: any) {
+    if (err.digest?.startsWith("NEXT_REDIRECT")) throw err;
     return {
       error: "Unable to connect to the server. Please try again later.",
     };
@@ -170,7 +171,7 @@ export async function recruiterSignupAction(prevState: any, formData: FormData) 
 
     if (data.tokens) {
       await setAuthCookies(data.tokens, data.user?.account_type);
-      return { success: true };
+      redirect("/recruiter/dashboard");
     }
 
     return { success: true };
@@ -205,6 +206,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     // Success, store tokens in HttpOnly cookies
     if (data.tokens) {
       await setAuthCookies(data.tokens, data.user?.account_type);
+      return { success: true, role: data.user?.account_type };
     }
 
   } catch (err: any) {

@@ -25,6 +25,8 @@ def verify_google_token(token):
     # Only accept ID tokens with strict audience validation
     try:
         client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
+        if not client_id:
+            return None
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
         return {
             'email': idinfo.get('email'),
@@ -60,8 +62,10 @@ def verify_linkedin_token(access_token):
         client_id = getattr(settings, 'LINKEDIN_CLIENT_ID', None)
         client_secret = getattr(settings, 'LINKEDIN_CLIENT_SECRET', None)
         
-        # If client credentials are provided, introspect to validate audience
-        if client_id and client_secret:
+        if not client_id or not client_secret:
+            return None
+        
+        # Introspect to validate audience
             introspect_res = requests.post(
                 'https://www.linkedin.com/oauth/v2/introspect',
                 data={

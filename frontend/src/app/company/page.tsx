@@ -91,7 +91,7 @@ export default function CompanyDashboardPage() {
       type: dbJob.employment_type || "Full-time",
       salary: salaryStr,
       status: statusMapped,
-      applicants: getStableApplicantCount(dbJob.id)
+      applicants: dbJob.applicant_count || 0
     };
   };
 

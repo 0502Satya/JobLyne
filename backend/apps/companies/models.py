@@ -41,13 +41,14 @@ class CompanyTeamInvitations(models.Model):
     role = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=255, null=True, blank=True)
     invited_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'company_team_invitations'
 
 class Recruiters(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=False, blank=False, related_name='recruiters_user')
+    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=False, blank=False, unique=True, related_name='recruiters_user')
     agency_name = models.CharField(max_length=255, null=True, blank=True)
     subscription_plan = models.ForeignKey('commerce.SubscriptionPlans', on_delete=models.CASCADE, null=True, blank=True, related_name='recruiters_subscription_plan')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
