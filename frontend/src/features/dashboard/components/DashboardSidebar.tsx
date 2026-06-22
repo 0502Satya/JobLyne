@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/features/auth/actions";
+import Icon from "@/shared/ui/Icon";
+import { Settings, LogOut } from "lucide-react";
 
 interface DashboardSidebarProps {
   profile: any;
@@ -16,8 +18,6 @@ const sidebarLinks = [
   { name: "Saved Jobs", icon: "bookmark", href: "/dashboard/saved-jobs" },
   { name: "Messages", icon: "chat", href: "/dashboard/messages" },
   { name: "Job Alerts", icon: "notifications_active", href: "/dashboard/alerts" },
-  { name: "My Learning", icon: "school", href: "/dashboard/learning" },
-  { name: "Resume Services", icon: "description", href: "/dashboard/services" },
 ];
 
 
@@ -26,55 +26,53 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
   const completeness = profile?.completeness || 75;
 
   return (
-    <aside className="hidden md:flex w-64 flex-col bg-surface border-right border-border pt-6 pb-6 px-4 gap-6 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
+    <aside className="h-[calc(100vh-65px)] w-64 border-border overflow-y-auto hidden pt-6 sticky top-[65px] gap-6 pb-6 border-right px-4 bg-surface flex-col md:flex">
       {/* User Summary */}
-      <div className="flex flex-col items-center text-center pb-6 border-b border-border">
+      <div className="border-b border-border items-center text-center pb-6 flex flex-col">
         <div 
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-20 mb-3 border-4 border-bg shadow-sm"
+          className="mb-3 bg-cover bg-no-repeat aspect-square bg-center border-bg shadow-sm rounded-full border-4 size-20"
           style={{ backgroundImage: `url(${profile?.profile_image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAs17bU3rIouTgNjBdP1LAEfCfrJ0ef0Qqf2OTGBidiwrqva-MkyupB0L8WHDUi1_bZYQVIFUjeVAFsramQ1IKOo5-nZjq6MYBmXckvow52QcfIMTkvghXeOj1w6ddyX3ta7TsE7nsUwmqPQg5MmBOE6WXghZbTk6MfZrNPQBMzf3BiOk3JnwVIQOrgSSwEVjQD5i29Ytazs6pZZTqn86pwzzepqLpyT16MAlf6E6BKQEaEnmnjsSChfKoNBGy7RIzP-I_Nl-czFaY"})` }}
         ></div>
-        <h1 className="text-text text-lg font-bold leading-tight">
+        <h1 className="text-text type-card-title leading-tight">
           {profile?.full_name || "Alex Morgan"}
         </h1>
-        <p className="text-muted text-sm font-normal">
+        <p className="type-body-sm text-muted">
           {profile?.headline || "Senior Software Engineer"}
         </p>
 
-        <div className="mt-4 w-full">
-          <div className="flex justify-between text-xs mb-1">
-            <span className="text-muted font-medium text-left">Profile Completeness</span>
-            <span className="text-primary font-bold">{completeness}%</span>
+        <div className="w-full mt-4">
+          <div className="flex mb-1 text-xs justify-between">
+            <span className="text-left text-muted">Profile Completeness</span>
+            <span className="text-primary">{completeness}%</span>
           </div>
           <div className="w-full bg-border/20 rounded-full h-2">
             <div 
-              className="bg-primary h-2 rounded-full transition-all duration-500" 
+              className="h-2 transition-all rounded-full duration-500 bg-primary" 
               style={{ width: `${completeness}%` }}
             ></div>
           </div>
-          <p className="text-[10px] text-muted mt-2 text-left">Complete your profile to get 3x more views.</p>
+          <p className="text-xs text-left text-muted mt-2">Complete your profile to get 3x more views.</p>
         </div>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex flex-col gap-1">
+      <nav className="gap-1 flex flex-col">
         {sidebarLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
             <Link 
               key={link.name}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${
+              className={`group px-3 items-center rounded-lg gap-3 py-2.5 transition-colors flex ${
                 isActive 
-                  ? "bg-primary/10 text-primary" 
+                  ? "text-primary bg-primary/10" 
                   : "text-muted hover:bg-bg"
               }`}
             >
-              <span className={`material-symbols-outlined ${isActive && link.filled ? "filled" : ""}`}>
-                {link.icon}
-              </span>
-              <span className="text-sm font-medium">{link.name}</span>
+              <Icon name={link.icon} size={20} />
+              <span className="type-ui">{link.name}</span>
               {link.name === "My Applications" && stats?.applications > 0 && (
-                <span className="ml-auto bg-border/40 text-muted text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="px-2 ml-auto rounded-full py-0.5 bg-border/40 type-caption text-muted">
                   {stats.applications}
                 </span>
               )}
@@ -84,21 +82,21 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
       </nav>
 
       {/* Settings & Logout */}
-      <div className="mt-auto pt-6 border-t border-border flex flex-col gap-1">
+      <div className="border-t border-border mt-auto gap-1 pt-6 flex flex-col">
         <Link 
           href="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted hover:bg-bg transition-colors"
+          className="px-3 items-center rounded-lg gap-3 py-2.5 transition-colors flex text-muted hover:bg-bg"
         >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="text-sm font-medium">Settings</span>
+          <Settings size={20} aria-hidden="true" />
+          <span className="type-ui">Settings</span>
         </Link>
         <form action={logoutAction}>
           <button 
             type="submit"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/10 transition-colors"
+            className="w-full px-3 items-center rounded-lg gap-3 py-2.5 transition-colors flex text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
           >
-            <span className="material-symbols-outlined">logout</span>
-            <span className="text-sm font-medium">Logout</span>
+            <LogOut size={20} aria-hidden="true" />
+            <span className="type-ui">Logout</span>
           </button>
         </form>
       </div>

@@ -1,7 +1,10 @@
 import requests
+import logging
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def verify_google_token(token):
     """
@@ -27,7 +30,7 @@ def verify_google_token(token):
         client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
         if not client_id:
             return None
-        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id, clock_skew_in_seconds=60)
         return {
             'email': idinfo.get('email'),
             'first_name': idinfo.get('given_name'),
@@ -36,7 +39,8 @@ def verify_google_token(token):
             'provider': 'google',
             'uid': idinfo.get('sub')
         }
-    except Exception:
+    except Exception as e:
+        logger.error(f"Google token verification failed: {str(e)}")
         return None
 
 
@@ -66,22 +70,22 @@ def verify_linkedin_token(access_token):
             return None
         
         # Introspect to validate audience
-            introspect_res = requests.post(
-                'https://www.linkedin.com/oauth/v2/introspect',
-                data={
-                    'token': access_token,
-                    'client_id': client_id,
-                    'client_secret': client_secret,
-                },
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
-            )
-            if introspect_res.status_code == 200:
-                introspect_data = introspect_res.json()
-                # Check that the token is active and matches our client_id
-                if not introspect_data.get('active') or introspect_data.get('client_id') != client_id:
-                    return None
-            else:
+        introspect_res = requests.post(
+            'https://www.linkedin.com/oauth/v2/introspect',
+            data={
+                'token': access_token,
+                'client_id': client_id,
+                'client_secret': client_secret,
+            },
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
+        if introspect_res.status_code == 200:
+            introspect_data = introspect_res.json()
+            # Check that the token is active and matches our client_id
+            if not introspect_data.get('active') or introspect_data.get('client_id') != client_id:
                 return None
+        else:
+            return None
 
         # Get basic profile info
         profile_res = requests.get(

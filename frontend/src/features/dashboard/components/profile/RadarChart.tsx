@@ -42,7 +42,7 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
   const dataPath = hasData ? `M ${dataPoints.join(" L ")} Z` : "";
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex justify-center items-center">
       <svg width={size} height={size} className="overflow-visible drop-shadow-sm">
         {/* Web Background Levels */}
         {webPaths.map((path, i) => (
@@ -78,14 +78,14 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
           stroke="#4c33cf" 
           strokeWidth="2.5" 
           strokeLinejoin="round"
-          className="animate-in fade-in zoom-in duration-1000"
+          className="fade-in duration-1000 animate-in zoom-in"
         />
 
         {/* Data Points (Dots) */}
         {dataPoints.map((point, i) => {
           const [x, y] = point.split(",").map(Number);
           return (
-            <g key={i} className="animate-in fade-in zoom-in duration-1000 delay-300">
+            <g key={i} className="fade-in animate-in duration-1000 delay-300 zoom-in">
                <circle 
                   cx={x} cy={y} 
                   r="4.5" 
@@ -110,7 +110,7 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
               key={i} 
               x={x} y={y} 
               textAnchor="middle" 
-              className="text-[9px] font-black fill-slate-500 uppercase tracking-widest"
+              className="uppercase text-xs fill-slate-500 tracking-widest"
               dominantBaseline="middle"
             >
               {skill.name}

@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Icon from "@/shared/ui/Icon";
+import { CheckCircle2 } from "lucide-react";
 
 interface RoleOption {
   id: string;
@@ -26,21 +28,21 @@ export default function RoleSelector({ selected, onSelect }: { selected: string,
         <button
           key={role.id}
           onClick={() => onSelect(role.id)}
-          className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+          className={`gap-4 border-2 items-center transition-all flex p-4 text-left rounded-xl ${
             selected === role.id 
-              ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
-              : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900"
+              ? "bg-primary/5 ring-4 ring-primary/10 border-primary" 
+              : "border-border bg-surface dark:bg-card dark:border-border hover:border-border dark:hover:border-border"
           }`}
         >
-          <div className={`p-2 rounded-lg ${selected === role.id ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}>
-            <span className="material-symbols-outlined">{role.icon}</span>
+          <div className={`rounded-lg p-2 ${selected === role.id ? "bg-primary text-white" : "text-muted bg-bg dark:bg-card"}`}>
+            <Icon name={role.icon} size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white">{role.name}</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{role.description}</p>
+            <h4 className="text-text">{role.name}</h4>
+            <p className="text-muted text-xs">{role.description}</p>
           </div>
           {selected === role.id && (
-            <span className="material-symbols-outlined ml-auto text-primary">check_circle</span>
+            <CheckCircle2 size={20} className="ml-auto text-primary" aria-hidden="true" />
           )}
         </button>
       ))}

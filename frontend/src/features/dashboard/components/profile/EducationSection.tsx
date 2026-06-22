@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Education } from "@/types/profile";
+import { Button, Input, FormField } from "@/shared/ui";
+import { GraduationCap, Plus, ScrollText, ArrowUp, ArrowDown, Pencil, Trash2 } from "lucide-react";
 
 interface EducationSectionProps {
   data: Education[];
@@ -84,7 +86,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
       "bg-primary",
       "bg-teal-600",
       "bg-sky-600",
-      "bg-indigo-600",
+      "bg-primary",
       "bg-purple-600",
       "bg-emerald-600",
       "bg-blue-600",
@@ -114,48 +116,51 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
   };
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="education">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="education">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">school</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <GraduationCap size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Education</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Add your degrees and study fields</p>
+            <h3 className="text-text type-card-title leading-tight">Education</h3>
+            <p className="text-xs text-muted mt-0.5">Add your degrees and study fields</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={addEntry}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 mr-1 min-h-[40px] flex items-center justify-center"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-1"
           >
-            <span className="material-symbols-outlined text-sm font-bold">add</span>
+            <Plus size={14} className="type-ui" aria-hidden="true" />
             Add
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         <div className="space-y-6">
           {education.length === 0 ? (
-            <div className="text-center py-10 border border-dashed border-border rounded-xl bg-bg/50">
-              <span className="material-symbols-outlined text-3xl text-muted/60 mb-2 block">history_edu</span>
-              <span className="text-sm font-bold text-text block mb-0.5">No education entries yet</span>
-              <span className="text-xs text-muted block mb-4 font-semibold">Adding qualifications helps recruiters verify your credentials.</span>
-              <button
+            <div className="border-dashed bg-bg/50 border-border text-center py-10 rounded-xl border">
+              <ScrollText size={24} className="text-muted/60 block mb-2" aria-hidden="true" />
+              <span className="text-text mb-0.5 block type-ui">No education entries yet</span>
+              <span className="block mb-4 type-caption text-muted">Adding qualifications helps recruiters verify your credentials.</span>
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={addEntry}
-                className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[44px] px-4"
+                className="text-primary hover:underline"
               >
                 Add first degree card
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="relative border-l-2 border-border/60 ml-4 pl-6 sm:pl-8 space-y-8 py-2">
+            <div className="space-y-8 border-l-2 relative border-border/60 ml-4 py-2 pl-6 sm:pl-8">
               {education.map((edu, idx) => {
                 const filteredSuggestions = FAMOUS_UNIVERSITIES.filter((uni) =>
                   uni.toLowerCase().includes((edu.school || "").toLowerCase())
@@ -166,20 +171,19 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                 const initials = getInitials(edu.school || "");
 
                 return (
-                  <div key={edu.id} className="relative group min-w-0">
+                  <div key={edu.id} className="min-w-0 relative group">
                     {/* Timeline Dot/Badge */}
-                    <div className={`absolute -left-[43px] sm:-left-[51px] top-1.5 w-8 h-8 sm:w-10 sm:h-10 rounded-full ${schoolColor} border-4 border-card shadow-xs flex items-center justify-center text-white text-[10px] sm:text-xs font-extrabold shrink-0 select-none`}>
+                    <div className={`-left-[43px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[51px] sm:w-10 ${schoolColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
                       {initials}
                     </div>
 
                     {isEditing ? (
                       /* Editing Form Mode */
-                      <div className="bg-bg/40 border border-border rounded-xl p-5 space-y-4 shadow-inner">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border-border bg-bg/40 p-5 shadow-inner space-y-4 rounded-xl border">
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                           <div className="relative">
-                            <label className="block text-xs font-semibold text-muted mb-1">School / University</label>
-                            <input
-                              type="text"
+                            <Input
+                              label="School / University"
                               value={edu.school || ""}
                               onChange={(e) => {
                                 updateEntry(edu.id, "school", e.target.value);
@@ -188,10 +192,9 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                               onFocus={() => setShowSuggestions((prev) => ({ ...prev, [edu.id as string]: true }))}
                               onBlur={() => setTimeout(() => setShowSuggestions((prev) => ({ ...prev, [edu.id as string]: false })), 200)}
                               placeholder="e.g. Stanford University"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                             />
                             {showSuggestions[edu.id as string] && filteredSuggestions.length > 0 && edu.school && (
-                              <div className="absolute z-10 w-full bg-card border border-border rounded-lg shadow-md mt-1 max-h-48 overflow-y-auto">
+                              <div className="w-full overflow-y-auto z-10 border-border shadow-md absolute max-h-48 rounded-lg bg-card mt-1 border">
                                 {filteredSuggestions.map((uni) => (
                                   <button
                                     key={uni}
@@ -200,7 +203,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                                       updateEntry(edu.id, "school", uni);
                                       setShowSuggestions((prev) => ({ ...prev, [edu.id as string]: false }));
                                     }}
-                                    className="w-full text-left px-4 py-2 text-xs font-medium text-text hover:bg-bg transition-colors cursor-pointer"
+                                    className="w-full text-text type-caption transition-colors cursor-pointer py-2 px-4 text-left hover:bg-bg"
                                   >
                                     {uni}
                                   </button>
@@ -208,164 +211,153 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                               </div>
                             )}
                           </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Degree</label>
-                            <input
-                              type="text"
-                              value={edu.degree || ""}
-                              onChange={(e) => updateEntry(edu.id, "degree", e.target.value)}
-                              placeholder="e.g. Bachelor of Science"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                          <Input
+                            label="Degree"
+                            value={edu.degree || ""}
+                            onChange={(e) => updateEntry(edu.id, "degree", e.target.value)}
+                            placeholder="e.g. Bachelor of Science"
+                          />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-4">
                           <div className="md:col-span-2">
-                            <label className="block text-xs font-semibold text-muted mb-1">Field of Study</label>
-                            <input
-                              type="text"
+                            <Input
+                              label="Field of Study"
                               value={edu.field || ""}
                               onChange={(e) => updateEntry(edu.id, "field", e.target.value)}
                               placeholder="e.g. Computer Science"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                             />
                           </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Start Year</label>
-                            <input
-                              type="number"
-                              value={edu.start_year || ""}
-                              onChange={(e) => updateEntry(edu.id, "start_year", e.target.value)}
-                              placeholder="2018"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">End Year (or Expected)</label>
-                            <input
-                              type="number"
-                              value={edu.end_year || ""}
-                              onChange={(e) => updateEntry(edu.id, "end_year", e.target.value)}
-                              placeholder="2022"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                          <Input
+                            label="Start Year"
+                            type="number"
+                            value={edu.start_year || ""}
+                            onChange={(e) => updateEntry(edu.id, "start_year", e.target.value)}
+                            placeholder="2018"
+                          />
+                          <Input
+                            label="End Year (or Expected)"
+                            type="number"
+                            value={edu.end_year || ""}
+                            onChange={(e) => updateEntry(edu.id, "end_year", e.target.value)}
+                            placeholder="2022"
+                          />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Grade / GPA / Percentage</label>
-                            <input
-                              type="text"
-                              value={edu.grade || ""}
-                              onChange={(e) => updateEntry(edu.id, "grade", e.target.value)}
-                              placeholder="e.g. 3.8/4.0 or 85%"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
+                          <Input
+                            label="Grade / GPA / Percentage"
+                            value={edu.grade || ""}
+                            onChange={(e) => updateEntry(edu.id, "grade", e.target.value)}
+                            placeholder="e.g. 3.8/4.0 or 85%"
+                          />
                           <div className="md:col-span-2">
-                            <label className="block text-xs font-semibold text-muted mb-1">Courses & Activities</label>
-                            <input
-                              type="text"
+                            <Input
+                              label="Courses & Activities"
                               value={edu.certifications || ""}
                               onChange={(e) => updateEntry(edu.id, "certifications", e.target.value)}
                               placeholder="e.g. Algorithms, Data Structures, Varsity Football"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                             />
                           </div>
                         </div>
 
-                        <div className="space-y-1">
-                          <label className="block text-xs font-semibold text-muted">Degree Description</label>
+                        <FormField label="Degree Description">
                           <textarea
                             value={edu.description || ""}
                             onChange={(e) => updateEntry(edu.id, "description", e.target.value)}
                             rows={3}
                             placeholder="Summarize your academic focus, thesis, or major milestones..."
-                            className="w-full bg-card border border-border rounded-xl py-2 px-3.5 text-sm font-medium text-text focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none leading-relaxed resize-none placeholder:text-muted/65"
+                            className="w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted disabled:opacity-50 disabled:cursor-not-allowed resize-none leading-relaxed px-4"
                           />
-                        </div>
+                        </FormField>
 
-                        <div className="flex justify-end gap-2.5 pt-2">
-                          <button
+                        <div className="pt-2 flex justify-end gap-2.5">
+                          <Button
                             type="button"
+                            variant="danger"
                             onClick={() => removeEntry(edu.id)}
-                            className="px-4 py-2 bg-card text-red-500 hover:bg-red-500/10 text-xs font-bold rounded-lg border border-border transition-all min-h-[44px] cursor-pointer"
                           >
                             Delete Entry
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="primary"
                             onClick={() => setEditingId(null)}
-                            className="px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all min-h-[44px] cursor-pointer shadow-xs"
                           >
                             Done Editing
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       /* Read-only Timeline Presentation Mode */
-                      <div className="relative pl-2">
+                      <div className="pl-2 relative">
                         {/* Hover Action Overlay */}
-                        <div className="absolute right-0 top-0 flex items-center gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10">
-                          <button
+                        <div className="gap-1.5 z-10 absolute opacity-100 items-center transition-opacity flex right-0 top-0 lg:opacity-0 lg:group-hover:opacity-100">
+                          <Button
                             type="button"
+                            variant="outline"
                             disabled={idx === 0}
                             onClick={() => moveEntry(idx, "up")}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary disabled:opacity-30 cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg"
                             title="Move Up"
+                            aria-label="Move Up"
                           >
-                            <span className="material-symbols-outlined text-base">arrow_upward</span>
-                          </button>
-                          <button
+                             <ArrowUp size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
                             type="button"
+                            variant="outline"
                             disabled={idx === education.length - 1}
                             onClick={() => moveEntry(idx, "down")}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary disabled:opacity-30 cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg"
                             title="Move Down"
+                            aria-label="Move Down"
                           >
-                            <span className="material-symbols-outlined text-base">arrow_downward</span>
-                          </button>
-                          <button
+                             <ArrowDown size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => setEditingId(edu.id || null)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg"
                             title="Edit Education"
+                            aria-label="Edit Education"
                           >
-                            <span className="material-symbols-outlined text-base">edit</span>
-                          </button>
-                          <button
+                             <Pencil size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => removeEntry(edu.id)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-red-500 hover:bg-red-500/10 cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
                             title="Delete Education"
+                            aria-label="Delete Education"
                           >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
+                             <Trash2 size={16} aria-hidden="true" />
+                          </Button>
                         </div>
 
-                        <div className="space-y-1.5 min-w-0 pr-24">
-                          <h4 className="text-base font-bold text-text tracking-tight leading-snug break-words font-display">
+                        <div className="min-w-0 pr-24 space-y-1.5">
+                          <h4 className="text-text break-words leading-snug tracking-tight type-card-title">
                             {edu.school || "Untitled Institution"}
                           </h4>
-                          <p className="text-sm font-semibold text-text/80 break-words">
+                          <p className="break-words type-ui text-text/80">
                             {edu.degree || "No Degree"} {edu.field ? `in ${edu.field}` : ""}
                           </p>
-                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider leading-relaxed break-words">
+                          <p className="break-words text-xs uppercase leading-relaxed tracking-wider text-muted">
                             {formatEducationMeta(edu)}
                           </p>
 
                           {/* Certifications / Courses */}
                           {edu.certifications && (
-                            <p className="text-xs text-muted font-medium leading-relaxed">
-                              <span className="font-bold text-text/90">Courses:</span> {edu.certifications}
+                            <p className="leading-relaxed type-caption text-muted">
+                              <span className="text-text/90">Courses:</span> {edu.certifications}
                             </p>
                           )}
 
                           {/* Description */}
                           {edu.description && (
-                            <p className="text-xs text-muted leading-relaxed font-medium mt-1 pl-2 border-l border-border italic">
+                            <p className="border-l border-border italic pl-2 leading-relaxed text-muted mt-1 type-caption">
                               {edu.description}
                             </p>
                           )}
@@ -379,10 +371,10 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
           )}
 
           {/* Fresh Graduate Tip */}
-          <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/10 rounded-xl">
-            <span className="material-symbols-outlined text-primary font-bold mt-0.5">school</span>
-            <div className="text-xs text-text/85 leading-normal">
-              <span className="font-bold block mb-0.5 text-primary">Freshers & student tips</span>
+          <div className="items-start bg-primary/5 border-primary/10 gap-3 flex p-4 rounded-xl border">
+            <GraduationCap size={18} className="text-primary mt-0.5" aria-hidden="true" />
+            <div className="text-text/85 text-xs leading-normal">
+              <span className="block text-primary mb-0.5">Freshers & student tips</span>
               Highlight key academic projects, hackathon achievements, and major course topics to capture entry-level recruiter attention.
             </div>
           </div>
@@ -391,3 +383,4 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
     </section>
   );
 }
+

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import SigninForm from "@/features/auth/components/SigninForm";
 import SocialLogin from "@/features/auth/components/SocialLogin";
+import { Network } from "lucide-react";
 
 /**
  * Candidate Sign In Page.
@@ -11,25 +12,25 @@ import SocialLogin from "@/features/auth/components/SocialLogin";
  */
 export default function SigninPage() {
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-6 transition-colors">
-      <div className="w-full max-w-md bg-surface rounded-2xl shadow-xl border border-border p-8 space-y-8">
+    <div className="justify-center items-center bg-bg p-6 transition-colors flex min-h-screen flex-col">
+      <div className="w-full space-y-8 border-border rounded-2xl shadow-xl max-w-md p-8 bg-surface border">
 
         {/* Branding & Welcome */}
         <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-2 text-primary font-bold text-2xl group">
-            <span className="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">hub</span>
+          <Link href="/" className="text-primary group type-h3 inline-flex items-center gap-2">
+            <Network className="transition-transform group-hover:rotate-12 text-primary" size={30} aria-hidden="true" />
             <span>JobLyne</span>
           </Link>
-          <h1 className="text-2xl font-black text-text tracking-tight">Welcome back</h1>
-          <p className="text-muted text-sm">Please enter your details to sign in.</p>
+          <h1 className="text-text type-h2">Welcome back</h1>
+          <p className="text-sm text-muted">Please enter your details to sign in.</p>
         </div>
 
         {/* Social Logins */}
         <SocialLogin />
 
-        <div className="relative flex items-center">
+        <div className="flex relative items-center">
           <div className="flex-grow border-t border-border"></div>
-          <span className="flex-shrink mx-4 text-muted text-[10px] font-black uppercase tracking-widest">or continue with</span>
+          <span className="flex-shrink mx-4 type-badge text-muted">or continue with</span>
           <div className="flex-grow border-t border-border"></div>
         </div>
 
@@ -39,7 +40,7 @@ export default function SigninPage() {
         {/* Footer Link */}
         <p className="text-center text-sm text-muted">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="text-primary font-bold hover:underline transition-colors">
+          <Link href="/auth/signup" className="text-primary transition-colors hover:underline">
             Sign up for free
           </Link>
         </p>

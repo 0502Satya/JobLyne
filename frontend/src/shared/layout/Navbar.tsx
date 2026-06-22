@@ -2,8 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/shared/ui";
-import ThemeToggle from "@/shared/ui/ThemeToggle";
+import { Button, Container, ThemeToggle } from "@/shared/ui";
+import { Search, Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -32,14 +32,14 @@ export default function Navbar() {
     }, []);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border bg-surface/80 backdrop-blur-md transition-colors overflow-visible">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
+        <header className="w-full border-b border-border bg-surface/80 backdrop-blur-md sticky transition-colors z-50 overflow-visible top-0">
+            <Container size="xl" className="h-16 sm:h-20 items-center flex justify-between">
                 {/* Left side: Logo and main links */}
-                <div className="flex items-center gap-4 sm:gap-8">
-                    <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="p-1.5 bg-primary rounded-lg text-surface">
+                <div className="gap-4 flex items-center sm:gap-8">
+                    <Link href="/" className="shrink-0 group items-center gap-2 flex">
+                        <div className="bg-primary rounded-lg text-white p-1.5">
                             <svg
-                                className="w-5 h-5 sm:w-6 sm:h-6"
+                                className="h-5 w-5 sm:h-6 sm:w-6"
                                 fill="none"
                                 viewBox="0 0 48 48"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -47,78 +47,123 @@ export default function Navbar() {
                                 <path
                                     d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
                                     fill="currentColor"
+                                    className="text-primary-light"
                                 />
                             </svg>
                         </div>
-                        <span className="text-lg sm:text-xl font-black tracking-tighter text-text">JobLyne</span>
+                        <span className="text-text type-card-title tracking-tighter font-bold">JobLyne</span>
                     </Link>
-                    <nav className="hidden md:flex items-center gap-6">
-                        <Link href="/dashboard" className="text-sm font-bold text-muted hover:text-primary transition-colors">Jobs</Link>
-                        <Link href="/dashboard/jobs" className="text-sm font-bold text-muted hover:text-primary transition-colors">Courses</Link>
-                        <Link href={`${recruiterUrl}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Recruiters</Link>
-                        <Link href={`${companyUrl}/auth/signin`} className="text-sm font-bold text-muted hover:text-primary transition-colors">Institutes</Link>
+                    <nav className="gap-6 hidden items-center md:flex">
+                        <Link href="/jobs" className="transition-colors type-label hover:text-primary font-semibold">Jobs</Link>
+                        <Link href="/courses" className="transition-colors type-label hover:text-primary font-semibold">Courses</Link>
+                        <Link href={`${recruiterUrl}/auth/signin`} className="transition-colors type-label hover:text-primary font-semibold">Recruiters</Link>
+                        <Link href={`${companyUrl}/auth/signin`} className="transition-colors type-label hover:text-primary font-semibold">Institutes</Link>
                     </nav>
                 </div>
 
                 {/* Right side: Actions */}
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="gap-2 flex items-center sm:gap-3">
                     <ThemeToggle />
                     
                     {/* Search button */}
-                    <button className="hidden sm:flex items-center text-muted hover:text-primary p-2 transition-colors min-w-[44px] min-h-[44px] justify-center">
-                        <span className="material-symbols-outlined">search</span>
+                    <button className="justify-center min-h-[44px] hidden items-center p-2 transition-colors min-w-[44px] text-muted sm:flex hover:text-primary">
+                        <Search size={20} aria-hidden="true" />
                     </button>
 
+                    {/* Compact Mobile Auth Actions (always visible on mobile) */}
+                    <div className="flex sm:hidden items-center ml-1">
+                        <MobileCompactAuthActions />
+                    </div>
+
                     {/* Desktop Auth Actions */}
-                    <div className="hidden sm:flex items-center gap-2 border-l border-border pl-4 ml-2">
+                    <div className="border-l border-border hidden items-center gap-2 pl-4 ml-2 sm:flex">
                         <AuthActions isMobile={false} />
-                        <div className="h-6 w-px bg-border mx-2 hidden lg:block"></div>
+                        <div className="hidden h-6 mx-2 w-px bg-border lg:block"></div>
                         <EmployerDropdown recruiterUrl={recruiterUrl} companyUrl={companyUrl} />
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button 
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="sm:hidden flex items-center justify-center w-11 h-11 text-muted hover:text-primary transition-colors"
+                        className="sm:hidden w-11 justify-center items-center transition-colors h-11 flex text-muted hover:text-primary cursor-pointer select-none"
                         aria-label="Toggle Menu"
                     >
-                        <span className="material-symbols-outlined text-2xl">
-                            {isMenuOpen ? 'close' : 'menu'}
-                        </span>
+                        {isMenuOpen ? (
+                            <X size={24} aria-hidden="true" />
+                        ) : (
+                            <Menu size={24} aria-hidden="true" />
+                        )}
                     </button>
                 </div>
-            </div>
+            </Container>
 
             {/* Mobile Navigation Drawer */}
             {isMenuOpen && (
-                <div className="sm:hidden absolute top-full left-0 w-full bg-surface border-b border-border shadow-xl py-6 px-4 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-300 z-50">
-                    <nav className="flex flex-col gap-4">
-                        <Link onClick={() => setIsMenuOpen(false)} href="/dashboard" className="text-base font-bold text-text py-3 border-b border-border/50">Jobs</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href="/dashboard/jobs" className="text-base font-bold text-text py-3 border-b border-border/50">Courses</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${recruiterUrl}/auth/signin`} className="text-base font-bold text-text py-3 border-b border-border/50">Recruiters</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${companyUrl}/auth/signin`} className="text-base font-bold text-text py-3">Institutes</Link>
+                <div className="sm:hidden w-full border-b border-border slide-in-from-top-4 absolute left-0 animate-in z-50 shadow-xl duration-300 py-6 flex gap-6 top-full px-4 bg-surface flex-col">
+                    <nav className="gap-4 flex flex-col">
+                        <Link onClick={() => setIsMenuOpen(false)} href="/jobs" className="text-text border-b border-border/50 type-card-title py-3">Jobs</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href="/courses" className="text-text border-b border-border/50 type-card-title py-3">Courses</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${recruiterUrl}/auth/signin`} className="text-text border-b border-border/50 type-card-title py-3">Recruiters</Link>
+                        <Link onClick={() => setIsMenuOpen(false)} href={`${companyUrl}/auth/signin`} className="text-text py-3 type-card-title">Institutes</Link>
                     </nav>
 
-                    <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="border-t flex-col gap-3 border-border flex pt-4 dark:border-border">
                         <AuthActions isMobile={true} />
-                        <div className="grid grid-cols-2 gap-3 mt-2">
+                        <div className="mt-2 grid-cols-2 grid gap-3">
                            <Link 
                                 href={`${recruiterUrl}/auth/signin`}
-                                className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
+                                className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
                             >
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">Recruiter</span>
+                                <span className="text-primary type-badge font-bold">Recruiter</span>
                             </Link>
                             <Link 
                                 href={`${companyUrl}/auth/signin`}
-                                className="flex flex-col items-center gap-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-center"
+                                className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
                             >
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">Company</span>
+                                <span className="text-primary type-badge font-bold">Company</span>
                             </Link>
                         </div>
                     </div>
                 </div>
             )}
         </header>
+    );
+}
+
+/**
+ * Compact action button for guest mobile layout context.
+ */
+function MobileCompactAuthActions() {
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+    React.useEffect(() => {
+        const hasSession = document.cookie.includes('joblyne_session=true');
+        setIsLoggedIn(hasSession);
+    }, []);
+
+    if (isLoggedIn) {
+        return (
+            <Button 
+                as={Link}
+                href="/dashboard" 
+                variant="primary"
+                size="sm"
+                aria-label="Dashboard"
+            >
+                Dashboard
+            </Button>
+        );
+    }
+
+    return (
+        <Button 
+            as={Link}
+            href="/auth/signup" 
+            variant="primary"
+            size="sm"
+        >
+            Get Started
+        </Button>
     );
 }
 
@@ -135,40 +180,53 @@ function AuthActions({ isMobile }: { isMobile?: boolean }) {
 
     if (isLoggedIn) {
         return (
-            <div className={`flex items-center ${isMobile ? 'flex-col gap-3 w-full' : 'gap-4'}`}>
-                <Link href="/dashboard" className={`text-sm font-black px-5 py-2.5 bg-btn-primary text-surface hover:bg-btn-primary-hover rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${isMobile ? 'w-full py-4' : ''}`}>
-                    <span className="material-symbols-outlined text-lg">dashboard</span>
+            <div className={`flex items-center ${isMobile ? 'w-full gap-3 flex-col' : 'gap-4'}`}>
+                <Button 
+                    as={Link} 
+                    href="/dashboard" 
+                    variant="primary" 
+                    className={`${isMobile ? 'w-full py-4' : ''}`}
+                >
+                    <LayoutDashboard size={18} aria-hidden="true" />
                     Dashboard
-                </Link>
+                </Button>
                 <form 
                   className={isMobile ? 'w-full' : ''}
                   action={async () => {
                     const { logoutAction } = await import("@/features/auth/actions");
                     await logoutAction();
                 }}>
-                    <button type="submit" className={`text-sm font-black text-muted hover:text-red-500 transition-colors flex items-center justify-center gap-2 min-h-[44px] ${isMobile ? 'w-full bg-bg rounded-xl py-3' : ''}`}>
-                        <span className="material-symbols-outlined text-lg">logout</span>
-                        <span>Logout</span>
-                    </button>
+                    <Button 
+                        type="submit" 
+                        variant="ghost" 
+                        className={`text-muted hover:text-red-500 ${isMobile ? 'w-full py-3 bg-surface-2 rounded-xl' : ''}`}
+                    >
+                        <LogOut size={18} aria-hidden="true" />
+                        Logout
+                    </Button>
                 </form>
             </div>
         );
     }
 
     return (
-        <div className={`flex items-center ${isMobile ? 'flex-col gap-3 w-full' : 'gap-2'}`}>
-            <Link 
+        <div className={`flex items-center ${isMobile ? 'w-full gap-3 flex-col' : 'gap-2'}`}>
+            <Button 
+                as={Link} 
                 href="/auth/signin" 
-                className={`text-sm font-black px-5 py-2.5 border-2 border-primary text-primary hover:bg-primary/5 rounded-xl transition-all flex items-center justify-center ${isMobile ? 'w-full py-4' : ''}`}
+                variant="outline" 
+                className={`${isMobile ? 'w-full py-4' : ''}`}
             >
                 Login
-            </Link>
-            <Link 
+            </Button>
+            <Button 
+                as={Link} 
                 href="/auth/signup" 
-                className={`text-sm font-black px-5 py-2.5 bg-btn-primary text-surface hover:bg-btn-primary-hover rounded-xl shadow-md shadow-primary/20 transition-all border-2 border-transparent flex items-center justify-center ${isMobile ? 'w-full py-4' : ''}`}
+                variant="primary" 
+                className={`shadow-md shadow-primary/10 ${isMobile ? 'w-full py-4' : ''}`}
             >
                 Register
-            </Link>
+            </Button>
         </div>
     );
 }
@@ -178,42 +236,77 @@ function AuthActions({ isMobile }: { isMobile?: boolean }) {
  */
 function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; companyUrl: string }) {
     const [isOpen, setIsOpen] = React.useState(false);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === "Escape") {
+                setIsOpen(false);
+            }
+        }
+        function handleClickOutside(e: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        if (isOpen) {
+            document.addEventListener("keydown", handleKeyDown);
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
 
     return (
-        <div className="relative group p-2">
+        <div className="p-2 relative" ref={dropdownRef}>
             <button 
+                id="employer-menu-button"
+                aria-expanded={isOpen}
+                aria-haspopup="true"
+                aria-controls="employer-menu"
+                onClick={() => setIsOpen(!isOpen)}
                 onMouseEnter={() => setIsOpen(true)}
-                className="flex items-center gap-1 text-sm font-black text-text hover:text-primary transition-colors py-2"
+                className="text-text gap-1 items-center type-ui py-2 transition-colors flex hover:text-primary cursor-pointer select-none font-semibold"
             >
                 For employers
-                <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                    expand_more
-                </span>
+                <ChevronDown
+                    size={18}
+                    className={`duration-300 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                />
             </button>
 
             <div 
+                id="employer-menu"
+                role="menu"
+                aria-labelledby="employer-menu-button"
                 onMouseEnter={() => setIsOpen(true)}
                 onMouseLeave={() => setIsOpen(false)}
-                className={`absolute right-0 top-full pt-2 w-56 transition-all duration-200 z-[100] ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+                className={`z-[100] absolute duration-200 pt-2 transition-all w-56 top-full right-0 ${isOpen ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-2 pointer-events-none'}`}
             >
-                <div className="bg-surface border border-border rounded-2xl shadow-2xl p-2 overflow-hidden">
+                <div className="border-border rounded-2xl overflow-hidden p-2 shadow-2xl bg-surface border">
                     <Link 
+                        role="menuitem"
+                        onClick={() => setIsOpen(false)}
                         href={`${recruiterUrl}/auth/signin`}
-                        className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
+                        className="group p-3 gap-0.5 transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card"
                     >
-                        <span className="text-sm font-black group-hover:text-primary transition-colors">Recruiter Portal</span>
-                        <span className="text-[10px] text-slate-500 font-bold">Find and vet top talent quickly.</span>
+                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Recruiter Portal</span>
+                        <span className="text-muted text-xs">Find and vet top talent quickly.</span>
                     </Link>
                     <Link 
+                        role="menuitem"
+                        onClick={() => setIsOpen(false)}
                         href={`${companyUrl}/auth/signin`}
-                        className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group border-t border-slate-100 dark:border-slate-800/50"
+                        className="border-t group p-3 gap-0.5 border-border transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card dark:border-border/50"
                     >
-                        <span className="text-sm font-black group-hover:text-primary transition-colors">Company Login</span>
-                        <span className="text-[10px] text-slate-500 font-bold">Manage your organization's hiring.</span>
+                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Company Login</span>
+                        <span className="text-muted text-xs">Manage your organization's hiring.</span>
                     </Link>
                 </div>
             </div>
         </div>
     );
 }
-

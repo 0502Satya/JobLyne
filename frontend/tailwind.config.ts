@@ -22,7 +22,12 @@ const config: Config = {
           dark: "var(--color-primary-dark)",
           light: "var(--color-primary-light)",
         },
+        accent: "var(--color-accent)",
         "accent-gradient": "var(--color-accent-gradient)",
+        "company-accent": "var(--color-company-accent)",
+        "recruiter-accent": "var(--color-recruiter-accent)",
+        linkedin: "var(--color-linkedin)",
+        "linkedin-hover": "var(--color-linkedin-hover)",
         "stat-blue": "var(--color-stat-blue)",
         "stat-green": "var(--color-stat-green)",
         "stat-lime": "var(--color-stat-lime)",
@@ -34,8 +39,7 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        display: ["var(--font-inter)", "sans-serif"],
+        sans: ["var(--font-primary)", "sans-serif"],
       }
     },
   },

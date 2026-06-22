@@ -14,8 +14,17 @@ import CertificationsSection from "@/features/dashboard/components/profile/Certi
 import ResumeBuilderSection from "@/features/dashboard/components/profile/ResumeBuilderSection";
 import PrivacySettingsSection from "@/features/dashboard/components/profile/PrivacySettingsSection";
 import UnsavedChangesBar from "@/features/dashboard/components/profile/UnsavedChangesBar";
-import Toast from "@/features/dashboard/components/profile/Toast";
+import { toast } from "react-hot-toast";
 import ProfileInfoCard from "@/features/dashboard/components/profile/ProfileInfoCard";
+import { Button, ErrorState, Icon } from "@/shared/ui";
+import {
+  CheckCircle2,
+  Network,
+  Sparkles,
+  Plus,
+  BadgeCheck,
+  Eye
+} from "lucide-react";
 
 import { Profile } from "@/types/profile";
 
@@ -81,7 +90,6 @@ export default function ProfilePage() {
   const [fetchError, setFetchError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [activeSection, setActiveSection] = useState("personal");
 
   const dirtyCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -208,9 +216,9 @@ export default function ProfilePage() {
     if (result.success) {
       setOriginalProfile(structuredClone(profile));
       setHasUnsavedChanges(false);
-      setToast({ message: "Profile updated successfully!", type: "success" });
+      toast.success("Profile updated successfully!");
     } else {
-      setToast({ message: result.error || "Failed to save profile", type: "error" });
+      toast.error(result.error || "Failed to save profile");
     }
     setIsSaving(false);
   };
@@ -219,7 +227,7 @@ export default function ProfilePage() {
     if (originalProfile) {
       setProfile(structuredClone(originalProfile));
       setHasUnsavedChanges(false);
-      setToast({ message: "Changes discarded", type: "success" });
+      toast.success("Changes discarded");
     }
   };
 
@@ -389,42 +397,28 @@ export default function ProfilePage() {
 
   if (fetchError) {
     return (
-      <main className="flex-1 overflow-y-auto px-4 py-8 md:px-10 md:py-12 h-[calc(100vh-73px)] bg-slate-50/50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mx-auto">
-            <span className="material-symbols-outlined text-2xl font-bold">error</span>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-slate-800">Failed to load profile</h3>
-            <p className="text-sm text-slate-500 mt-1">
-              There was a problem retrieving your candidate profile. Please check your network connection and try again.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={fetchProfile}
-            className="w-full py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/95 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
-          >
-            <span className="material-symbols-outlined text-lg">refresh</span>
-            Try Again
-          </button>
-        </div>
+      <main className="justify-center flex-1 overflow-y-auto items-center py-8 bg-bg/50 flex h-[calc(100vh-73px)] px-4 md:py-12 md:px-10">
+        <ErrorState
+          title="Failed to load profile"
+          description="There was a problem retrieving your candidate profile. Please check your network connection and try again."
+          onRetry={fetchProfile}
+        />
       </main>
     );
   }
 
   if (loading && !profile) {
     return (
-      <main className="flex-1 overflow-y-auto px-4 py-8 md:px-10 md:py-12 h-[calc(100vh-73px)] animate-pulse bg-slate-50/50">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="h-10 w-48 bg-slate-250 rounded-2xl"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_320px] gap-8">
-            <div className="h-64 bg-slate-250 rounded-2xl"></div>
+      <main className="flex-1 overflow-y-auto animate-pulse py-8 bg-bg/50 h-[calc(100vh-73px)] px-4 md:py-12 md:px-10">
+        <div className="mx-auto max-w-7xl space-y-12">
+          <div className="rounded-2xl w-48 h-10 bg-border"></div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr_320px]">
+            <div className="rounded-2xl bg-border h-64"></div>
             <div className="space-y-6">
-              <div className="h-80 bg-slate-250 rounded-2xl"></div>
-              <div className="h-80 bg-slate-250 rounded-2xl"></div>
+              <div className="rounded-2xl bg-border h-80"></div>
+              <div className="rounded-2xl bg-border h-80"></div>
             </div>
-            <div className="h-96 bg-slate-250 rounded-2xl"></div>
+            <div className="h-96 rounded-2xl bg-border"></div>
           </div>
         </div>
       </main>
@@ -439,98 +433,98 @@ export default function ProfilePage() {
         onDiscard={handleDiscard} 
       />
       <main
-        className="candidate-profile-reference flex-1 overflow-y-auto px-4 pt-6 pb-32 md:px-8 md:py-8 h-[calc(100vh-73px)] custom-scrollbar bg-bg"
+        className="custom-scrollbar flex-1 overflow-y-auto pb-32 pt-6 bg-bg h-[calc(100vh-73px)] candidate-profile-reference px-4 md:px-8 md:py-8"
         style={{
-          "--color-primary": "14 124 134",
-          "--color-primary-dark": "10 87 94",
+          "--color-primary": "#0e7c86",
+          "--color-primary-dark": "#0a575e",
           "--color-primary-light": "#e7f4f5",
         } as React.CSSProperties}
       >
         <div className="max-w-[1440px] mx-auto animate-fade-in">
-          <div className="flex flex-wrap items-center justify-between mb-6 gap-5">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="size-12 rounded-xl bg-primary text-white flex items-center justify-center shadow-sm shrink-0">
-                <span className="material-symbols-outlined text-[26px]">hub</span>
+          <div className="items-center flex-wrap flex gap-5 mb-6 justify-between">
+            <div className="gap-4 flex items-center min-w-0">
+              <div className="justify-center shrink-0 size-12 items-center text-white shadow-sm bg-primary flex rounded-xl">
+                <Network size={24} aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h2 className="text-2xl sm:text-3xl font-black text-text tracking-tight leading-none">Candidate Profile</h2>
-                  <span className="inline-flex h-7 items-center gap-1 rounded-full bg-primary/10 px-3 text-[11px] font-black uppercase tracking-wide text-primary border border-primary/20">
-                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                <div className="items-center gap-2 flex-wrap flex mb-1">
+                  <h2 className="text-text type-h2 leading-none">Candidate Profile</h2>
+                  <span className="text-xs text-primary h-7 border gap-1 inline-flex uppercase px-3 border-primary/20 items-center tracking-wide rounded-full bg-primary/10">
+                    <Sparkles size={14} aria-hidden="true" />
                     Edit mode
                   </span>
                 </div>
-                <p className="text-muted font-semibold text-xs sm:text-sm">Keep your professional profile polished, searchable, and ready for recruiters.</p>
+                <p className="type-caption text-muted">Keep your professional profile polished, searchable, and ready for recruiters.</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex gap-3 items-center">
               {hasUnsavedChanges && (
                 <>
-                  <button 
+                  <Button 
+                    variant="secondary"
                     onClick={handleDiscard}
-                    className="px-4 py-2.5 rounded-lg bg-card text-text font-bold text-xs border border-border hover:bg-bg hover:text-text transition-all min-h-[40px] flex items-center justify-center cursor-pointer shadow-sm"
                   >
                     Discard Draft
-                  </button>
-                  <button 
+                  </Button>
+                  <Button 
                     onClick={handleSave}
-                    className="px-5 py-2.5 rounded-lg bg-primary text-white font-bold text-xs transition-all shadow-sm hover:bg-primary-dark flex items-center gap-2 min-h-[40px] justify-center cursor-pointer"
+                    isLoading={isSaving}
                   >
-                    {isSaving ? "Saving..." : "Save Draft"}
-                  </button>
+                    Save Draft
+                  </Button>
                 </>
               )}
             </div>
           </div>
 
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <section className="gap-4 grid grid-cols-1 mb-6 sm:grid-cols-2 lg:grid-cols-4">
             {profileStats.map((stat) => (
-              <div key={stat.label} className="bg-card border border-border rounded-xl p-4 shadow-sm flex items-center justify-between gap-4">
+              <div key={stat.label} className="border-border gap-4 items-center shadow-sm bg-card flex justify-between p-4 rounded-xl border">
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-wide text-muted">{stat.label}</p>
-                  <p className="text-xl font-black text-text mt-1">{stat.value}</p>
+                  <p className="text-xs uppercase tracking-wide text-muted">{stat.label}</p>
+                  <p className="text-text type-h2 mt-1">{stat.value}</p>
                 </div>
-                <div className={`size-11 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
-                  <span className="material-symbols-outlined text-[22px]">{stat.icon}</span>
+                <div className={`size-11 rounded-xl ${stat.bg} ${stat.color} flex justify-center items-center`}>
+                  <Icon name={stat.icon} size={20} aria-hidden="true" />
                 </div>
               </div>
             ))}
           </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] xl:grid-cols-[260px_minmax(0,1fr)_310px] gap-6 items-start">
+          <div className="items-start gap-6 grid grid-cols-1 lg:grid-cols-[240px_1fr] xl:grid-cols-[260px_minmax(0,1fr)_310px]">
             
             {/* Left Sidebar Navigation (Desktop only) */}
-            <aside className="hidden lg:block sticky top-6 bg-card rounded-xl p-4 border border-border shadow-sm space-y-4">
+            <aside className="border-border hidden sticky shadow-sm bg-card p-4 top-6 space-y-4 rounded-xl border lg:block">
               {/* Mini Profile Header */}
-              <div className="flex flex-col items-center text-center pb-4 border-b border-border/60 mb-2">
-                <div className="size-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-xl font-bold mb-3 overflow-hidden shadow-inner">
+              <div className="border-b items-center border-border/60 text-center pb-4 flex mb-2 flex-col">
+                <div className="justify-center text-primary mb-3 type-h3 border-primary/20 items-center overflow-hidden bg-primary/10 rounded-full flex size-16 shadow-inner border">
                   {profile?.profile_photo_url ? (
                     <img src={profile.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     initials
                   )}
                 </div>
-                <h3 className="text-sm font-bold text-text break-words w-full max-w-[200px]">
+                <h3 className="w-full text-text break-words max-w-[200px] type-ui">
                   {profile?.full_name || "JobLyne User"}
                 </h3>
-                <p className="text-[11px] font-semibold text-muted leading-tight mt-0.5 line-clamp-1 break-words w-full max-w-[200px]">
+                <p className="w-full text-xs break-words mt-0.5 max-w-[200px] text-muted line-clamp-1 leading-tight">
                   {profile?.headline || "Add a career headline"}
                 </p>
                 <div className="w-full mt-3 px-2">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-muted uppercase mb-1">
+                  <div className="text-xs uppercase items-center flex mb-1 text-muted justify-between">
                     <span>Profile strength</span>
                     <span className="text-primary">{completenessScore}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-bg border border-border rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 border-border overflow-hidden bg-bg rounded-full border">
                     <div 
-                      className="h-full bg-primary transition-all duration-500"
+                      className="bg-primary transition-all h-full duration-500"
                       style={{ width: `${completenessScore}%` }}
                     />
                   </div>
                 </div>
               </div>
 
-              <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-2">Profile Sections</h4>
+              <h4 className="type-caption uppercase tracking-wider mb-2 text-muted">Profile Sections</h4>
               <nav className="space-y-1">
                 {SECTIONS.map((sect) => {
                   const status = sectionStatuses[sect.id] || { status: "empty", error: false };
@@ -541,24 +535,24 @@ export default function ProfilePage() {
                       onClick={() => handleNavClick(sect.id)}
                       aria-current={isActive ? "location" : undefined}
                       aria-label={`${sect.label} section`}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                      className={`w-full cursor-pointer items-center transition-all rounded-lg p-2.5 flex text-left justify-between ${
                         isActive 
-                          ? "bg-primary/10 text-primary font-bold" 
-                          : "text-muted hover:bg-bg/50 hover:text-text font-medium"
+                          ? "text-primary bg-primary/10" 
+                          : "text-muted hover:text-text hover:bg-bg/50"
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="material-symbols-outlined text-lg">{sect.icon}</span>
+                      <div className="flex gap-2.5 items-center">
+                        <Icon name={sect.icon} size={18} aria-hidden="true" />
                         <span className="text-xs">{sect.label}</span>
                       </div>
                       
-                      <div className="flex items-center gap-1">
+                      <div className="gap-1 flex items-center">
                         {status.status === "complete" ? (
-                          <span className="material-symbols-outlined text-base text-emerald-500 font-bold">check_circle</span>
+                          <CheckCircle2 size={16} className="text-emerald-500" aria-hidden="true" />
                         ) : status.status === "partial" ? (
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" title="Partially Complete"></span>
+                          <span className="h-2.5 w-2.5 shadow-sm rounded-full bg-amber-400" title="Partially Complete"></span>
                         ) : status.error ? (
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-400" title="Required Fields Missing"></span>
+                          <span className="bg-red-400 h-2.5 w-2.5 rounded-full" title="Required Fields Missing"></span>
                         ) : null}
                       </div>
                     </button>
@@ -568,7 +562,7 @@ export default function ProfilePage() {
             </aside>
 
             {/* Mobile Bottom Navigation bar (Visible below lg screen size) */}
-            <div className="lg:hidden fixed bottom-6 left-4 right-4 z-50 bg-card/90 backdrop-blur-md rounded-xl p-2 border border-border shadow-lg flex items-center overflow-x-auto gap-2 no-scrollbar scroll-smooth" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+            <div className="lg:hidden no-scrollbar scroll-smooth left-4 bg-card/90 border border-border items-center p-2 backdrop-blur-md right-4 overflow-x-auto gap-2 flex bottom-6 z-50 shadow-lg rounded-xl fixed" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
               {SECTIONS.map((sect) => {
                 const status = sectionStatuses[sect.id] || { status: "empty", error: false };
                 const isActive = activeSection === sect.id;
@@ -578,28 +572,28 @@ export default function ProfilePage() {
                     onClick={() => handleNavClick(sect.id)}
                     aria-current={isActive ? "location" : undefined}
                     aria-label={`${sect.label} section`}
-                    className={`flex-shrink-0 flex flex-col items-center justify-center gap-0.5 p-2 rounded-lg w-16 text-muted hover:text-primary transition-all cursor-pointer relative min-h-[44px] ${
-                      isActive ? "text-primary font-bold scale-105 bg-primary/10" : ""
+                    className={`flex-shrink-0 justify-center cursor-pointer w-16 relative min-h-[44px] items-center p-2 transition-all rounded-lg gap-0.5 flex text-muted flex-col hover:text-primary ${
+                      isActive ? "scale-105 text-primary bg-primary/10" : ""
                     }`}
                   >
                     <div className="relative">
-                      <span className="material-symbols-outlined text-lg">{sect.icon}</span>
+                      <Icon name={sect.icon} size={18} aria-hidden="true" />
                       {status.status === "complete" ? (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white"></span>
+                        <span className="-top-1 border h-2.5 w-2.5 absolute rounded-full border-white bg-emerald-500 -right-1"></span>
                       ) : status.status === "partial" ? (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border border-white"></span>
+                        <span className="-top-1 border h-2.5 w-2.5 absolute bg-amber-400 rounded-full border-white -right-1"></span>
                       ) : status.error ? (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-400 border border-white"></span>
+                        <span className="-top-1 border bg-red-400 h-2.5 w-2.5 absolute rounded-full border-white -right-1"></span>
                       ) : null}
                     </div>
-                    <span className="text-[10px] font-semibold truncate w-full text-center">{sect.label.split(" ")[0]}</span>
+                    <span className="w-full text-xs text-center truncate">{sect.label.split(" ")[0]}</span>
                   </button>
                 );
               })}
             </div>
 
             {/* Center column: Form Editing Area */}
-            <div className="space-y-8 min-w-0">
+            <div className="min-w-0 space-y-8">
               <ProfileInfoCard 
                 profile={profile} 
                 onEdit={() => handleNavClick("personal")} 
@@ -664,12 +658,12 @@ export default function ProfilePage() {
             </div>
 
             {/* Right Sticky Sidebar: Completeness Widget & Visibility Index */}
-            <aside className="hidden xl:block sticky top-6 space-y-5">
-              <div className="bg-card rounded-xl p-5 border border-border shadow-sm text-center space-y-5">
-                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Profile Completeness</h4>
+            <aside className="top-6 sticky hidden space-y-5 xl:block">
+              <div className="border-border text-center shadow-sm bg-card space-y-5 p-5 rounded-xl border">
+                <h4 className="uppercase tracking-wider type-caption text-muted">Profile Completeness</h4>
                 
-                <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <div className="justify-center mx-auto w-28 relative items-center flex h-28">
+                  <svg className="w-full transform h-full -rotate-90" viewBox="0 0 100 100">
                     <circle
                       cx="50"
                       cy="50"
@@ -698,48 +692,51 @@ export default function ProfilePage() {
                       </linearGradient>
                     </defs>
                   </svg>
-                  <div className="absolute flex flex-col items-center">
-                    <span className="text-2xl font-bold text-text">{completenessScore}%</span>
-                    <span className="text-xs font-bold uppercase text-muted tracking-wider">Completeness</span>
+                  <div className="flex absolute items-center flex-col">
+                    <span className="type-h3 text-text">{completenessScore}%</span>
+                    <span className="uppercase tracking-wider type-caption text-muted">Completeness</span>
                   </div>
                 </div>
 
-                <div className="space-y-2.5 text-left pt-2 border-t border-border/60">
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block">Recommended Actions</span>
+                <div className="border-t border-border/60 pt-2 text-left space-y-2.5">
+                  <span className="block uppercase tracking-wider type-caption text-muted">Recommended Actions</span>
                   <div className="space-y-1.5">
                     {completenessScore < 100 ? (
                       <>
                         {sectionStatuses["resume"]?.status !== "complete" && (
-                          <button
+                          <Button
+                            variant="ghost"
                             onClick={() => handleNavClick("resume")}
-                            className="w-full text-left p-2 bg-bg hover:bg-primary/10 rounded-lg text-xs font-semibold text-muted hover:text-primary flex items-center gap-2 cursor-pointer transition-colors"
+                            className="w-full justify-start font-normal text-muted hover:text-primary hover:bg-primary/10 p-2 bg-bg rounded-lg gap-2 min-h-[36px]"
                           >
-                            <span className="material-symbols-outlined text-xs text-primary font-bold">add</span>
+                            <Plus size={14} className="text-primary" aria-hidden="true" />
                             Upload resume (+5%)
-                          </button>
+                          </Button>
                         )}
                         {sectionStatuses["experience"]?.status !== "complete" && (
-                          <button
+                          <Button
+                            variant="ghost"
                             onClick={() => handleNavClick("experience")}
-                            className="w-full text-left p-2 bg-bg hover:bg-primary/10 rounded-lg text-xs font-semibold text-muted hover:text-primary flex items-center gap-2 cursor-pointer transition-colors"
+                            className="w-full justify-start font-normal text-muted hover:text-primary hover:bg-primary/10 p-2 bg-bg rounded-lg gap-2 min-h-[36px]"
                           >
-                            <span className="material-symbols-outlined text-xs text-primary font-bold">add</span>
+                            <Plus size={14} className="text-primary" aria-hidden="true" />
                             Add Work Experience (+20%)
-                          </button>
+                          </Button>
                         )}
                         {sectionStatuses["skills"]?.status !== "complete" && (
-                          <button
+                          <Button
+                            variant="ghost"
                             onClick={() => handleNavClick("skills")}
-                            className="w-full text-left p-2 bg-bg hover:bg-primary/10 rounded-lg text-xs font-semibold text-muted hover:text-primary flex items-center gap-2 cursor-pointer transition-colors"
+                            className="w-full justify-start font-normal text-muted hover:text-primary hover:bg-primary/10 p-2 bg-bg rounded-lg gap-2 min-h-[36px]"
                           >
-                            <span className="material-symbols-outlined text-xs text-primary font-bold">add</span>
+                            <Plus size={14} className="text-primary" aria-hidden="true" />
                             Add 3 skills (+15%)
-                          </button>
+                          </Button>
                         )}
                       </>
                     ) : (
-                      <div className="p-2.5 bg-emerald-500/10 rounded-xl text-center text-xs font-bold text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 flex items-center justify-center gap-1.5">
-                        <span className="material-symbols-outlined text-base">verified</span>
+                      <div className="justify-center gap-1.5 text-emerald-600 items-center text-center bg-emerald-500/10 p-2.5 border-emerald-500/20 flex type-caption rounded-xl border dark:text-emerald-450">
+                        <BadgeCheck size={16} aria-hidden="true" />
                         Profile fully complete!
                       </div>
                     )}
@@ -747,103 +744,106 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="bg-card rounded-xl p-5 border border-border shadow-sm space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary font-bold text-lg">visibility</span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted">Profile Visibility</span>
+              <div className="border-border shadow-sm bg-card p-5 space-y-4 rounded-xl border">
+                <div className="gap-2 flex items-center">
+                  <Eye className="text-primary" size={18} aria-hidden="true" />
+                  <span className="uppercase tracking-wider type-caption text-muted">Profile Visibility</span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3" role="radiogroup" aria-label="Profile Visibility">
                   {/* Everyone */}
-                  <label
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={activeVisibility === "everyone"}
                     onClick={() => handleVisibilityChange("everyone")}
-                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer select-none ${
+                    className={`text-left w-full cursor-pointer items-start p-3 transition-all rounded-lg gap-3 select-none flex border outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       activeVisibility === "everyone"
-                        ? "border-primary bg-primary/10 text-text"
-                        : "border-border hover:border-border/80 text-muted bg-card"
+                        ? "text-text border-primary bg-primary/10"
+                        : "bg-card text-muted border-border hover:border-border/80"
                     }`}
                   >
-                    <div className="flex items-center justify-center pt-0.5">
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                    <div className="pt-0.5 flex justify-center items-center">
+                      <div className={`justify-center shrink-0 items-center rounded-full h-4 w-4 flex border ${
                         activeVisibility === "everyone" ? "border-primary" : "border-border"
                       }`}>
                         {activeVisibility === "everyone" && (
-                          <div className="w-2 bg-primary h-2 rounded-full" />
+                          <div className="bg-primary h-2 rounded-full w-2" />
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs font-bold block leading-tight">Everyone</span>
-                      <span className="text-[10px] text-muted font-semibold block mt-0.5 leading-snug">
+                      <span className="block type-caption leading-tight">Everyone</span>
+                      <span className="leading-snug block text-xs mt-0.5 text-muted">
                         Maximum reach. Open search engines and recruiters.
                       </span>
                     </div>
-                  </label>
+                  </button>
 
                   {/* Recruiters & companies */}
-                  <label
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={activeVisibility === "recruiters"}
                     onClick={() => handleVisibilityChange("recruiters")}
-                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer select-none ${
+                    className={`text-left w-full cursor-pointer items-start p-3 transition-all rounded-lg gap-3 select-none flex border outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       activeVisibility === "recruiters"
-                        ? "border-primary bg-primary/10 text-text"
-                        : "border-border hover:border-border/80 text-muted bg-card"
+                        ? "text-text border-primary bg-primary/10"
+                        : "bg-card text-muted border-border hover:border-border/80"
                     }`}
                   >
-                    <div className="flex items-center justify-center pt-0.5">
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                    <div className="pt-0.5 flex justify-center items-center">
+                      <div className={`justify-center shrink-0 items-center rounded-full h-4 w-4 flex border ${
                         activeVisibility === "recruiters" ? "border-primary" : "border-border"
                       }`}>
                         {activeVisibility === "recruiters" && (
-                          <div className="w-2 bg-primary h-2 rounded-full" />
+                          <div className="bg-primary h-2 rounded-full w-2" />
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs font-bold block leading-tight">Recruiters & companies</span>
-                      <span className="text-[10px] text-muted font-semibold block mt-0.5 leading-snug">
+                      <span className="block type-caption leading-tight">Recruiters & companies</span>
+                      <span className="leading-snug block text-xs mt-0.5 text-muted">
                         Recommended. Only verified recruiters can find you.
                       </span>
                     </div>
-                  </label>
+                  </button>
 
                   {/* Hidden */}
-                  <label
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={activeVisibility === "hidden"}
                     onClick={() => handleVisibilityChange("hidden")}
-                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer select-none ${
+                    className={`text-left w-full cursor-pointer items-start p-3 transition-all rounded-lg gap-3 select-none flex border outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       activeVisibility === "hidden"
-                        ? "border-primary bg-primary/10 text-text"
-                        : "border-border hover:border-border/80 text-muted bg-card"
+                        ? "text-text border-primary bg-primary/10"
+                        : "bg-card text-muted border-border hover:border-border/80"
                     }`}
                   >
-                    <div className="flex items-center justify-center pt-0.5">
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                    <div className="pt-0.5 flex justify-center items-center">
+                      <div className={`justify-center shrink-0 items-center rounded-full h-4 w-4 flex border ${
                         activeVisibility === "hidden" ? "border-primary" : "border-border"
                       }`}>
                         {activeVisibility === "hidden" && (
-                          <div className="w-2 bg-primary h-2 rounded-full" />
+                          <div className="bg-primary h-2 rounded-full w-2" />
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs font-bold block leading-tight">Hidden</span>
-                      <span className="text-[10px] text-muted font-semibold block mt-0.5 leading-snug">
+                      <span className="block type-caption leading-tight">Hidden</span>
+                      <span className="leading-snug block text-xs mt-0.5 text-muted">
                         Off the radar. Only visible via direct job applications.
                       </span>
                     </div>
-                  </label>
+                  </button>
                 </div>
               </div>
             </aside>
           </div>
         </div>
 
-        {toast && (
-          <Toast 
-            message={toast.message} 
-            type={toast.type} 
-            onClose={() => setToast(null)} 
-          />
-        )}
+
       </main>
     </>
   );

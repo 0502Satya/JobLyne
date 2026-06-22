@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getActionPlanAction } from "@/features/auth/actions";
+import { CalendarClock, ArrowRight, Code2, Brain, Video, FilePen, Palette, Share2 } from "lucide-react";
+import Icon from "@/shared/ui/Icon";
 
 export default function SidebarWidgets() {
   const [actions, setActions] = useState<any[]>([]);
@@ -21,129 +23,128 @@ export default function SidebarWidgets() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex gap-6 flex-col">
         {[1, 2].map((i) => (
-          <div key={i} className="h-40 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 animate-pulse"></div>
+          <div key={i} className="h-40 animate-pulse bg-surface border-border rounded-2xl border dark:bg-card"></div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex gap-8 flex-col text-left">
       {/* Today's Action Plan */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">event_upcoming</span>
+      <div className="bg-surface border-border shadow-sm p-6 rounded-2xl border dark:bg-card">
+        <h3 className="type-card-title items-center mb-4 gap-2 text-text flex font-semibold">
+          <CalendarClock size={20} className="text-primary font-bold" aria-hidden="true" />
           Today&apos;s Action Plan
         </h3>
         <ul className="text-sm space-y-4">
           {actions.map((action) => (
-            <li key={action.id} className="flex gap-3 text-slate-600 dark:text-slate-300">
-              <span className="material-symbols-outlined text-primary text-xl">
-                {action.icon}
-              </span>
+            <li key={action.id} className="flex gap-3 text-muted">
+              <Icon name={action.icon} size={20} className="text-primary font-bold" aria-hidden="true" />
               <div className="flex-1">
-                <p className="font-bold text-slate-900 dark:text-white text-sm">{action.title}</p>
-                <p className="text-xs mb-2">{action.description}</p>
+                <p className="text-text type-ui font-semibold">{action.title}</p>
+                <p className="mb-2 text-xs">{action.description}</p>
                 <Link 
                   href={action.link} 
-                  className="inline-flex items-center text-primary hover:underline font-bold text-xs gap-1"
+                  className="text-primary gap-1 inline-flex items-center type-caption hover:underline font-bold"
                 >
                   Get Started
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  <ArrowRight size={12} className="font-bold" aria-hidden="true" />
                 </Link>
               </div>
             </li>
           ))}
           {actions.length === 0 && (
-            <li className="text-slate-500 italic text-center py-2">
+            <li className="italic text-muted py-2 text-center font-medium">
               All caught up! ✨ Check back later for more tips.
             </li>
           )}
         </ul>
       </div>
+
       {/* Learning Progress */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Learning Progress</h3>
+      <div className="bg-surface border-border shadow-sm p-6 rounded-2xl border dark:bg-card">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-text type-card-title font-semibold">Learning Progress</h3>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="gap-4 flex flex-col">
           {/* Course 1 */}
           <div className="flex gap-3 items-start">
-            <div className="h-10 w-10 rounded bg-blue-100 dark:bg-blue-900/30 flex-shrink-0 flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined text-xl">code</span>
+            <div className="flex-shrink-0 justify-center h-10 w-10 text-info items-center bg-info-bg border border-info/10 flex rounded-xl">
+              <Code2 size={20} className="font-bold" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Advanced React Patterns</h4>
-              <p className="text-xs text-slate-500 mb-2">Module 4 of 12</p>
-              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
+              <h4 className="type-ui text-text leading-tight font-semibold">Advanced React Patterns</h4>
+              <p className="text-muted mb-2 text-xs font-medium">Module 4 of 12</p>
+              <div className="w-full h-1.5 bg-bg rounded-full dark:bg-card">
                 <div className="bg-primary h-1.5 rounded-full" style={{ width: "35%" }}></div>
               </div>
             </div>
           </div>
           {/* Course 2 */}
-          <div className="flex gap-3 items-start pt-4 border-t border-slate-100 dark:border-slate-800">
-            <div className="h-10 w-10 rounded bg-purple-100 dark:bg-purple-900/30 flex-shrink-0 flex items-center justify-center text-purple-600">
-              <span className="material-symbols-outlined text-xl">psychology</span>
+          <div className="border-t items-start border-border gap-3 flex pt-4 dark:border-border">
+            <div className="flex-shrink-0 justify-center h-10 w-10 bg-primary/10 border border-primary/5 items-center flex text-primary rounded-xl">
+              <Brain size={20} className="font-bold" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">System Design Interview</h4>
-              <p className="text-xs text-slate-500 mb-2">Module 8 of 10</p>
-              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
-                <div className="bg-purple-600 h-1.5 rounded-full" style={{ width: "80%" }}></div>
+              <h4 className="type-ui text-text leading-tight font-semibold">System Design Interview</h4>
+              <p className="text-muted mb-2 text-xs font-medium">Module 8 of 10</p>
+              <div className="w-full h-1.5 bg-bg rounded-full dark:bg-card">
+                <div className="bg-primary h-1.5 rounded-full" style={{ width: "80%" }}></div>
               </div>
             </div>
           </div>
         </div>
-        <button className="w-full mt-5 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+        <button className="w-full mt-5 bg-bg text-text rounded-xl type-ui transition-colors py-2.5 dark:bg-card hover:bg-bg dark:hover:bg-border cursor-pointer font-bold min-h-[40px]">
           View All Courses
         </button>
       </div>
 
       {/* Upcoming Interview Promo */}
-      <div className="bg-gradient-to-br from-primary to-blue-700 rounded-xl p-6 shadow-md text-white relative overflow-hidden">
+      <div className="shadow-md relative overflow-hidden bg-gradient-to-br from-primary to-primary-dark text-white p-6 rounded-2xl">
         {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-black/10 rounded-full blur-xl"></div>
+        <div className="bg-white/10 -mr-4 w-24 absolute blur-xl rounded-full h-24 -mt-4 right-0 top-0"></div>
+        <div className="-mb-4 h-20 absolute blur-xl left-0 bg-black/10 -ml-4 rounded-full w-20 bottom-0"></div>
         <div className="relative z-10">
-          <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center mb-4 backdrop-blur-sm">
-            <span className="material-symbols-outlined">video_call</span>
+          <div className="justify-center h-10 w-10 items-center bg-white/20 mb-4 rounded-lg backdrop-blur-sm flex">
+            <Video size={20} className="font-bold" aria-hidden="true" />
           </div>
-          <h3 className="text-lg font-bold mb-1">Interview Prep</h3>
-          <p className="text-blue-100 text-sm mb-4">Practice with our AI interviewer to boost your confidence.</p>
-          <button className="w-full py-2 bg-white text-primary text-sm font-bold rounded-lg hover:bg-blue-50 transition-colors">
+          <h3 className="mb-1 type-card-title font-bold">Interview Prep</h3>
+          <p className="mb-4 text-sm text-primary-light">Practice with our AI interviewer to boost your confidence.</p>
+          <button className="w-full text-primary bg-surface rounded-xl type-ui transition-colors py-2.5 hover:bg-primary-light/10 hover:text-white font-bold cursor-pointer min-h-[40px] border-none">
             Start Session
           </button>
         </div>
       </div>
 
       {/* Quick Links/Resume Services */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Resume Services</h3>
+      <div className="bg-surface border-border shadow-sm p-6 rounded-2xl border dark:bg-card">
+        <h3 className="mb-4 text-text type-card-title font-semibold">Resume Services</h3>
         <ul className="space-y-3">
           <li>
-            <button className="flex items-center gap-3 group w-full text-left">
-              <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-colors">
-                <span className="material-symbols-outlined text-sm">edit_document</span>
+            <button className="w-full group items-center gap-3 flex text-left cursor-pointer">
+              <div className="justify-center text-muted items-center rounded-full bg-bg transition-colors h-8 flex w-8 dark:bg-card group-hover:bg-primary group-hover:text-white">
+                <FilePen size={14} className="font-bold" aria-hidden="true" />
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">AI Resume Review</span>
+              <span className="text-text type-ui transition-colors group-hover:text-primary font-semibold">AI Resume Review</span>
             </button>
           </li>
           <li>
-            <button className="flex items-center gap-3 group w-full text-left">
-              <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-colors">
-                <span className="material-symbols-outlined text-sm">palette</span>
+            <button className="w-full group items-center gap-3 flex text-left cursor-pointer">
+              <div className="justify-center text-muted items-center rounded-full bg-bg transition-colors h-8 flex w-8 dark:bg-card group-hover:bg-primary group-hover:text-white">
+                <Palette size={14} className="font-bold" aria-hidden="true" />
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Cover Letter Generator</span>
+              <span className="text-text type-ui transition-colors group-hover:text-primary font-semibold">Cover Letter Generator</span>
             </button>
           </li>
           <li>
-            <button className="flex items-center gap-3 group w-full text-left">
-              <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-colors">
-                <span className="material-symbols-outlined text-sm">share</span>
+            <button className="w-full group items-center gap-3 flex text-left cursor-pointer">
+              <div className="justify-center text-muted items-center rounded-full bg-bg transition-colors h-8 flex w-8 dark:bg-card group-hover:bg-primary group-hover:text-white">
+                <Share2 size={14} className="font-bold" aria-hidden="true" />
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Share Profile</span>
+              <span className="text-text type-ui transition-colors group-hover:text-primary font-semibold">Share Profile</span>
             </button>
           </li>
         </ul>

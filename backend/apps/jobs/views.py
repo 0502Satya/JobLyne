@@ -2,7 +2,7 @@ import uuid
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -21,7 +21,10 @@ class JobPagination(PageNumberPagination):
     max_page_size = 100
 
 class JobListView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request):
         query = request.query_params.get('query', '')
@@ -35,13 +38,13 @@ class JobListView(APIView):
         
         my_jobs = request.query_params.get('my_jobs', '')
         if my_jobs == 'true':
-            if request.user.account_type == 'COMPANY':
+            if request.user.is_authenticated and request.user.account_type == 'COMPANY':
                 try:
                     adv_account = AdvertiserAccounts.objects.get(user=request.user)
                     jobs = jobs.filter(company=adv_account.company)
                 except AdvertiserAccounts.DoesNotExist:
                     jobs = jobs.none()
-            elif request.user.account_type == 'RECRUITER':
+            elif request.user.is_authenticated and request.user.account_type == 'RECRUITER':
                 try:
                     recruiter = Recruiters.objects.get(user=request.user)
                     jobs = jobs.filter(recruiter=recruiter)
@@ -120,7 +123,13 @@ class JobListView(APIView):
                     
                     job_data['match_score'] = min(max(round(match_ratio), 0), 100)
             except JobSeekers.DoesNotExist:
-                pass
+                for job_data in response_data:
+                    job_data['is_saved'] = False
+                    job_data['match_score'] = 60
+        else:
+            for job_data in response_data:
+                job_data['is_saved'] = False
+                job_data['match_score'] = 60
 
         if page is not None:
             return paginator.get_paginated_response(response_data)
@@ -217,7 +226,10 @@ class JobListView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class JobDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request, pk):
         try:
@@ -225,7 +237,7 @@ class JobDetailView(APIView):
             serializer = JobSerializer(job)
             data = serializer.data
             
-            if request.user.account_type == 'CANDIDATE':
+            if request.user.is_authenticated and request.user.account_type == 'CANDIDATE':
                 try:
                     job_seeker = JobSeekers.objects.get(user=request.user)
                     data['has_applied'] = Applications.objects.filter(job=job, job_seeker=job_seeker).exists()
@@ -233,6 +245,9 @@ class JobDetailView(APIView):
                 except JobSeekers.DoesNotExist:
                     data['has_applied'] = False
                     data['is_saved'] = False
+            else:
+                data['has_applied'] = False
+                data['is_saved'] = False
             
             return Response(data)
         except Jobs.DoesNotExist:

@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Banknote, Clock } from "lucide-react";
+
 /**
  * This section shows job recommendations specifically for the user.
  * It includes a 'match percentage' to show how well they fit the job.
@@ -37,50 +40,50 @@ export default function RecommendedJobs() {
     ];
 
     return (
-        <section className="py-20 bg-bg transition-colors">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="bg-bg transition-colors py-20">
+            <div className="mx-auto px-4 max-w-7xl sm:px-6 lg:px-8">
                 {/* Title and 'View All' button */}
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
+                <div className="mb-10 flex-col flex gap-6 justify-between sm:flex-row sm:items-end">
                     <div className="min-w-0">
-                        <h2 className="text-2xl sm:text-3xl font-black text-text mb-2 truncate">Recommended for You</h2>
-                        <p className="text-muted text-sm sm:text-base">Jobs that match your profile and search history.</p>
+                        <h2 className="text-text type-h2 truncate mb-2">Recommended for You</h2>
+                        <p className="text-sm text-muted sm:text-base">Jobs that match your profile and search history.</p>
                     </div>
-                    <button className="text-primary font-bold hover:underline shrink-0 min-h-[44px] text-sm text-left">View All Jobs</button>
+                    <Link href="/jobs" className="text-primary shrink-0 min-h-[44px] type-ui text-left hover:underline flex items-center">View All Jobs</Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {jobs.map((job) => (
-                        <div key={job.title} className="bg-surface p-5 sm:p-6 rounded-2xl border border-border shadow-sm hover:shadow-md transition-all group min-w-0">
-                            <div className="flex justify-between items-start mb-4 gap-4">
+                        <div key={job.title} className="border-border group rounded-2xl transition-all shadow-sm min-w-0 p-5 bg-surface border sm:p-6 hover:shadow-md">
+                            <div className="gap-4 items-start mb-4 flex justify-between">
                                 {/* A circle with the company's short name (like TC) */}
-                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 ${job.color === 'primary' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+                                <div className={`justify-center h-10 w-10 shrink-0 items-center type-ui flex rounded-xl sm:text-base sm:w-12 sm:h-12 ${job.color === 'primary' ? 'text-primary bg-primary/10' : 'bg-accent/10 text-accent'
                                     }`}>
                                     {job.logo}
                                 </div>
                                 {/* A small green tag showing the match percentage */}
-                                <span className="bg-green-100 text-green-700 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-full uppercase shrink-0">
+                                <span className="px-2 py-1 shrink-0 text-green-700 uppercase text-xs rounded-full bg-green-100">
                                     {job.match} Match
                                 </span>
                             </div>
 
-                            <h3 className="font-bold text-lg text-text mb-1 group-hover:text-primary transition-colors truncate">
+                            <h3 className="text-text type-card-title truncate transition-colors mb-1 group-hover:text-primary">
                                 {job.title}
                             </h3>
-                            <p className="text-muted text-sm mb-4 truncate">{job.company} • {job.location}</p>
+                            <p className="mb-4 truncate text-sm text-muted">{job.company} • {job.location}</p>
 
                             {/* Extra details like Salary and Job Type */}
-                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[11px] sm:text-xs font-semibold text-muted mb-6">
-                                <span className="flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-sm shrink-0">payments</span> {job.salary}
+                            <div className="text-xs items-center flex-wrap gap-3 flex mb-6 text-muted sm:gap-4 sm:text-xs">
+                                <span className="gap-1.5 flex items-center">
+                                    <Banknote size={14} className="shrink-0" aria-hidden="true" /> {job.salary}
                                 </span>
-                                <span className="flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-sm shrink-0">schedule</span> {job.type}
+                                <span className="gap-1.5 flex items-center">
+                                    <Clock size={14} className="shrink-0" aria-hidden="true" /> {job.type}
                                 </span>
                             </div>
 
-                            <button className="w-full py-3.5 bg-bg text-text font-bold rounded-xl hover:bg-btn-primary hover:text-surface transition-all min-h-[44px]">
+                            <Link href="/auth/signup" className="w-full text-text min-h-[44px] py-3.5 bg-bg transition-all rounded-xl hover:text-white hover:bg-btn-primary flex items-center justify-center type-ui">
                                 Apply Now
-                            </button>
+                            </Link>
                         </div>
                     ))}
                 </div>

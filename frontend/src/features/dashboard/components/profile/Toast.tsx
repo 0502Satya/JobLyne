@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Icon from "@/shared/ui/Icon";
 
 interface ToastProps {
   message: string;
@@ -26,9 +27,9 @@ export default function Toast({ message, type = "success", onClose }: ToastProps
   const iconColor = type === "success" ? "text-green-400" : type === "error" ? "text-red-400" : "text-blue-400";
 
   return (
-    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-      <div className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold px-5 py-3 rounded-xl shadow-xl flex items-center gap-2">
-        <span className={`material-symbols-outlined text-base ${iconColor}`}>{icon}</span>
+    <div className={`-translate-x-1/2 transition-all left-1/2 duration-300 bottom-6 z-[200] fixed ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+      <div className="bg-card rounded-xl items-center gap-2 text-white py-3 type-ui shadow-xl flex px-5 dark:text-text dark:bg-surface">
+        <Icon name={icon} size={16} className={iconColor} />
         <span>{message}</span>
       </div>
     </div>

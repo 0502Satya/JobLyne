@@ -7,6 +7,8 @@ import {
   markNotificationReadAction 
 } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
+import { Bell, BellRing, BellOff, Clock, ChevronRight } from "lucide-react";
+import Icon from "@/shared/ui/Icon";
 
 /**
  * Premium glassmorphic Notification Center dropdown.
@@ -29,16 +31,35 @@ export default function NotificationCenter() {
     }
   };
 
-  // Sync on mount & active poll every 4 seconds for real-time responsiveness
+  // Sync on mount & active poll using Page Visibility API and dynamic timing
   useEffect(() => {
     syncNotifications(true);
 
-    const interval = setInterval(() => {
-      syncNotifications(true);
-    }, 4000);
+    let interval: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
-  }, []);
+    const startPolling = () => {
+      if (document.hidden) return;
+      const ms = isOpen ? 10000 : 30000; // 10s if open, 30s if closed
+      interval = setInterval(() => {
+        syncNotifications(true);
+      }, ms);
+    };
+
+    const handleVisibilityChange = () => {
+      clearInterval(interval);
+      if (!document.hidden) {
+        startPolling();
+      }
+    };
+
+    startPolling();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isOpen]);
 
   // Handle outside clicks to close the dropdown popover
   useEffect(() => {
@@ -97,14 +118,14 @@ export default function NotificationCenter() {
       {/* Bell Trigger Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative flex items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-bg text-muted hover:bg-border/20 transition-colors cursor-pointer min-h-[44px] min-w-[44px]"
+        className="justify-center h-10 w-10 cursor-pointer relative min-h-[44px] overflow-hidden items-center bg-bg rounded-full transition-colors flex min-w-[44px] text-muted hover:bg-border/20"
         aria-label="Toggle notifications"
       >
-        <span className="material-symbols-outlined text-xl">notifications</span>
+        <Bell size={20} aria-hidden="true" />
         
         {/* Unread Counter Badge */}
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 bg-red-500 text-surface text-[10px] font-black h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center animate-bounce border border-surface">
+          <span className="justify-center border-surface right-1.5 absolute top-1.5 text-xs min-w-[16px] items-center rounded-full h-4 flex bg-red-500 text-white px-1 border">
             {unreadCount}
           </span>
         )}
@@ -112,18 +133,18 @@ export default function NotificationCenter() {
 
       {/* Floating Popover Container */}
       {isOpen && (
-        <div className="absolute right-0 mt-2.5 w-80 sm:w-96 bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="slide-in-from-top-2 mt-2.5 w-80 fade-in border-border rounded-2xl absolute overflow-hidden duration-200 animate-in shadow-2xl z-50 right-0 bg-surface border sm:w-96">
           
           {/* Header Block */}
-          <div className="p-4 border-b border-border/60 bg-bg/20 flex items-center justify-between">
-            <h3 className="font-black text-sm text-text flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl">notifications_active</span>
+          <div className="bg-bg/20 border-b items-center border-border/60 flex p-4 justify-between">
+            <h3 className="text-text items-center gap-2 type-ui flex">
+              <BellRing size={20} className="text-primary" aria-hidden="true" />
               Recent Alerts
             </h3>
             {unreadCount > 0 && (
               <button 
                 onClick={handleMarkAllRead}
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-primary type-caption hover:underline"
               >
                 Mark all read
               </button>
@@ -131,7 +152,7 @@ export default function NotificationCenter() {
           </div>
 
           {/* List Pool */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-border/40">
+          <div className="overflow-y-auto divide-border/40 divide-y max-h-80">
             {notifications.length > 0 ? (
               notifications.map((n) => {
                 const isUnread = n.status === "UNREAD";
@@ -139,32 +160,30 @@ export default function NotificationCenter() {
                   <div 
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
-                    className={`p-4 flex gap-3 transition-colors cursor-pointer ${isUnread ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-bg/40"}`}
+                    className={`cursor-pointer gap-3 transition-colors flex p-4 ${isUnread ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-bg/40"}`}
                   >
                     {/* Icon Column */}
-                    <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${isUnread ? "bg-primary/10 border-primary/20 text-primary" : "bg-bg border-border/30 text-muted"}`}>
-                      <span className="material-symbols-outlined text-lg leading-none">
-                        {getNotificationIcon(n.template_key)}
-                      </span>
+                    <div className={`justify-center w-9 shrink-0 items-center flex h-9 rounded-xl border ${isUnread ? "text-primary border-primary/20 bg-primary/10" : "bg-bg text-muted border-border/30"}`}>
+                      <Icon name={getNotificationIcon(n.template_key)} size={18} aria-hidden="true" />
                     </div>
 
                     {/* Content Column */}
-                    <div className="flex-1 flex flex-col gap-0.5">
-                      <div className="flex justify-between items-start gap-2">
-                        <span className={`text-xs ${isUnread ? "font-black text-text" : "font-bold text-muted"}`}>
+                    <div className="flex gap-0.5 flex-1 flex-col">
+                      <div className="gap-2 flex items-start justify-between">
+                        <span className={`text-xs ${isUnread ? "text-text" : "text-muted"}`}>
                           {n.subject || "Alert Notification"}
                         </span>
                         {isUnread && (
-                          <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5 animate-pulse"></span>
+                          <span className="h-2 shrink-0 animate-pulse w-2 rounded-full bg-primary mt-1.5"></span>
                         )}
                       </div>
                       
-                      <p className={`text-xs leading-relaxed ${isUnread ? "text-text/90 font-medium" : "text-muted font-normal"}`}>
+                      <p className={`leading-relaxed text-xs ${isUnread ? "text-text/90" : "text-muted"}`}>
                         {n.body || n.content?.message || "Opportunity listing update."}
                       </p>
                       
-                      <span className="text-[10px] text-muted font-semibold mt-1 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">schedule</span>
+                      <span className="gap-1 text-xs items-center flex mt-1 text-muted">
+                        <Clock size={12} aria-hidden="true" />
                         {new Date(n.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(n.sent_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -172,27 +191,27 @@ export default function NotificationCenter() {
                 );
               })
             ) : (
-              <div className="py-12 text-center flex flex-col items-center justify-center gap-3">
-                <div className="p-3 bg-border/20 rounded-full text-muted">
-                  <span className="material-symbols-outlined text-4xl">notifications_off</span>
+              <div className="justify-center py-12 items-center text-center gap-3 flex flex-col">
+                <div className="bg-border/20 p-3 text-muted rounded-full">
+                  <BellOff size={36} className="text-muted" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-text font-black text-sm">All caught up!</p>
-                  <p className="text-muted text-xs mt-0.5">You have zero new notifications.</p>
+                  <p className="text-text type-ui">All caught up!</p>
+                  <p className="text-xs text-muted mt-0.5">You have zero new notifications.</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Footer View Alerts redirect */}
-          <div className="p-3 border-t border-border/60 bg-bg/20 text-center">
+          <div className="border-t bg-bg/20 p-3 border-border/60 text-center">
             <a 
               href="/dashboard/alerts" 
               onClick={() => setIsOpen(false)}
-              className="text-xs font-black text-primary hover:underline flex items-center justify-center gap-1 min-h-[36px]"
+              className="justify-center text-primary type-badge gap-1 items-center min-h-[36px] flex hover:underline"
             >
               Manage Alert Settings
-              <span className="material-symbols-outlined text-sm leading-none">chevron_right</span>
+              <ChevronRight size={16} className="leading-none" aria-hidden="true" />
             </a>
           </div>
         </div>

@@ -21,40 +21,40 @@ export default function CandidateDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-8 animate-pulse text-text">
-        <div className="h-20 bg-surface rounded-xl border border-border"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-surface rounded-xl border border-border"></div>)}
+      <div className="text-text gap-8 animate-pulse flex flex-col">
+        <div className="border-border h-20 bg-surface rounded-xl border"></div>
+        <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+          {[1, 2, 3].map(i => <div key={i} className="h-32 border-border bg-surface rounded-xl border"></div>)}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-           <div className="lg:col-span-2 h-[600px] bg-surface rounded-xl border border-border"></div>
-           <div className="h-[600px] bg-surface rounded-xl border border-border"></div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+           <div className="lg:col-span-2 border-border h-[600px] bg-surface rounded-xl border"></div>
+           <div className="border-border h-[600px] bg-surface rounded-xl border"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex gap-8 flex-col">
       {/* Welcome Header */}
       <div className="mb-2">
-        <h2 className="text-3xl font-black tracking-tight text-text mb-2">
+        <h1 className="text-text type-h1 mb-2">
           Welcome back, {profile?.full_name?.split(' ')[0] || "Alex"}! 👋
-        </h2>
-        <p className="text-muted font-medium">Here&apos;s what&apos;s happening with your job search today.</p>
+        </h1>
+        <p className="text-muted">Here&apos;s what&apos;s happening with your job search today.</p>
       </div>
 
       {/* Stats Grid */}
       <DashboardStats />
 
       {/* Main Grid: Feed + Side Column */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left: Job Feed */}
         <div className="lg:col-span-2">
           <React.Suspense fallback={
-            <div className="flex flex-col gap-6">
+            <div className="flex gap-6 flex-col">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-44 bg-surface rounded-xl animate-pulse border border-border shadow-sm"></div>
+                <div key={i} className="border-border animate-pulse shadow-sm h-44 bg-surface rounded-xl border"></div>
               ))}
             </div>
           }>
@@ -63,7 +63,7 @@ export default function CandidateDashboardPage() {
         </div>
 
         {/* Right: Side Widgets */}
-        <aside className="lg:sticky lg:top-[85px]">
+        <aside className="lg:sticky lg:top-[calc(var(--height-header)+16px)]">
           <DashboardRightSidebar />
         </aside>
       </div>

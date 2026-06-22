@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Profile } from "@/types/profile";
+import { Button, Input, Select, FormField } from "@/shared/ui";
+import { SlidersHorizontal, Check, Pencil, MapPin, X } from "lucide-react";
 
 interface JobPreferencesSectionProps {
   data: Profile;
@@ -65,8 +67,6 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
     onChange("preferred_locations", updated);
   };
 
-  const isComplete = !!(data.desired_titles && data.expected_salary);
-
   // Helper to safely get work modes array for rendering
   const getActiveWorkModes = (): string[] => {
     if (Array.isArray(data.work_mode)) return data.work_mode;
@@ -83,174 +83,182 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
   const activeModes = getActiveWorkModes();
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="preferences">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="preferences">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">tune</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <SlidersHorizontal size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Job Preferences</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Define your ideal career opportunities</p>
+            <h3 className="text-text type-card-title leading-tight">Job Preferences</h3>
+            <p className="text-xs text-muted mt-0.5">Define your ideal career opportunities</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => setIsEditing(!isEditing)}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-2"
           >
-            <span className="material-symbols-outlined text-sm font-bold">
-              {isEditing ? "check" : "edit"}
-            </span>
+            {isEditing ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Pencil size={16} aria-hidden="true" />
+            )}
             {isEditing ? "Done" : "Edit"}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6 text-left">
         {isEditing ? (
           /* EDIT MODE */
           <div className="space-y-6">
             {/* Desired Titles */}
-            <div>
-              <label className="block text-xs font-semibold text-muted mb-1.5">Desired Job Roles</label>
-              <input
+            <div className="text-left">
+              <Input
+                label="Desired Job Roles"
                 type="text"
                 value={data.desired_titles || ""}
                 onChange={(e) => onChange("desired_titles", e.target.value)}
                 placeholder="e.g. Senior Product Manager, Technical Lead"
-                className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                helper="Separate multiple titles with commas"
               />
-              <span className="text-xs text-muted block mt-1">Separate multiple titles with commas</span>
             </div>
 
             {/* Expected & Current Salaries */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="gap-5 grid grid-cols-1 md:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-muted mb-1.5">Expected Salary (Annual)</label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2 text-muted text-sm font-semibold">{data.currency || "$"}</span>
-                  <input
-                    type="text"
-                    value={data.expected_salary || ""}
-                    onChange={(e) => onChange("expected_salary", e.target.value)}
-                    placeholder="120,000"
-                    className="w-full pl-8 pr-4 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                  />
-                </div>
+                <FormField label="Expected Salary (Annual)">
+                  <div className="relative w-full text-text">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted select-none type-label z-10">
+                      {data.currency || "$"}
+                    </span>
+                    <Input
+                      type="text"
+                      value={data.expected_salary || ""}
+                      onChange={(e) => onChange("expected_salary", e.target.value)}
+                      placeholder="120,000"
+                      className="pl-8!"
+                    />
+                  </div>
+                </FormField>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-muted mb-1.5">Current CTC / Salary</label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2 text-muted text-sm font-semibold">{data.currency || "$"}</span>
-                  <input
-                    type="text"
-                    value={data.current_salary || ""}
-                    onChange={(e) => onChange("current_salary", e.target.value)}
-                    placeholder="95,000"
-                    className="w-full pl-8 pr-4 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                  />
-                </div>
+                <FormField label="Current CTC / Salary">
+                  <div className="relative w-full text-text">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted select-none type-label z-10">
+                      {data.currency || "$"}
+                    </span>
+                    <Input
+                      type="text"
+                      value={data.current_salary || ""}
+                      onChange={(e) => onChange("current_salary", e.target.value)}
+                      placeholder="95,000"
+                      className="pl-8!"
+                    />
+                  </div>
+                </FormField>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-muted mb-1.5">Notice Period</label>
-                <select
-                  value={data.notice_period || ""}
-                  onChange={(e) => onChange("notice_period", e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
-                >
-                  <option value="">Select Notice Period</option>
-                  <option value="Immediate">Immediate</option>
-                  <option value="15 Days">15 Days</option>
-                  <option value="1 Month">1 Month</option>
-                  <option value="2 Months">2 Months</option>
-                  <option value="3 Months">3 Months</option>
-                </select>
+                <FormField label="Notice Period">
+                  <Select
+                    value={data.notice_period || ""}
+                    onChange={(e) => onChange("notice_period", e.target.value)}
+                    options={[
+                      { value: "", label: "Select Notice Period" },
+                      { value: "Immediate", label: "Immediate" },
+                      { value: "15 Days", label: "15 Days" },
+                      { value: "1 Month", label: "1 Month" },
+                      { value: "2 Months", label: "2 Months" },
+                      { value: "3 Months", label: "3 Months" },
+                    ]}
+                  />
+                </FormField>
               </div>
             </div>
 
             {/* Work Mode & Company Size */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="gap-5 grid grid-cols-1 md:grid-cols-2">
               <div>
-                <label className="block text-xs font-semibold text-muted mb-2">Preferred Work Mode</label>
-                <div className="flex flex-wrap gap-2">
+                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Preferred Work Mode</label>
+                <div className="gap-2 flex flex-wrap">
                   {workModes.map((mode) => {
                     const isSelected = activeModes.includes(mode);
                     return (
-                      <button
+                      <Button
                         key={mode}
                         type="button"
+                        variant={isSelected ? "primary" : "outline"}
                         onClick={() => handleToggleWorkMode(mode)}
-                        className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer min-h-[44px] flex items-center justify-center ${
-                          isSelected
-                            ? "bg-primary text-white border-primary shadow-xs"
-                            : "bg-card border-border text-muted hover:border-muted/80"
-                        }`}
+                        className="type-caption px-4 py-2"
                       >
                         {mode}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-muted mb-2">Preferred Company Size</label>
-                <select
-                  value={data.preferred_company_size || ""}
-                  onChange={(e) => onChange("preferred_company_size", e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
-                >
-                  <option value="">Select Company Size</option>
-                  {companySizes.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
+                <FormField label="Preferred Company Size">
+                  <Select
+                    value={data.preferred_company_size || ""}
+                    onChange={(e) => onChange("preferred_company_size", e.target.value)}
+                    options={[
+                      { value: "", label: "Select Company Size" },
+                      ...companySizes.map((size) => ({ value: size, label: size })),
+                    ]}
+                  />
+                </FormField>
               </div>
             </div>
 
             {/* Relocation & International Opportunities Toggles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center justify-between p-4 bg-bg border border-border rounded-xl">
+            <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+              <div className="border border-border items-center bg-bg/40 flex p-4 rounded-xl justify-between">
                 <div>
-                  <p className="text-xs font-bold text-text">Open to Relocation</p>
-                  <p className="text-[11px] text-muted font-semibold mt-0.5">Willing to move for correct opportunities</p>
+                  <p className="text-text type-caption font-medium">Open to Relocation</p>
+                  <p className="text-xs mt-0.5 text-muted">Willing to move for correct opportunities</p>
                 </div>
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={!!data.open_to_relocation}
                   onClick={() => onChange("open_to_relocation", !data.open_to_relocation)}
-                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 min-h-[44px] cursor-pointer ${
-                    data.open_to_relocation ? "bg-primary" : "bg-border"
+                  className={`flex-shrink-0 relative min-h-[44px] w-12 h-6 rounded-full transition-colors cursor-pointer ${
+                    data.open_to_relocation ? "bg-primary" : "bg-border dark:bg-border"
                   }`}
                 >
                   <span
-                    className={`absolute top-0.5 w-5 h-5 bg-card rounded-full shadow-xs transition-transform ${
+                    className={`top-0.5 h-5 absolute bg-surface transition-transform w-5 rounded-full shadow ${
                       data.open_to_relocation ? "right-0.5" : "left-0.5"
                     }`}
                   ></span>
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-bg border border-border rounded-xl">
+              <div className="border border-border items-center bg-bg/40 flex p-4 rounded-xl justify-between">
                 <div>
-                  <p className="text-xs font-bold text-text">International Opportunities</p>
-                  <p className="text-[11px] text-muted font-semibold mt-0.5">Open to jobs based outside home country</p>
+                  <p className="text-text type-caption font-medium">International Opportunities</p>
+                  <p className="text-xs mt-0.5 text-muted">Open to jobs based outside home country</p>
                 </div>
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={!!data.open_to_international}
                   onClick={() => onChange("open_to_international", !data.open_to_international)}
-                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 min-h-[44px] cursor-pointer ${
-                    data.open_to_international ? "bg-primary" : "bg-border"
+                  className={`flex-shrink-0 relative min-h-[44px] w-12 h-6 rounded-full transition-colors cursor-pointer ${
+                    data.open_to_international ? "bg-primary" : "bg-border dark:bg-border"
                   }`}
                 >
                   <span
-                    className={`absolute top-0.5 w-5 h-5 bg-card rounded-full shadow-xs transition-transform ${
+                    className={`top-0.5 h-5 absolute bg-surface transition-transform w-5 rounded-full shadow ${
                       data.open_to_international ? "right-0.5" : "left-0.5"
                     }`}
                   ></span>
@@ -260,129 +268,131 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
 
             {/* Preferred Locations */}
             <div>
-              <label className="block text-xs font-semibold text-muted mb-2">Preferred Cities / Locations</label>
-              <div className="flex flex-wrap gap-2 mb-3">
+              <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Preferred Cities / Locations</label>
+              <div className="gap-2 flex flex-wrap mb-3">
                 {locations.map((loc) => (
                   <span
                     key={loc}
-                    className="flex items-center gap-1.5 bg-bg border border-border text-text pl-3 pr-1 py-1 rounded-lg text-xs font-semibold"
+                    className="text-text py-1 gap-1.5 border-border items-center pr-1 bg-bg/40 pl-3 rounded-lg flex type-caption border"
                   >
-                    <span className="material-symbols-outlined text-sm text-primary">location_on</span>
+                    <MapPin size={14} className="text-primary" aria-hidden="true" />
                     <span>{loc}</span>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleRemoveLocation(loc)}
-                      className="hover:text-red-500 text-muted flex items-center justify-center cursor-pointer min-h-[32px] min-w-[32px]"
+                      className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
                       title="Remove Location"
+                      aria-label={`Remove ${loc}`}
                     >
-                      <span className="material-symbols-outlined text-xs">close</span>
-                    </button>
+                      <X size={12} aria-hidden="true" />
+                    </Button>
                   </span>
                 ))}
               </div>
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   value={locInput}
                   onChange={(e) => setLocInput(e.target.value)}
                   onKeyDown={handleAddLocation}
                   placeholder="Type preferred city and press Enter..."
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                 />
               </div>
             </div>
           </div>
         ) : (
           /* READONLY VIEW MODE */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+          <div className="gap-6 grid grid-cols-1 text-sm md:grid-cols-2 lg:grid-cols-3 text-left">
             <div className="md:col-span-2 lg:col-span-3">
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-1">Desired Job Roles</span>
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Desired Job Roles</span>
               <div className="flex flex-wrap gap-1.5">
                 {data.desired_titles ? (
                   data.desired_titles.split(",").map((title) => (
-                    <span key={title} className="inline-flex h-7 items-center rounded-lg bg-primary/10 dark:bg-primary/20 px-3 text-xs font-bold text-primary">
+                    <span key={title} className="text-primary h-7 inline-flex px-3 items-center rounded-lg type-caption bg-primary/10 dark:bg-primary/20">
                       {title.trim()}
                     </span>
                   ))
                 ) : (
-                  <span className="text-muted italic">Not specified</span>
+                  <span className="italic text-muted">Not specified</span>
                 )}
               </div>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Expected Salary</span>
-              <span className="font-semibold text-text">
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Expected Salary</span>
+              <span className="text-text">
                 {data.expected_salary ? `${data.currency || "$"}${parseFloat(String(data.expected_salary).replace(/,/g, "")).toLocaleString()}` : "Not specified"}
               </span>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Current Salary</span>
-              <span className="font-semibold text-text">
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Current Salary</span>
+              <span className="text-text">
                 {data.current_salary ? `${data.currency || "$"}${parseFloat(String(data.current_salary).replace(/,/g, "")).toLocaleString()}` : "Not specified"}
               </span>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Notice Period</span>
-              <span className="font-semibold text-text">{data.notice_period || "Not specified"}</span>
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Notice Period</span>
+              <span className="text-text">{data.notice_period || "Not specified"}</span>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-1">Preferred Work Mode</span>
-              <div className="flex flex-wrap gap-1">
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Preferred Work Mode</span>
+              <div className="gap-1 flex flex-wrap">
                 {activeModes.length > 0 ? (
                   activeModes.map((mode) => (
-                    <span key={mode} className="inline-flex h-6 items-center rounded-md bg-bg border border-border px-2 text-[10px] font-bold text-text uppercase tracking-wide">
+                    <span key={mode} className="text-text px-2 border-border inline-flex text-xs uppercase items-center h-6 bg-bg tracking-wide rounded-md border">
                       {mode}
                     </span>
                   ))
                 ) : (
-                  <span className="text-muted italic">Not specified</span>
+                  <span className="italic text-muted">Not specified</span>
                 )}
               </div>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Company Size Preference</span>
-              <span className="font-semibold text-text">{data.preferred_company_size || "Not specified"}</span>
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Company Size Preference</span>
+              <span className="text-text">{data.preferred_company_size || "Not specified"}</span>
             </div>
 
             <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Relocation & International</span>
-              <div className="flex flex-wrap gap-2 mt-0.5">
-                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Relocation & International</span>
+              <div className="gap-2 flex flex-wrap mt-0.5">
+                <span className={`px-2 gap-1 inline-flex text-xs items-center rounded-full py-0.5 border ${
                   data.open_to_relocation
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                    : "bg-red-500/10 text-red-650 dark:text-red-400 border-red-500/20"
+                    ? "text-emerald-600 border-emerald-500/20 bg-emerald-500/10 dark:text-emerald-400"
+                    : "border-red-500/20 bg-red-500/10 text-red-650 dark:text-red-400"
                 }`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0"></span>
+                  <span className="h-1.5 shrink-0 bg-current rounded-full w-1.5"></span>
                   Relocation: {data.open_to_relocation ? "YES" : "NO"}
                 </span>
-                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                <span className={`px-2 gap-1 inline-flex text-xs items-center rounded-full py-0.5 border ${
                   data.open_to_international
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                    : "bg-red-500/10 text-red-650 dark:text-red-400 border-red-500/20"
+                    ? "text-emerald-600 border-emerald-500/20 bg-emerald-500/10 dark:text-emerald-400"
+                    : "border-red-500/20 bg-red-500/10 text-red-650 dark:text-red-450"
                 }`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0"></span>
+                  <span className="h-1.5 shrink-0 bg-current rounded-full w-1.5"></span>
                   International: {data.open_to_international ? "YES" : "NO"}
                 </span>
               </div>
             </div>
 
-            <div className="md:col-span-2 lg:col-span-3 pt-5 border-t border-border/60">
-              <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-2">Preferred Cities / Locations</span>
-              <div className="flex flex-wrap gap-2">
+            <div className="md:col-span-2 lg:col-span-3 border-t pt-5 border-border/60">
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Preferred Cities / Locations</span>
+              <div className="gap-2 flex flex-wrap">
                 {locations.length > 0 ? (
                   locations.map((loc) => (
-                    <span key={loc} className="flex items-center gap-1 px-3 py-1 bg-bg border border-border rounded-xl text-xs font-semibold text-text">
-                      <span className="material-symbols-outlined text-sm text-primary">location_on</span>
+                    <span key={loc} className="text-text py-1 border-border gap-1.5 px-3 items-center bg-bg flex type-caption rounded-xl border">
+                      <MapPin size={14} className="text-primary" aria-hidden="true" />
                       {loc}
                     </span>
                   ))
                 ) : (
-                  <span className="text-muted italic">No cities selected.</span>
+                  <span className="italic text-muted">No cities selected.</span>
                 )}
               </div>
             </div>
