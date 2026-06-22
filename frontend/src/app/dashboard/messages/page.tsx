@@ -8,6 +8,15 @@ import {
   sendMessageAction, 
   markThreadReadAction 
 } from "@/features/auth/actions";
+import {
+  Search,
+  MessagesSquare,
+  ArrowLeft,
+  Clock,
+  CheckCheck,
+  Send,
+  MessageSquare
+} from "lucide-react";
 
 interface Participant {
   id: string;
@@ -212,49 +221,49 @@ function CandidateMessagesContent() {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-full overflow-hidden box-sizing">
+    <div className="max-w-full box-sizing overflow-hidden flex gap-6 flex-col">
       
       {/* Title Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-text">Messages</h1>
-          <p className="text-muted text-sm font-semibold">Communicate with recruiters and hiring managers in real time.</p>
+          <h1 className="text-text type-h1">Messages</h1>
+          <p className="type-label">Communicate with recruiters and hiring managers in real time.</p>
         </div>
       </div>
 
       {/* Main Glassmorphic Inbox Container */}
-      <div className="w-full bg-surface border border-border rounded-3xl overflow-hidden shadow-sm flex h-[calc(100vh-220px)] md:h-[650px] relative max-w-full">
+      <div className="w-full max-w-full border-border rounded-3xl relative overflow-hidden h-[calc(100vh-220px)] shadow-sm flex bg-surface border md:h-[650px]">
         
         {/* Left Pane: Conversation List */}
-        <div className={`w-full md:w-[350px] lg:w-[400px] border-r border-border flex flex-col h-full bg-surface transition-all duration-300 ${
+        <div className={`w-full h-full border-border transition-all duration-300 flex border-r bg-surface flex-col md:w-[350px] lg:w-[400px] ${
           viewMode === "chat" ? "hidden md:flex" : "flex"
         }`}>
           {/* Search Box */}
-          <div className="p-4 border-b border-border">
+          <div className="border-b p-4 border-border">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[20px]">search</span>
+              <Search className="left-3 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
               <input
                 type="text"
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-bg border border-border rounded-2xl pl-10 pr-4 py-2.5 text-sm text-text placeholder-muted focus:outline-none focus:border-primary transition-all min-h-[44px]"
+                className="w-full text-text border-border rounded-2xl pl-10 min-h-[44px] text-sm bg-bg transition-all py-2.5 placeholder-muted pr-4 border focus:outline-none focus:border-primary"
               />
             </div>
           </div>
 
           {/* Thread List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-border/40">
+          <div className="divide-y divide-border/40 flex-1 overflow-y-auto">
             {loadingThreads ? (
-              <div className="h-full flex flex-col items-center justify-center p-6 text-muted">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary mb-2"></div>
-                <span className="text-xs font-bold uppercase tracking-wider">Loading inbox...</span>
+              <div className="justify-center h-full items-center p-6 flex text-muted flex-col">
+                <div className="mb-2 border-t-2 rounded-full border-primary h-8 w-8 animate-spin"></div>
+                <span className="tracking-wider uppercase type-caption">Loading inbox...</span>
               </div>
             ) : filteredThreads.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted">
-                <span className="material-symbols-outlined text-[48px] mb-2 text-muted/60">forum</span>
-                <p className="font-bold text-sm">No conversations found</p>
-                <p className="text-xs text-muted/80 mt-1 max-w-[200px]">Start checking in on your job applications to trigger recruiter interactions.</p>
+              <div className="justify-center h-full items-center text-center p-6 flex text-muted flex-col">
+                <MessagesSquare className="text-muted/60 mb-2" size={32} aria-hidden="true" />
+                <p className="type-ui">No conversations found</p>
+                <p className="mt-1 text-xs text-muted/80 max-w-[200px]">Start checking in on your job applications to trigger recruiter interactions.</p>
               </div>
             ) : (
               filteredThreads.map((thread) => {
@@ -266,7 +275,7 @@ function CandidateMessagesContent() {
                   <button
                     key={thread.id}
                     onClick={() => handleSelectThread(thread.id)}
-                    className={`w-full text-left p-4 flex gap-4 transition-all duration-200 group relative border-none ${
+                    className={`w-full group gap-4 relative duration-200 transition-all flex border-none p-4 text-left ${
                       isSelected 
                         ? "bg-primary/5 dark:bg-primary/10" 
                         : "hover:bg-bg/50"
@@ -274,46 +283,46 @@ function CandidateMessagesContent() {
                   >
                     {/* Active highlight line */}
                     {isSelected && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r"></div>
+                      <div className="absolute w-1 left-0 bg-primary bottom-0 rounded-r top-0"></div>
                     )}
 
                     {/* Avatar */}
-                    <div className="relative flex-shrink-0">
-                      <div className={`size-12 rounded-2xl text-white flex items-center justify-center font-black shadow-sm ${getAvatarStyle(otherPart.email)}`}>
+                    <div className="flex-shrink-0 relative">
+                      <div className={`justify-center rounded-2xl size-12 items-center text-white shadow-sm flex ${getAvatarStyle(otherPart.email)}`}>
                         {otherPart.name.charAt(0).toUpperCase()}
                       </div>
                       {/* Active status bubble */}
-                      <span className="absolute bottom-0 right-0 size-3 bg-emerald-500 border-2 border-surface rounded-full"></span>
+                      <span className="absolute border-2 rounded-full size-3 bg-emerald-500 bottom-0 border-surface right-0"></span>
                     </div>
 
                     {/* Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-baseline mb-1">
-                        <h3 className={`text-sm font-bold truncate group-hover:text-primary transition-colors ${
-                          hasUnread ? "text-text font-black" : "text-text"
+                    <div className="min-w-0 flex-1">
+                      <div className="items-baseline flex mb-1 justify-between">
+                        <h3 className={`type-ui truncate transition-colors group-hover:text-primary ${
+                          hasUnread ? "text-text" : "text-text"
                         }`}>
                           {otherPart.name}
                         </h3>
                         {thread.latest_message && (
-                          <span className="text-[10px] text-muted font-bold whitespace-nowrap">
+                          <span className="text-xs whitespace-nowrap text-muted">
                             {new Date(thread.latest_message.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         )}
                       </div>
                       
-                      <p className="text-xs text-muted font-medium truncate mb-1">
+                      <p className="truncate text-muted mb-1 type-caption">
                         {otherPart.headline}
                       </p>
                       
                       {thread.latest_message ? (
-                        <p className={`text-xs truncate ${
-                          hasUnread ? "text-text font-black" : "text-muted"
+                        <p className={`truncate text-xs ${
+                          hasUnread ? "text-text" : "text-muted"
                         }`}>
                           {thread.latest_message.sender_id === "me" || thread.latest_message.sender_id === otherPart.id ? "" : "You: "}
                           {thread.latest_message.content}
                         </p>
                       ) : (
-                        <p className="text-xs text-muted/60 italic truncate">
+                        <p className="italic text-muted/60 truncate text-xs">
                           No messages yet
                         </p>
                       )}
@@ -321,8 +330,8 @@ function CandidateMessagesContent() {
 
                     {/* Badge */}
                     {hasUnread && (
-                      <div className="flex-shrink-0 flex items-center justify-center">
-                        <span className="bg-primary text-white text-[10px] font-black size-5 rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                      <div className="flex-shrink-0 flex justify-center items-center">
+                        <span className="size-5 justify-center text-xs items-center text-white rounded-full shadow-lg shadow-primary/20 bg-primary flex">
                           {thread.unread_count}
                         </span>
                       </div>
@@ -335,55 +344,55 @@ function CandidateMessagesContent() {
         </div>
 
         {/* Right Pane: Message Viewer */}
-        <div className={`flex-1 flex flex-col h-full bg-bg/20 transition-all duration-300 ${
+        <div className={`bg-bg/20 h-full flex-1 transition-all duration-300 flex flex-col ${
           viewMode === "list" ? "hidden md:flex" : "flex"
         }`}>
           {activeThread ? (
             <>
               {/* Conversation Header */}
-              <div className="p-4 bg-surface border-b border-border flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0">
+              <div className="border-b border-border gap-4 items-center flex p-4 bg-surface justify-between">
+                <div className="flex gap-3 items-center min-w-0">
                   {/* Mobile Back Button */}
                   <button
                     onClick={() => setViewMode("list")}
-                    className="md:hidden size-10 rounded-xl hover:bg-bg flex items-center justify-center text-text border border-border flex-shrink-0 min-h-[44px]"
+                    className="md:hidden flex-shrink-0 text-text justify-center border-border min-h-[44px] items-center flex size-10 rounded-xl border hover:bg-bg cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                    <ArrowLeft size={20} aria-hidden="true" />
                   </button>
 
                   {/* Avatar */}
-                  <div className={`size-11 rounded-2xl text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm ${getAvatarStyle(activeThread.other_participant.email)}`}>
+                  <div className={`flex-shrink-0 justify-center rounded-2xl items-center size-11 text-white shadow-sm flex ${getAvatarStyle(activeThread.other_participant.email)}`}>
                     {activeThread.other_participant.name.charAt(0).toUpperCase()}
                   </div>
 
                   {/* Name and Headline */}
                   <div className="min-w-0">
-                    <h2 className="text-sm font-bold text-text truncate">
+                    <h2 className="text-text type-ui truncate">
                       {activeThread.other_participant.name}
                     </h2>
-                    <p className="text-[11px] text-muted font-bold truncate">
+                    <p className="text-xs truncate text-muted">
                       {activeThread.other_participant.headline}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+                <div className="gap-2 flex items-center">
+                  <span className="py-1 text-emerald-500 px-2.5 bg-emerald-500/10 rounded-full type-badge">
                     Online
                   </span>
                 </div>
               </div>
 
               {/* Message List */}
-              <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 flex flex-col min-w-0">
+              <div className="flex-1 overflow-y-auto min-w-0 flex p-4 space-y-4 flex-col md:p-6">
                 {loadingMessages && messages.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-muted">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary mb-2"></div>
+                  <div className="justify-center h-full items-center flex text-muted">
+                    <div className="mb-2 border-t-2 rounded-full border-primary h-8 w-8 animate-spin"></div>
                   </div>
                 ) : (
                   <>
                     <div className="text-center py-4">
-                      <span className="bg-border/30 text-muted text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+                      <span className="bg-border/30 px-3 py-1.5 rounded-full type-badge text-muted">
                         Conversation Initialized
                       </span>
                     </div>
@@ -394,28 +403,28 @@ function CandidateMessagesContent() {
                       return (
                         <div
                           key={msg.id}
-                          className={`flex flex-col max-w-[80%] ${
+                          className={`flex max-w-[80%] flex-col ${
                             isMe ? "ml-auto items-end" : "mr-auto items-start"
                           }`}
                         >
-                          <div className={`p-4 rounded-3xl shadow-sm text-sm word-break break-word ${
+                          <div className={`break-word rounded-3xl text-sm shadow-sm word-break p-4 ${
                             isMe
                               ? "bg-primary text-white rounded-tr-none"
-                              : "bg-surface text-text border border-border/80 rounded-tl-none"
+                              : "text-text border border-border/80 bg-surface rounded-tl-none"
                           }`}>
-                            <p className="leading-relaxed font-semibold whitespace-pre-wrap">{msg.content}</p>
+                            <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                           </div>
                           
-                          <div className="flex items-center gap-1.5 mt-1 px-1.5">
-                            <span className="text-[10px] text-muted font-bold">
+                          <div className="px-1.5 gap-1.5 items-center flex mt-1">
+                            <span className="text-xs text-muted">
                               {new Date(msg.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {isMe && (
-                              <span className={`material-symbols-outlined text-[14px] ${
-                                msg.is_read ? "text-primary" : "text-muted"
-                              }`}>
-                                {msg.isOptimistic ? "schedule" : "done_all"}
-                              </span>
+                              msg.isOptimistic ? (
+                                <Clock size={12} className="text-muted" aria-hidden="true" />
+                              ) : (
+                                <CheckCheck size={12} className={msg.is_read ? "text-primary" : "text-muted"} aria-hidden="true" />
+                              )
                             )}
                           </div>
                         </div>
@@ -429,30 +438,30 @@ function CandidateMessagesContent() {
               {/* Chat Input Footer */}
               <form 
                 onSubmit={handleSendMessage}
-                className="p-4 bg-surface border-t border-border flex items-center gap-3 box-sizing"
+                className="border-t box-sizing border-border items-center gap-3 flex p-4 bg-surface"
               >
                 <input
                   type="text"
                   placeholder="Type a secure message..."
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
-                  className="flex-1 bg-bg border border-border rounded-2xl px-4 py-3 text-sm text-text placeholder-muted focus:outline-none focus:border-primary transition-all min-h-[48px] box-sizing"
+                  className="text-text flex-1 min-h-[48px] box-sizing border-border rounded-2xl text-sm bg-bg transition-all py-3 placeholder-muted px-4 border focus:outline-none focus:border-primary"
                 />
                 
                 <button
                   type="submit"
                   disabled={!messageInput.trim()}
-                  className="size-12 rounded-2xl bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:shadow-none min-h-[48px] min-w-[48px] flex-shrink-0"
+                  className="flex-shrink-0 justify-center min-h-[48px] rounded-2xl size-12 items-center transition-all text-white min-w-[48px] shadow-primary/20 bg-primary flex shadow-lg hover:scale-105 hover:bg-primary/95 active:scale-95 disabled:shadow-none disabled:opacity-50 disabled:scale-100 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[20px]">send</span>
+                  <Send size={20} aria-hidden="true" />
                 </button>
               </form>
             </>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted">
-              <span className="material-symbols-outlined text-[64px] mb-4 text-muted/40">chat_bubble</span>
-              <h2 className="text-xl font-black text-text mb-1">Your Conversation Canvas</h2>
-              <p className="text-sm font-semibold max-w-sm">Select a thread from the side panel to view messages or start corresponding with hiring stakeholders.</p>
+            <div className="justify-center h-full items-center text-center p-6 flex text-muted flex-col">
+              <MessageSquare className="mb-4 text-muted/40" size={32} aria-hidden="true" />
+              <h2 className="text-text type-h2 mb-1">Your Conversation Canvas</h2>
+              <p className="type-ui max-w-sm">Select a thread from the side panel to view messages or start corresponding with hiring stakeholders.</p>
             </div>
           )}
         </div>
@@ -465,9 +474,9 @@ function CandidateMessagesContent() {
 export default function CandidateMessagesPage() {
   return (
     <Suspense fallback={
-      <div className="flex flex-col gap-4 items-center justify-center p-12 text-muted">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary mb-2"></div>
-        <span className="text-xs font-bold uppercase tracking-wider">Loading inbox...</span>
+      <div className="justify-center gap-4 items-center p-12 flex text-muted flex-col">
+        <div className="mb-2 border-t-2 rounded-full border-primary h-8 w-8 animate-spin"></div>
+        <span className="tracking-wider uppercase type-caption">Loading inbox...</span>
       </div>
     }>
       <CandidateMessagesContent />

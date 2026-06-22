@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect, useActionState } from "react";
 import { verifyOtpAction } from "../actions";
+import { Button } from "@/shared/ui";
+import { MailCheck, AlertCircle, Timer } from "lucide-react";
 
 interface OTPVerificationProps {
   email: string;
@@ -64,15 +66,15 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 space-y-8 text-center animate-in fade-in zoom-in duration-300">
+    <div className="fade-in space-y-8 mx-auto zoom-in rounded-2xl bg-surface border-border text-center animate-in shadow-xl max-w-md duration-300 p-8 border dark:bg-card dark:border-border">
       <div className="space-y-2">
-        <div className="size-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-          <span className="material-symbols-outlined text-4xl">mark_email_read</span>
+        <div className="justify-center text-primary mx-auto items-center mb-4 rounded-full flex size-16 bg-primary/10">
+          <MailCheck size={36} aria-hidden="true" />
         </div>
-        <h2 className="text-2xl font-black tracking-tight">Verify Your Email</h2>
-        <p className="text-slate-500 text-sm">
+        <h2 className="type-h2">Verify Your Email</h2>
+        <p className="text-muted text-sm">
           We've sent a 6-digit verification code to <br />
-          <span className="font-bold text-slate-900 dark:text-white">{email}</span>
+          <span className="text-text">{email}</span>
         </p>
       </div>
 
@@ -80,7 +82,8 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
         <input type="hidden" name="email" value={email} />
         <input type="hidden" name="otp_code" value={otp.join("")} />
         
-        <div className="flex justify-between gap-2">
+        <div role="group" aria-labelledby="otp-label" className="gap-2 flex justify-between">
+          <p id="otp-label" className="sr-only">6-digit verification code</p>
           {otp.map((data, index) => (
             <input
               key={index}
@@ -91,41 +94,41 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
               onChange={(e) => handleChange(e.target, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
-              className="w-12 h-14 text-center text-xl font-bold bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:border-primary focus:ring-0 transition-all outline-none"
+              aria-label={`Digit ${index + 1} of 6`}
+              className="outline-none type-h3 w-12 border-2 transition-all text-center bg-bg border-border h-14 rounded-xl dark:border-border dark:bg-card focus:ring-0 focus:border-primary"
             />
           ))}
         </div>
 
         {state?.error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded-lg animate-shake">
+          <div className="bg-error-bg border border-error/20 text-error animate-shake p-3 rounded-xl type-caption flex items-center justify-center gap-2">
+            <AlertCircle size={14} className="shrink-0" aria-hidden="true" />
             {state.error}
           </div>
         )}
 
-        <button
+        <Button
+          variant="primary"
           type="submit"
-          disabled={isPending || otp.some(v => v === "")}
-          className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/25 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
+          disabled={otp.some(v => v === "")}
+          isLoading={isPending}
+          className="w-full"
         >
-          {isPending ? (
-            <div className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          ) : (
-            "Verify & Complete Registration"
-          )}
-        </button>
+          Verify & Complete Registration
+        </Button>
       </form>
 
-      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-        <div className="flex items-center justify-center gap-2 text-sm">
-          <span className="material-symbols-outlined text-sm text-slate-400">timer</span>
-          <span className={`${timer < 60 ? "text-red-500 font-bold" : "text-slate-500"}`}>
+      <div className="border-t border-border space-y-4 pt-4 dark:border-border">
+        <div className="justify-center text-sm items-center gap-2 flex">
+          <Timer size={14} className="text-muted" aria-hidden="true" />
+          <span className={`${timer < 60 ? "text-red-500" : "text-muted"}`}>
             Expires in {formatTime(timer)}
           </span>
         </div>
         
-        <p className="text-xs text-slate-400 leading-relaxed">
+        <p className="leading-relaxed text-xs text-muted">
           Didn't receive the code? Check your spam folder or <br />
-          <button className="text-primary font-bold hover:underline">Resend OTP</button>
+          <button className="text-primary hover:underline">Resend OTP</button>
         </p>
       </div>
     </div>

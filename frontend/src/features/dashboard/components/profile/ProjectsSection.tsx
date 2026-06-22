@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Project } from "@/types/profile";
+import { Button, Input, FormField } from "@/shared/ui";
+import { FolderOpen, Plus, Folder, X, Pencil, Trash2, Link as LinkIcon, Code2 } from "lucide-react";
 
 interface ProjectsSectionProps {
   projects: Project[];
@@ -72,57 +74,60 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
     let currentTechs: string[] = [];
     if (Array.isArray(proj.tech_stack)) {
       currentTechs = proj.tech_stack;
+    } else if (typeof proj.tech_stack === "string") {
+      currentTechs = (proj.tech_stack as string).split(",").map((t) => t.trim()).filter(Boolean);
     }
 
     const updatedTechs = currentTechs.filter((t) => t !== techName);
     updateProject(projId, "tech_stack", updatedTechs);
   };
 
-  const isComplete = projects.length > 0;
-
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-355 overflow-hidden" id="projects">
+    <section className="border-border rounded-2xl duration-355 overflow-hidden transition-all shadow-sm bg-card border" id="projects">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">folder_open</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <FolderOpen size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Key Projects</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Showcase your practical project builds</p>
+            <h3 className="text-text type-card-title leading-tight">Key Projects</h3>
+            <p className="text-xs text-muted mt-0.5">Showcase your practical project builds</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={addProject}
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 mr-1 min-h-[40px] flex items-center justify-center"
+            variant="secondary"
+            size="sm"
+            onClick={addProject}
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-2"
           >
-            <span className="material-symbols-outlined text-sm font-bold">add</span>
+            <Plus size={16} aria-hidden="true" />
             Add
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         <div className="space-y-6">
           {projects.length === 0 ? (
-            <div className="text-center py-10 border border-dashed border-border rounded-xl bg-bg/50">
-              <span className="material-symbols-outlined text-3xl text-muted/60 mb-2 block">folder</span>
-              <span className="text-sm font-bold text-text block mb-0.5">No projects added yet</span>
-              <span className="text-xs text-muted block mb-4 font-semibold">Adding key projects boosts profile discovery index.</span>
-              <button
+            <div className="border-dashed bg-bg/50 border-border text-center py-10 rounded-xl border">
+              <Folder size={32} className="text-muted/60 block mx-auto mb-2" aria-hidden="true" />
+              <span className="text-text mb-0.5 block type-ui">No projects added yet</span>
+              <span className="block mb-4 type-caption text-muted">Adding key projects boosts profile discovery index.</span>
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={addProject}
-                className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[44px] px-4"
+                className="text-primary hover:underline"
               >
                 Add first project card
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="gap-6 grid grid-cols-1">
               {projects.map((proj) => {
                 const techs = Array.isArray(proj.tech_stack)
                   ? proj.tech_stack
@@ -135,171 +140,156 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                 return (
                   <div
                     key={proj.id}
-                    className="relative bg-bg/25 hover:bg-bg/40 border border-border rounded-2xl p-5 transition-all group"
+                    className="border-border group bg-bg/25 rounded-2xl relative transition-all p-5 border hover:bg-bg/40"
                   >
                     {isEditing ? (
                       /* EDIT MODE FORM */
                       <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Project Title</label>
-                            <input
-                              type="text"
-                              value={proj.title || ""}
-                              onChange={(e) => updateProject(proj.id, "title", e.target.value)}
-                              placeholder="e.g. E-Commerce Platform"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Your Role</label>
-                            <input
-                              type="text"
-                              value={proj.role || ""}
-                              onChange={(e) => updateProject(proj.id, "role", e.target.value)}
-                              placeholder="e.g. Lead Architect"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                          <Input
+                            label="Project Title"
+                            value={proj.title || ""}
+                            onChange={(e) => updateProject(proj.id, "title", e.target.value)}
+                            placeholder="e.g. E-Commerce Platform"
+                          />
+                          <Input
+                            label="Your Role"
+                            value={proj.role || ""}
+                            onChange={(e) => updateProject(proj.id, "role", e.target.value)}
+                            placeholder="e.g. Lead Architect"
+                          />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Duration</label>
-                            <input
-                              type="text"
-                              value={proj.duration || ""}
-                              onChange={(e) => updateProject(proj.id, "duration", e.target.value)}
-                              placeholder="e.g. 3 Months"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Project URL</label>
-                            <input
-                              type="text"
-                              value={proj.project_url || ""}
-                              onChange={(e) => updateProject(proj.id, "project_url", e.target.value)}
-                              placeholder="https://myproject.com"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">GitHub Repo URL</label>
-                            <input
-                              type="text"
-                              value={proj.github_url || ""}
-                              onChange={(e) => updateProject(proj.id, "github_url", e.target.value)}
-                              placeholder="https://github.com/myrepo"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
+                          <Input
+                            label="Duration"
+                            value={proj.duration || ""}
+                            onChange={(e) => updateProject(proj.id, "duration", e.target.value)}
+                            placeholder="e.g. 3 Months"
+                          />
+                          <Input
+                            label="Project URL"
+                            value={proj.project_url || ""}
+                            onChange={(e) => updateProject(proj.id, "project_url", e.target.value)}
+                            placeholder="https://myproject.com"
+                          />
+                          <Input
+                            label="GitHub Repo URL"
+                            value={proj.github_url || ""}
+                            onChange={(e) => updateProject(proj.id, "github_url", e.target.value)}
+                            placeholder="https://github.com/myrepo"
+                          />
                         </div>
 
-                        <div className="space-y-1">
-                          <label className="block text-xs font-semibold text-muted">Project Description</label>
+                        <FormField label="Project Description">
                           <textarea
                             value={proj.description || ""}
                             onChange={(e) => updateProject(proj.id, "description", e.target.value)}
                             rows={3}
                             placeholder="Describe the problem solved, tech stack highlights, and achievements..."
-                            className="w-full bg-card border border-border rounded-xl py-2 px-3.5 text-sm font-medium text-text focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none leading-relaxed resize-none placeholder:text-muted/65"
+                            className="w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted disabled:opacity-50 disabled:cursor-not-allowed resize-none leading-relaxed px-4"
                           />
-                        </div>
+                        </FormField>
 
                         {/* Tech Stack tags */}
                         <div>
-                          <label className="block text-xs font-semibold text-muted mb-2">Tech Stack Used</label>
-                          <div className="flex flex-wrap gap-2 mb-2">
+                          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Tech Stack Used</label>
+                          <div className="gap-2 flex mb-2 flex-wrap">
                             {techs.map((tech) => (
                               <span
                                 key={tech}
-                                className="flex items-center gap-1 bg-card border border-border text-text pl-2.5 pr-1 py-1 rounded-lg text-xs font-medium"
+                                className="text-text py-1 border-border gap-1 items-center pr-1 pl-2.5 rounded-lg bg-card flex type-caption border"
                               >
                                 <span>{tech}</span>
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => handleRemoveTech(proj.id, tech)}
-                                  className="hover:text-red-500 ml-1 text-muted flex items-center justify-center cursor-pointer min-h-[32px] min-w-[32px]"
+                                  className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                                  aria-label={`Remove ${tech}`}
                                 >
-                                  <span className="material-symbols-outlined text-xs">close</span>
-                                </button>
+                                  <X size={12} aria-hidden="true" />
+                                </Button>
                               </span>
                             ))}
                           </div>
-                          <input
+                          <Input
                             type="text"
                             value={techInput[proj.id as string] || ""}
                             onChange={(e) => setTechInput((prev) => ({ ...prev, [proj.id as string]: e.target.value }))}
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleAddTech(proj.id, techInput[proj.id as string]);
+                                  e.preventDefault();
+                                  handleAddTech(proj.id, techInput[proj.id as string]);
                               }
                             }}
                             placeholder="Type a technology (e.g. Next.js) and press Enter..."
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                           />
                         </div>
 
-                        <div className="flex justify-end gap-2.5 pt-2">
-                          <button
+                        <div className="pt-2 flex justify-end gap-2.5">
+                          <Button
                             type="button"
+                            variant="danger"
                             onClick={() => removeProject(proj.id)}
-                            className="px-4 py-2 bg-card text-red-500 hover:bg-red-500/10 text-xs font-bold rounded-lg border border-border transition-all min-h-[44px] cursor-pointer"
                           >
                             Delete Entry
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="primary"
                             onClick={() => setEditingId(null)}
-                            className="px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all min-h-[44px] cursor-pointer shadow-xs"
                           >
                             Done Editing
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       /* READONLY VIEW MODE */
                       <div>
                         {/* Hover Action Overlay */}
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10">
-                          <button
+                        <div className="right-3 gap-1.5 z-10 absolute opacity-100 items-center transition-opacity flex top-3 lg:opacity-0 lg:group-hover:opacity-100">
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => setEditingId(proj.id || null)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-muted border-border hover:text-primary"
                             title="Edit Project"
+                            aria-label="Edit Project"
                           >
-                            <span className="material-symbols-outlined text-base">edit</span>
-                          </button>
-                          <button
+                            <Pencil size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => removeProject(proj.id)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-red-500 hover:bg-red-500/10 cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-red-500 border-border hover:bg-red-500/10"
                             title="Delete Project"
+                            aria-label="Delete Project"
                           >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
+                            <Trash2 size={16} aria-hidden="true" />
+                          </Button>
                         </div>
 
                         <div className="space-y-2.5 pr-20">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-base font-bold text-text tracking-tight font-display">{proj.title || "Untitled Project"}</h4>
+                          <div className="gap-2 flex flex-wrap items-center">
+                            <h4 className="text-text tracking-tight type-card-title">{proj.title || "Untitled Project"}</h4>
                             {proj.role && (
-                              <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wide">
+                              <span className="px-2 text-primary text-xs uppercase tracking-wide py-0.5 rounded bg-primary/10">
                                 {proj.role}
                               </span>
                             )}
                           </div>
 
                           {proj.duration && (
-                            <p className="text-[10px] font-bold text-muted uppercase tracking-wider">
+                            <p className="text-xs uppercase tracking-wider text-muted">
                               Duration: {proj.duration}
                             </p>
                           )}
 
                           {proj.description && (
-                            <p className="text-xs text-text/85 font-medium leading-relaxed whitespace-pre-line">
+                            <p className="leading-relaxed whitespace-pre-line text-text/85 type-caption">
                               {proj.description}
                             </p>
                           )}
@@ -308,7 +298,7 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                           {techs.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-1">
                               {techs.map((t) => (
-                                <span key={t} className="px-2 py-0.5 bg-card text-muted text-[10px] font-bold rounded border border-border/80">
+                                <span key={t} className="px-2 text-xs border-border/80 py-0.5 bg-card rounded text-muted border">
                                   {t}
                                 </span>
                               ))}
@@ -317,28 +307,34 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
 
                           {/* Project Links */}
                           {(proj.project_url || proj.github_url) && (
-                            <div className="flex flex-wrap gap-2.5 pt-2">
+                            <div className="pt-2 flex gap-2.5 flex-wrap">
                               {proj.project_url && (
-                                <a
+                                <Button
+                                  as="a"
+                                  variant="ghost"
+                                  size="sm"
                                   href={proj.project_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
+                                  className="text-primary hover:text-primary-dark gap-1"
                                 >
-                                  <span className="material-symbols-outlined text-sm">link</span>
+                                  <LinkIcon size={14} aria-hidden="true" />
                                   Live Demo
-                                </a>
+                                </Button>
                               )}
                               {proj.github_url && (
-                                <a
+                                <Button
+                                  as="a"
+                                  variant="ghost"
+                                  size="sm"
                                   href={proj.github_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs font-bold text-text/80 hover:underline cursor-pointer"
+                                  className="text-text hover:bg-surface-3 gap-1"
                                 >
-                                  <span className="material-symbols-outlined text-sm">code</span>
+                                  <Code2 size={14} aria-hidden="true" />
                                   GitHub Repository
-                                </a>
+                                </Button>
                               )}
                             </div>
                           )}
@@ -355,3 +351,4 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
     </section>
   );
 }
+

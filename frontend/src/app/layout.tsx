@@ -3,12 +3,18 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 
-/**
- * Setting up the 'Inter' font for the whole website.
- */
-const inter = Inter({
+/* ─── FONT CONTROL ────────────────────────────────────────────
+   To change the app font, replace "Inter" with any Google Font:
+     import { Geist } from "next/font/google"
+     import { Plus_Jakarta_Sans } from "next/font/google"
+     import { DM_Sans } from "next/font/google"
+   Then update the variable name below to match.
+   No other file needs to change.
+──────────────────────────────────────────────────────────────── */
+const primaryFont = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,15 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={primaryFont.variable} suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased font-display bg-bg text-text transition-colors flex flex-col min-h-screen`}
+        className="flex min-h-screen transition-colors flex-col"
         suppressHydrationWarning
       >
         <Providers>

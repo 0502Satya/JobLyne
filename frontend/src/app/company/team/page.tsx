@@ -10,6 +10,21 @@ import {
   getTeamInvitesAction, 
   inviteTeamMemberAction 
 } from "@/features/company/actions";
+import { toast } from "react-hot-toast";
+import { Button, Dialog } from "@/shared/ui";
+import { 
+  Network, 
+  LayoutDashboard, 
+  UserPlus, 
+  AlertCircle, 
+  CheckCircle, 
+  Search, 
+  Users, 
+  Mail, 
+  X, 
+  Send, 
+  Loader2 
+} from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -40,10 +55,12 @@ export default function CompanyTeamPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"ADMIN" | "HIRING_MANAGER" | "INTERVIEWER" | "VIEWER">("VIEWER");
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [isPending, startTransition] = useTransition();
-
   // Search filter
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+
 
   const loadTeamData = async () => {
     try {
@@ -92,8 +109,11 @@ export default function CompanyTeamPage() {
       const res = await inviteTeamMemberAction(emailTrimmed, inviteRole);
       if (res.error) {
         setError(res.error);
+        toast.error(res.error);
       } else {
-        setSuccess(`Invitation successfully sent to ${emailTrimmed}.`);
+        const msg = `Invitation successfully sent to ${emailTrimmed}.`;
+        setSuccess(msg);
+        toast.success(msg);
         setInviteEmail("");
         setInviteRole("VIEWER");
         setShowInviteModal(false);
@@ -106,25 +126,32 @@ export default function CompanyTeamPage() {
     });
   };
 
-  const handleRemoveMember = async (memberId: string, name: string) => {
-    if (!confirm(`Are you sure you want to remove ${name || "this user"} from your company team?`)) {
-      return;
-    }
+  const handleRemoveMemberClick = (memberId: string, name: string) => {
+    setDeleteTarget({ id: memberId, name });
+  };
 
+  const confirmRemoveMember = async () => {
+    if (!deleteTarget) return;
+    const { id, name } = deleteTarget;
+    setDeleteTarget(null);
     setError(null);
     setSuccess(null);
     setLoading(true);
 
     try {
-      const res = await deleteTeamMemberAction(memberId);
+      const res = await deleteTeamMemberAction(id);
       if (res.error) {
         setError(res.error);
+        toast.error(res.error);
       } else {
-        setSuccess("Team member successfully dissociated.");
+        const msg = `Team member ${name} successfully dissociated.`;
+        setSuccess(msg);
+        toast.success(msg);
         await loadTeamData();
       }
     } catch (err) {
       setError("Failed to delete member.");
+      toast.error("Failed to delete member.");
     } finally {
       setLoading(false);
     }
@@ -139,116 +166,116 @@ export default function CompanyTeamPage() {
   const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case "ADMIN":
-        return "bg-red-500/10 text-red-500 border-red-500/20";
+        return "bg-error-bg text-error border-error/20";
       case "HIRING_MANAGER":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+        return "bg-info/10 text-info border-info/20";
       case "INTERVIEWER":
-        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        return "bg-warning/10 text-warning border-warning/20";
       default:
-        return "bg-slate-500/10 text-slate-500 border-slate-500/20";
+        return "bg-muted/10 text-muted border-muted/20";
     }
   };
 
   if (loading && members.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text gap-4">
-        <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-        <p className="text-muted font-bold text-sm tracking-widest uppercase">Loading Teammates...</p>
+      <div className="text-text justify-center gap-4 items-center bg-bg flex min-h-screen flex-col">
+        <div className="border-t-primary size-12 border-primary/20 rounded-full border-4 animate-spin"></div>
+        <p className="type-label uppercase tracking-widest">Loading Teammates...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg text-text flex flex-col font-sans transition-colors pb-20">
+    <div className="text-text bg-bg pb-20 transition-colors flex min-h-screen flex-col">
       
       {/* Sticky Header */}
-      <header className="flex items-center justify-between border-b border-border bg-surface px-6 md:px-12 py-4 sticky top-0 z-40">
-        <div className="flex items-center gap-6">
-          <Link href="/company" className="flex items-center gap-2 text-primary font-black hover:opacity-90 transition-opacity">
-            <span className="material-symbols-outlined text-3xl">hub</span>
+      <header className="border-b border-border px-6 py-4 items-center sticky z-40 flex top-0 bg-surface justify-between md:px-12">
+        <div className="flex gap-6 items-center">
+          <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+            <Network size={30} aria-hidden="true" />
             <span className="text-2xl tracking-tight">JobLyne</span>
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hidden md:inline-block">Company Hub</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <span className="text-primary px-3 hidden py-1.5 rounded-full type-badge bg-primary/10 md:inline-block">Company Hub</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/company" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">dashboard</span>
+        <div className="gap-4 flex items-center">
+          <Link href="/company" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <LayoutDashboard size={18} aria-hidden="true" />
             Dashboard
           </Link>
           <button 
             onClick={() => logoutAction()} 
-            className="text-xs font-black text-muted hover:text-red-500 transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-red-500/5 active:scale-[0.98] min-h-[44px]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
           >
             Logout
           </button>
         </div>
       </header>
 
-      <main className="p-6 md:p-12 max-w-7xl mx-auto w-full flex-1 space-y-8">
+      <main className="w-full space-y-8 mx-auto max-w-7xl flex-1 p-6 md:p-12">
         
         {/* Welcome Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex justify-between gap-6 flex-col sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-text">Team Collaboration</h1>
-            <p className="text-muted text-sm font-semibold">Invite hiring managers, configure sub-roles, and review system logs.</p>
+            <h1 className="text-text type-h1">Team Collaboration</h1>
+            <p className="type-label">Invite hiring managers, configure sub-roles, and review system logs.</p>
           </div>
           <button 
             onClick={() => setShowInviteModal(true)}
-            className="bg-primary text-surface px-6 py-3.5 rounded-2xl font-black text-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 min-h-[48px] shadow-lg shadow-primary/10 cursor-pointer"
+            className="min-h-[48px] cursor-pointer px-6 rounded-2xl py-3.5 items-center transition-all gap-2 type-ui shadow-primary/10 shadow-lg bg-primary flex text-white hover:scale-[1.02] active:scale-[0.98]"
           >
-            <span className="material-symbols-outlined text-lg">person_add</span>
+            <UserPlus size={18} aria-hidden="true" />
             Invite Teammate
           </button>
         </div>
 
         {/* Alerts */}
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-black flex gap-3 animate-in slide-in-from-top-2">
-            <span className="material-symbols-outlined text-[20px]">error</span>
+          <div className="slide-in-from-top-2 rounded-2xl text-red-500 animate-in gap-3 border-red-500/20 type-ui flex p-4 bg-red-500/10 border">
+            <AlertCircle size={20} aria-hidden="true" />
             {error}
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-500 text-sm font-black flex gap-3 animate-in slide-in-from-top-2">
-            <span className="material-symbols-outlined text-[20px]">check_circle</span>
+          <div className="slide-in-from-top-2 rounded-2xl text-emerald-500 animate-in gap-3 bg-emerald-500/10 type-ui border-emerald-500/20 flex p-4 border">
+            <CheckCircle size={20} aria-hidden="true" />
             {success}
           </div>
         )}
 
         {/* Filter Input */}
-        <section className="bg-surface border border-border p-5 rounded-card shadow-sm flex flex-col sm:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted">search</span>
+        <section className="rounded-card border-border gap-4 items-center shadow-sm flex-col flex p-5 bg-surface border sm:flex-row">
+          <div className="w-full relative flex-1">
+            <Search className="left-4 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter by teammate name or email..."
-              className="w-full pl-12 pr-4 py-3.5 bg-bg border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary font-medium text-xs min-h-[48px]"
+              className="w-full outline-none pl-12 min-h-[48px] border-border rounded-2xl py-3.5 bg-bg pr-4 type-caption border focus:ring-2 focus:ring-primary"
             />
           </div>
         </section>
 
         {/* Layout: Active Team on Left, Pending Invites on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
           
           {/* Active Teammates Table */}
           <div className="lg:col-span-2 space-y-4">
-            <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl">group</span>
+            <h3 className="type-h2 items-center gap-2 flex">
+              <Users className="text-primary" size={20} aria-hidden="true" />
               Active Teammates
             </h3>
             
-            <div className="bg-surface border border-border rounded-card overflow-hidden shadow-sm">
+            <div className="rounded-card border-border overflow-hidden shadow-sm bg-surface border">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[550px]">
+                <table className="w-full border-collapse text-left min-w-[550px]">
                   <thead>
-                    <tr className="border-b border-border bg-bg/50">
-                      <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Teammate</th>
-                      <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Role</th>
-                      <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Status</th>
-                      <th className="p-4 text-xs font-black uppercase tracking-wider text-muted text-right">Actions</th>
+                    <tr className="border-b bg-bg/50 border-border">
+                      <th scope="col" className="type-badge p-4">Teammate</th>
+                      <th scope="col" className="type-badge p-4">Role</th>
+                      <th scope="col" className="type-badge p-4">Status</th>
+                      <th scope="col" className="text-right type-badge p-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -256,44 +283,46 @@ export default function CompanyTeamPage() {
                       const name = `${member.first_name || ""} ${member.last_name || ""}`.trim() || "Teammate";
                       const initials = name.substring(0, 2).toUpperCase();
                       return (
-                        <tr key={member.id} className="border-b border-border last:border-0 hover:bg-bg/10 transition-colors">
+                        <tr key={member.id} className="border-b transition-colors border-border last:border-0 hover:bg-bg/10">
                           <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="size-10 rounded-xl bg-gradient-to-tr from-primary to-[#4c33cf] text-white flex items-center justify-center font-black text-sm shadow-md shrink-0">
+                            <div className="flex gap-3 items-center">
+                              <div className="justify-center shrink-0 shadow-md bg-gradient-to-tr items-center from-primary text-white type-ui to-[#4c33cf] flex size-10 rounded-xl">
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <h4 className="font-black text-sm text-text leading-tight truncate">{name}</h4>
-                                <p className="text-xs text-muted font-bold tracking-tight truncate">{member.email}</p>
+                                <h4 className="text-text type-ui truncate leading-tight">{name}</h4>
+                                <p className="tracking-tight truncate type-caption text-muted">{member.email}</p>
                               </div>
                             </div>
                           </td>
                           <td className="p-4">
-                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider ${getRoleBadgeClass(member.team_role)}`}>
+                            <span className={`py-1 px-2.5 rounded-full type-badge border ${getRoleBadgeClass(member.team_role)}`}>
                               {member.team_role}
                             </span>
                           </td>
                           <td className="p-4">
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                              member.is_active ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                            <span className={`px-2.5 rounded-full py-0.5 type-badge border ${
+                              member.is_active ? "bg-success-bg text-success border-success/15" : "bg-error-bg text-error border-error/15"
                             }`}>
                               {member.is_active ? "Active" : "Inactive"}
                             </span>
                           </td>
                           <td className="p-4 text-right">
-                            <button
-                              onClick={() => handleRemoveMember(member.id, name)}
-                              className="px-3 py-2 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white font-black text-[10px] uppercase rounded-xl transition-all min-h-[44px]"
+                            <Button
+                              onClick={() => handleRemoveMemberClick(member.id, name)}
+                              variant="danger"
+                              size="sm"
+                              className="text-xs uppercase min-h-0 py-2"
                             >
                               Remove
-                            </button>
+                            </Button>
                           </td>
                         </tr>
                       );
                     })}
                     {filteredMembers.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="p-12 text-center text-muted font-semibold text-sm">
+                        <td colSpan={4} className="type-label p-12 text-center">
                           No active team members matching filter preferences.
                         </td>
                       </tr>
@@ -306,29 +335,29 @@ export default function CompanyTeamPage() {
 
           {/* Pending Invitations list */}
           <div className="space-y-4">
-            <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl">mail</span>
+            <h3 className="type-h2 items-center gap-2 flex">
+              <Mail className="text-primary" size={20} aria-hidden="true" />
               Pending Invitations
             </h3>
 
-            <div className="bg-surface border border-border p-6 rounded-card shadow-sm space-y-4">
+            <div className="rounded-card border-border shadow-sm p-6 space-y-4 bg-surface border">
               {invites.filter(i => i.status === "PENDING").map((invite) => (
-                <div key={invite.id} className="border-b border-border/60 last:border-0 pb-4 last:pb-0 space-y-2">
-                  <div className="flex justify-between items-start gap-2">
+                <div key={invite.id} className="border-b pb-4 space-y-2 border-border/60 last:border-0 last:pb-0">
+                  <div className="gap-2 flex items-start justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-black text-text truncate leading-tight">{invite.invited_email}</p>
-                      <p className="text-[10px] text-muted font-bold mt-0.5">
+                      <p className="text-text type-ui truncate leading-tight">{invite.invited_email}</p>
+                      <p className="text-xs mt-0.5 text-muted">
                         Sent on {new Date(invite.invited_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase tracking-wider ${getRoleBadgeClass(invite.role)}`}>
+                    <span className={`px-2 uppercase text-xs rounded-full tracking-wider py-0.5 border ${getRoleBadgeClass(invite.role)}`}>
                       {invite.role}
                     </span>
                   </div>
                 </div>
               ))}
               {invites.filter(i => i.status === "PENDING").length === 0 && (
-                <div className="text-center text-muted text-xs font-semibold py-8 border border-dashed border-border/80 rounded-2xl">
+                <div className="border-dashed rounded-2xl border-border/80 text-center py-8 type-caption text-muted border">
                   No pending corporate team invitations.
                 </div>
               )}
@@ -341,38 +370,39 @@ export default function CompanyTeamPage() {
 
       {/* Invite Modal */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-surface border border-border rounded-card p-8 w-full max-w-md shadow-2xl relative animate-in zoom-in-95 duration-200">
+        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
+          <div className="w-full rounded-card border-border relative duration-200 animate-in max-w-md shadow-2xl zoom-in-95 p-8 bg-surface border">
             <button 
               onClick={() => { setShowInviteModal(false); setInviteEmail(""); setError(null); }}
-              className="absolute top-6 right-6 p-2 text-muted hover:text-text hover:bg-bg rounded-xl min-h-[40px] min-w-[40px] flex items-center justify-center"
+              className="min-h-[40px] justify-center rounded-xl min-w-[40px] absolute items-center p-2 right-6 flex top-6 text-muted hover:bg-bg hover:text-text"
+              aria-label="Close modal"
             >
-              <span className="material-symbols-outlined">close</span>
+              <X size={18} aria-hidden="true" />
             </button>
             <div className="space-y-2 mb-6">
-              <h3 className="text-xl font-black tracking-tight">Invite Teammate</h3>
-              <p className="text-muted text-sm font-semibold">Send a secure corporate invite to collaborate in this workspace.</p>
+              <h3 className="type-h2">Invite Teammate</h3>
+              <p className="type-label">Send a secure corporate invite to collaborate in this workspace.</p>
             </div>
             
             <form onSubmit={handleInviteSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Work Email Address</label>
+                <label className="type-badge">Work Email Address</label>
                 <input 
                   type="email" 
                   required
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full p-3.5 bg-bg border border-border rounded-2xl font-semibold text-xs min-h-[48px] outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Access Level (Role)</label>
+                <label className="type-badge">Access Level (Role)</label>
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as any)}
-                  className="w-full p-3.5 bg-bg border border-border rounded-2xl font-semibold text-xs min-h-[48px] outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border focus:ring-2 focus:ring-primary"
                 >
                   <option value="VIEWER">Viewer (Read-only)</option>
                   <option value="INTERVIEWER">Interviewer (Assess candidate details)</option>
@@ -384,24 +414,48 @@ export default function CompanyTeamPage() {
               <button 
                 type="submit"
                 disabled={isPending}
-                className="w-full py-4 bg-primary text-surface font-black text-sm rounded-2xl hover:scale-[1.02] transition-all min-h-[48px] shadow-lg shadow-primary/10 cursor-pointer flex items-center justify-center gap-2"
+                className="relative w-full justify-center min-h-[48px] py-4 rounded-2xl items-center transition-all gap-2 type-ui shadow-primary/10 shadow-lg flex bg-primary cursor-pointer text-white hover:scale-[1.02]"
               >
-                {isPending ? (
-                  <>
-                    <div className="size-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
-                    Sending Invite...
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-lg">send</span>
-                    Send Invitation
-                  </>
+                <span className="flex items-center gap-2">
+                  <Send size={18} aria-hidden="true" />
+                  <span>Send Invitation</span>
+                </span>
+                {isPending && (
+                  <span className="absolute right-4 flex items-center">
+                    <Loader2 className="animate-spin" size={18} aria-hidden="true" />
+                  </span>
                 )}
               </button>
             </form>
           </div>
         </div>
       )}
+
+      <Dialog
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Confirm Member Dissociation"
+      >
+        <div className="space-y-4">
+          <p className="text-text">
+            Are you sure you want to remove <strong className="font-semibold text-primary">{deleteTarget?.name}</strong> from your company team? This action is irreversible.
+          </p>
+          <div className="flex gap-3 justify-end pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setDeleteTarget(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confirmRemoveMember}
+            >
+              Remove Teammate
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
     </div>
   );

@@ -40,7 +40,7 @@ services:
     container_name: joblyne_backend
     restart: always
     environment:
-      - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-joblyne}
+      # - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-joblyne}
       - REDIS_URL=redis://redis:6379/0
       - JWT_SECRET=${JWT_SECRET}
     env_file:

@@ -3,29 +3,75 @@
 import React, { useState } from "react";
 import { loginAction } from "@/features/auth/actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Input, Button, Checkbox, toast } from "@/shared/ui";
+import { AlertCircle } from "lucide-react";
 
-/**
- * Re-implemented SigninForm for restoration.
- * Wired to Django backend via Next.js Server Actions for secure HttpOnly cookie management.
- */
 export default function SigninForm({ role = "Candidate" }: { role?: string }) {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateField = (name: string, value: string) => {
+    const newErrors = { ...errors };
+    if (name === "email") {
+      if (!value.trim()) {
+        newErrors.email = "Email address is required.";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        newErrors.email = "Please enter a valid email address.";
+      } else {
+        delete newErrors.email;
+      }
+    } else if (name === "password") {
+      if (!value) {
+        newErrors.password = "Password is required.";
+      } else {
+        delete newErrors.password;
+      }
+    }
+    setErrors(newErrors);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    validateField(e.target.name, e.target.value);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
     setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const email = (formData.get("email") as string) || "";
+    const password = (formData.get("password") as string) || "";
+
+    // Local check before submission
+    const newErrors: Record<string, string> = {};
+    if (!email.trim()) {
+      newErrors.email = "Email address is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    if (!password) {
+      newErrors.password = "Password is required.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsPending(false);
+      return;
+    }
+
     try {
-      const formData = new FormData(e.currentTarget);
       const res = await loginAction(null, formData);
       if (res?.error) {
         setError(res.error);
       } else if (res?.success) {
         const role = res.role;
-        if (role === 'COMPANY') window.location.href = '/company';
-        else if (role === 'RECRUITER') window.location.href = '/recruiter/dashboard';
-        else window.location.href = '/dashboard';
+        if (role === 'COMPANY') router.push('/company');
+        else if (role === 'RECRUITER') router.push('/recruiter/dashboard');
+        else router.push('/dashboard');
         return;
       }
     } catch (err) {
@@ -38,79 +84,71 @@ export default function SigninForm({ role = "Candidate" }: { role?: string }) {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Render Server Errors */}
       {error && (
-        <div className="bg-error/10 text-error p-3 rounded-lg text-sm mb-4 border border-error/20">
+        <div className="text-error p-4 text-sm bg-error-bg mb-4 rounded-xl border-error/20 border flex items-center gap-2">
+          <AlertCircle size={18} className="shrink-0" aria-hidden="true" />
           {error}
         </div>
       )}
       
       {/* Input for Email Address */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-text" htmlFor="email">
-          Email Address
-        </label>
-        <div className="relative text-text">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted">mail</span>
-          <input 
-            className="w-full pl-10 pr-4 py-3 rounded-lg border border-input-border bg-input-bg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-muted" 
-            id="email" 
-            name="email"
-            placeholder="name@example.com" 
-            type="email"
-            required
-            disabled={isPending}
-          />
-        </div>
-      </div>
+      <Input
+        label="Email Address"
+        id="email"
+        name="email"
+        placeholder="name@example.com"
+        type="email"
+        icon="mail"
+        required
+        disabled={isPending}
+        error={errors.email}
+        onBlur={handleBlur}
+      />
 
-      {/* Input for Password */}
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <label className="block text-sm font-medium text-text" htmlFor="password">
+      {/* Input for Password with Show/Hide visibility */}
+      <div className="space-y-1.5 w-full">
+        <div className="flex items-center justify-between">
+          <label className="text-text type-ui block font-medium" htmlFor="password">
             Password
           </label>
-          <Link className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors" href="#">
+          <button 
+            type="button"
+            onClick={() => toast.info("Password recovery is coming soon. Please contact system support.")}
+            className="type-ui text-primary transition-colors hover:text-primary/80 font-medium cursor-pointer"
+          >
             Forgot Password?
-          </Link>
+          </button>
         </div>
-        <div className="relative text-text">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted">lock</span>
-          <input 
-            className="w-full pl-10 pr-4 py-3 rounded-lg border border-input-border bg-input-bg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-muted" 
-            id="password" 
-            name="password"
-            placeholder="••••••••" 
-            type="password"
-            required
-            disabled={isPending}
-          />
-        </div>
+        <Input
+          id="password"
+          name="password"
+          placeholder="••••••••"
+          type="password"
+          icon="lock"
+          showVisibilityToggle={true}
+          required
+          disabled={isPending}
+          error={errors.password}
+          onBlur={handleBlur}
+        />
       </div>
 
       {/* Checkbox to stay logged in */}
-      <div className="flex items-center">
-        <input 
-          className="w-4 h-4 rounded border-input-border text-primary focus:ring-primary cursor-pointer disabled:opacity-50" 
-          id="remember" 
-          type="checkbox"
-          name="remember"
-          disabled={isPending}
-        />
-        <label className="ml-2 text-sm text-muted cursor-pointer select-none" htmlFor="remember">
-          Remember me for 30 days
-        </label>
-      </div>
-
-      {/* The main blue button to sign in */}
-      <button 
-        className="flex justify-center items-center w-full bg-btn-primary hover:bg-btn-primary-hover text-surface font-bold py-3.5 px-4 rounded-lg transition-all shadow-lg shadow-primary/20 active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed" 
-        type="submit"
+      <Checkbox 
+        id="remember" 
+        name="remember"
         disabled={isPending}
+        label="Remember me for 30 days"
+      />
+
+      {/* Sign In Button */}
+      <Button 
+        variant="primary"
+        type="submit"
+        isLoading={isPending}
+        className="w-full mt-4"
       >
-        {isPending ? (
-          <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
-        ) : null}
-        {isPending ? "Signing In..." : `Sign In as ${role}`}
-      </button>
+        Sign In as {role}
+      </Button>
     </form>
   );
 }

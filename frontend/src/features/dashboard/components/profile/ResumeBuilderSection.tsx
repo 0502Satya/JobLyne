@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Profile } from "@/types/profile";
+import { Button } from "@/shared/ui";
+import { BarChart3, Info, Sparkles, Printer, Eye } from "lucide-react";
 
 interface ResumeBuilderSectionProps {
   profile: Profile | null;
@@ -33,75 +35,76 @@ export default function ResumeBuilderSection({ profile, onChange }: ResumeBuilde
   };
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="resume">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="resume">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">analytics</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <BarChart3 size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Resume Builder & Strength</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Auto-generate and optimize your CV</p>
+            <h3 className="text-text type-card-title leading-tight">Resume Builder & Strength</h3>
+            <p className="text-xs text-muted mt-0.5">Auto-generate and optimize your CV</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full border border-primary/20">
+        <div className="flex gap-3 items-center">
+          <span className="text-primary border border-primary/20 px-2.5 rounded-full py-0.5 type-caption bg-primary/10">
             Strength: {profileStrength}%
           </span>
         </div>
       </div>
 
       {/* Card Content */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6 text-left">
+        <div className="gap-6 grid grid-cols-1 lg:grid-cols-[1fr_240px]">
           {/* Templates Selection & Resume Details */}
-          <div className="space-y-5 min-w-0">
-            <div className="bg-bg/40 border border-border rounded-xl p-4">
-              <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-2.5">Select Template</h4>
+          <div className="min-w-0 space-y-5">
+            <div className="border-border bg-bg/40 p-4 rounded-xl border">
+              <h4 className="mb-2.5 uppercase tracking-wider type-caption text-muted">Select Template</h4>
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { id: "classic", label: "Classic", color: "bg-slate-700" },
                   { id: "modern", label: "Modern", color: "bg-primary" },
                   { id: "minimal", label: "Minimalist", color: "bg-slate-500" },
                 ].map((tmpl) => (
-                  <button
+                  <Button
                     key={tmpl.id}
                     onClick={() => setTemplate(tmpl.id)}
                     type="button"
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-lg border-2 transition-all cursor-pointer ${
+                    variant={template === tmpl.id ? "outline" : "ghost"}
+                    className={`h-auto p-2.5 flex flex-col items-center justify-center ${
                       template === tmpl.id
-                        ? "border-primary bg-card shadow-xs"
-                        : "border-transparent bg-bg hover:bg-bg/80"
+                        ? "border-primary! ring-2 ring-primary/20 bg-card!"
+                        : "border-transparent"
                     }`}
                   >
-                    <div className={`w-8 h-10 rounded shadow-inner mb-1.5 ${tmpl.color} opacity-80 flex items-center justify-center text-white text-[8px] font-bold`}>
+                    <div className={`mb-1.5 h-10 w-8 shadow-inner rounded ${tmpl.color} text-xs justify-center opacity-80 items-center text-white flex`}>
                       CV
                     </div>
-                    <span className="text-[11px] font-semibold text-text">{tmpl.label}</span>
-                  </button>
+                    <span className="text-text text-xs font-normal">{tmpl.label}</span>
+                  </Button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2.5">
-              <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Optimization Recommendations</h4>
+              <h4 className="uppercase tracking-wider type-caption text-muted">Optimization Recommendations</h4>
               <div className="space-y-2">
                 {(!profile?.skills || profile.skills.length < 5) && (
-                  <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400 font-semibold bg-amber-500/5 p-3 rounded-lg border border-amber-500/10">
-                    <span className="material-symbols-outlined text-sm mt-0.5">info</span>
+                  <div className="border-amber-500/10 text-amber-600 items-start p-3 gap-2 rounded-lg flex bg-amber-500/5 type-caption border dark:text-amber-400">
+                    <Info size={14} className="mt-0.5" aria-hidden="true" />
                     Add at least 5 skills to showcase your core competencies.
                   </div>
                 )}
                 {(!profile?.experience || profile.experience.length === 0) && (
-                  <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400 font-semibold bg-amber-500/5 p-3 rounded-lg border border-amber-500/10">
-                    <span className="material-symbols-outlined text-sm mt-0.5">info</span>
+                  <div className="border-amber-500/10 text-amber-600 items-start p-3 gap-2 rounded-lg flex bg-amber-500/5 type-caption border dark:text-amber-400">
+                    <Info size={14} className="mt-0.5" aria-hidden="true" />
                     Add work experience records to highlight your career history.
                   </div>
                 )}
                 {profileStrength >= 80 && (
-                  <div className="flex items-start gap-2 text-xs text-emerald-600 dark:text-emerald-450 font-semibold bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/10">
-                    <span className="material-symbols-outlined text-sm mt-0.5">stars</span>
+                  <div className="bg-emerald-500/5 border-emerald-500/10 text-emerald-600 items-start p-3 gap-2 rounded-lg flex type-caption border dark:text-emerald-450">
+                    <Sparkles size={14} className="mt-0.5" aria-hidden="true" />
                     Looking good! Your profile has excellent detail and strength.
                   </div>
                 )}
@@ -110,29 +113,31 @@ export default function ResumeBuilderSection({ profile, onChange }: ResumeBuilde
           </div>
 
           {/* Action Widgets */}
-          <div className="flex flex-col justify-between gap-5 border-t lg:border-t-0 lg:border-l border-border/60 pt-5 lg:pt-0 lg:pl-5">
+          <div className="border-t border-border/60 flex-col pt-5 flex gap-5 justify-between lg:pl-5 lg:border-t-0 lg:pt-0 lg:border-l">
             <div className="space-y-2">
-              <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Actions</h4>
-              <button
+              <h4 className="uppercase tracking-wider type-caption text-muted">Actions</h4>
+              <Button
                 onClick={handleDownloadPDF}
                 type="button"
-                className="w-full py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/95 transition-all shadow-xs flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
+                variant="primary"
+                className="w-full justify-center gap-1.5 min-h-[44px]"
               >
-                <span className="material-symbols-outlined text-sm">print</span>
+                <Printer size={14} aria-hidden="true" />
                 Print / Save PDF
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleLivePreview}
                 type="button"
-                className="w-full py-2.5 bg-card text-text border border-border font-bold text-xs rounded-lg hover:bg-bg transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
+                variant="outline"
+                className="w-full justify-center gap-1.5 min-h-[44px]"
               >
-                <span className="material-symbols-outlined text-sm">visibility</span>
+                <Eye size={14} aria-hidden="true" />
                 Live Preview
-              </button>
+              </Button>
             </div>
 
-            <div className="bg-bg/40 p-3.5 rounded-lg text-xs text-muted font-medium leading-relaxed border border-border">
-              <span className="font-bold text-text uppercase block mb-0.5">Print Tip</span>
+            <div className="border-border p-3.5 leading-relaxed rounded-lg bg-bg/40 type-caption text-muted border">
+              <span className="text-text mb-0.5 block uppercase">Print Tip</span>
               Use the browser print window to save as PDF. Ensure &quot;Background graphics&quot; is checked in print settings.
             </div>
           </div>

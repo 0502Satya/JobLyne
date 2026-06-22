@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ChevronDown } from "lucide-react";
 
 // Generate last 30 days labels (show every 5th day for readability)
 function getLast30DaysLabels(): string[] {
@@ -20,49 +21,49 @@ export default function VacancyStats() {
   const dayLabels = getLast30DaysLabels();
 
   return (
-    <div className="bg-white rounded-[32px] p-10 shadow-xl shadow-slate-200/50 flex flex-col w-full overflow-hidden">
+    <div className="w-full p-10 overflow-hidden rounded-[32px] bg-surface flex shadow-xl shadow-slate-200/50 flex-col">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-6 mb-12">
-        <h4 className="text-xl font-black text-slate-900 tracking-tight">Vacancy Stats</h4>
+      <div className="items-center flex-wrap mb-12 flex gap-6 justify-between">
+        <h4 className="text-text type-h2">Vacancy Stats</h4>
         
-        <div className="flex items-center gap-8 flex-wrap">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-2.5 rounded-full bg-primary"></div>
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Application Sent</span>
-              <div className="w-8 h-4 bg-primary/20 rounded-full relative cursor-pointer">
-                <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-primary rounded-full"></div>
+        <div className="flex flex-wrap items-center gap-8">
+          <div className="flex gap-6 items-center">
+            <div className="flex gap-3 items-center">
+              <div className="bg-primary h-2.5 w-5 rounded-full"></div>
+              <span className="text-xs text-muted uppercase tracking-widest">Application Sent</span>
+              <div className="relative rounded-full h-4 cursor-pointer w-8 bg-primary/20">
+                <div className="top-0.5 right-0.5 h-3 absolute w-3 rounded-full bg-primary"></div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-2.5 rounded-full bg-stat-green"></div>
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Interviews</span>
-              <div className="w-8 h-4 bg-stat-green/20 rounded-full relative cursor-pointer">
-                <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-stat-green rounded-full"></div>
+            <div className="flex gap-3 items-center">
+              <div className="h-2.5 w-5 rounded-full bg-stat-green"></div>
+              <span className="text-xs text-muted uppercase tracking-widest">Interviews</span>
+              <div className="bg-stat-green/20 relative rounded-full h-4 cursor-pointer w-8">
+                <div className="top-0.5 right-0.5 h-3 absolute w-3 rounded-full bg-stat-green"></div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-2.5 rounded-full bg-slate-300"></div>
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Rejected</span>
-              <div className="w-8 h-4 bg-slate-100 rounded-full relative cursor-pointer">
-                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-slate-300 rounded-full"></div>
+            <div className="flex gap-3 items-center">
+              <div className="bg-border h-2.5 w-5 rounded-full"></div>
+              <span className="text-xs text-muted uppercase tracking-widest">Rejected</span>
+              <div className="relative rounded-full bg-bg h-4 cursor-pointer w-8">
+                <div className="top-0.5 bg-border h-3 absolute w-3 rounded-full left-0.5"></div>
               </div>
             </div>
           </div>
 
           <div className="relative">
-            <button className="flex items-center gap-3 px-6 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-100 transition-all">
+            <button className="text-xs text-muted px-6 rounded-2xl uppercase items-center transition-all bg-bg py-3 gap-3 border-border tracking-widest flex border hover:bg-bg">
               Last 30 Days
-              <span className="material-symbols-outlined text-sm">expand_more</span>
+              <ChevronDown size={14} aria-hidden="true" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Chart Area */}
-      <div className="relative h-[300px] w-full mt-4 overflow-hidden">
+      <div className="w-full relative overflow-hidden h-[300px] mt-4">
         {/* Y-Axis Labels */}
-        <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[10px] font-bold text-slate-300 pointer-events-none z-10">
+        <div className="z-10 text-xs absolute pointer-events-none left-0 flex-col text-muted flex justify-between bottom-0 top-0">
           <span>80</span>
           <span>60</span>
           <span>40</span>
@@ -71,14 +72,14 @@ export default function VacancyStats() {
         </div>
 
         {/* Grid Lines */}
-        <div className="absolute left-8 right-0 top-0 bottom-0 flex flex-col justify-between pointer-events-none">
+        <div className="absolute left-8 pointer-events-none flex-col flex justify-between bottom-0 right-0 top-0">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="w-full h-[1px] bg-slate-50 border-t border-dashed border-slate-100"></div>
+            <div key={i} className="w-full border-t border-dashed bg-bg border-border h-[1px]"></div>
           ))}
         </div>
 
         {/* The SVG Chart — uses viewBox so it scales within the container */}
-        <svg className="absolute left-8 right-0 top-0 bottom-0 w-[calc(100%-32px)] h-full" viewBox="0 0 700 300" preserveAspectRatio="none">
+        <svg className="h-full absolute w-[calc(100%-32px)] left-8 bottom-0 right-0 top-0" viewBox="0 0 700 300" preserveAspectRatio="none">
           {/* Green Line (Interviews) */}
           <path 
             d="M 0 220 C 80 200, 120 180, 200 190 S 340 160, 420 180 S 520 210, 600 200 S 660 190, 700 185" 
@@ -104,21 +105,21 @@ export default function VacancyStats() {
              
              {/* Tooltip Popup */}
              <foreignObject x="420" y="50" width="160" height="85">
-                <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-3 flex flex-col gap-1.5">
-                   <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Mar 18, 2026</div>
-                   <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-1.5">
-                         <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                <div className="gap-1.5 rounded-2xl p-3 bg-surface border-border flex-col shadow-2xl flex border">
+                   <div className="text-muted uppercase text-xs text-center tracking-widest">Mar 18, 2026</div>
+                   <div className="flex gap-3 items-center justify-between">
+                      <div className="flex gap-1.5 items-center">
+                         <div className="bg-primary h-2.5 w-2.5 rounded-full"></div>
                          <div>
-                            <div className="text-[13px] font-black leading-none">12</div>
-                            <div className="text-[7px] font-bold text-slate-400 uppercase">App. Sent</div>
+                            <div className="leading-none text-sm">12</div>
+                            <div className="text-xs uppercase text-muted">App. Sent</div>
                          </div>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                         <div className="w-2.5 h-2.5 rounded-full bg-stat-green"></div>
+                      <div className="flex gap-1.5 items-center">
+                         <div className="h-2.5 w-2.5 rounded-full bg-stat-green"></div>
                          <div>
-                            <div className="text-[13px] font-black leading-none">3</div>
-                            <div className="text-[7px] font-bold text-slate-400 uppercase">Interviews</div>
+                            <div className="leading-none text-sm">3</div>
+                            <div className="text-xs uppercase text-muted">Interviews</div>
                          </div>
                       </div>
                    </div>
@@ -129,25 +130,25 @@ export default function VacancyStats() {
       </div>
 
       {/* X-Axis Labels — Last 30 days, showing every 5th day */}
-      <div className="flex justify-between mt-10 ml-8 text-[11px] font-bold text-slate-300 uppercase tracking-widest">
+      <div className="text-xs uppercase mt-10 ml-8 tracking-widest text-muted flex justify-between">
         {dayLabels.map((label, i) => (
           <span key={i}>{label}</span>
         ))}
       </div>
 
       {/* Bottom Legend */}
-      <div className="flex items-center justify-center gap-10 mt-12 border-t border-slate-50 pt-10">
-         <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-primary"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Application Sent</span>
+      <div className="justify-center border-t mt-12 pt-10 gap-10 items-center border-border flex">
+         <div className="flex gap-3 items-center">
+            <div className="bg-primary w-3 rounded-full h-3"></div>
+            <span className="text-muted type-badge">Application Sent</span>
          </div>
-         <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-stat-green"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Interviews</span>
+         <div className="flex gap-3 items-center">
+            <div className="w-3 rounded-full h-3 bg-stat-green"></div>
+            <span className="text-muted type-badge">Interviews</span>
          </div>
-         <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-red-400"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rejected</span>
+         <div className="flex gap-3 items-center">
+            <div className="bg-red-400 w-3 rounded-full h-3"></div>
+            <span className="text-muted type-badge">Rejected</span>
          </div>
       </div>
     </div>

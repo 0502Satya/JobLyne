@@ -11,10 +11,10 @@ export default function RecruiterRootPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center">
-      <div className="animate-pulse flex flex-col items-center gap-4">
-        <div className="size-12 bg-primary/20 rounded-full border border-primary/30"></div>
-        <p className="text-muted text-sm font-medium italic">Redirecting to recruiter portal...</p>
+    <div className="justify-center items-center bg-bg flex min-h-screen">
+      <div className="gap-4 animate-pulse items-center flex flex-col">
+        <div className="size-12 bg-primary/20 rounded-full border-primary/30 border"></div>
+        <p className="italic type-label">Redirecting to recruiter portal...</p>
       </div>
     </div>
   );

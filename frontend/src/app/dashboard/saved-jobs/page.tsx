@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { getSavedJobsAction, unsaveJobAction, applyToJobAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
+import { Button } from "@/shared/ui";
+import { Briefcase, Bookmark, Clock, Banknote } from "lucide-react";
 
 export default function SavedJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -37,89 +39,93 @@ export default function SavedJobsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      <div className="items-center flex justify-center min-h-[60vh]">
+        <div className="h-10 w-10 border-b-2 rounded-full border-primary animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 lg:p-10 max-w-[1400px] mx-auto">
+    <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1">Saved Jobs</h1>
-        <p className="text-slate-500 font-medium">Jobs you&apos;ve saved for later. Take your time to apply.</p>
+        <h1 className="type-h2 mb-1 text-text">Saved Jobs</h1>
+        <p className="text-muted">Jobs you&apos;ve saved for later. Take your time to apply.</p>
       </div>
 
       {/* Job Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="gap-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         {jobs.map((job) => (
           <div
             key={job.id}
-            className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group p-6 flex flex-col gap-4"
+            className="group gap-4 rounded-2xl transition-all bg-surface border-border shadow-sm flex-col p-6 flex border hover:shadow-md"
           >
             {/* Card Top */}
-            <div className="flex justify-between items-start gap-3">
+            <div className="flex gap-3 items-start justify-between">
               <div className="flex gap-3 items-center min-w-0">
-                <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                <div className="justify-center shrink-0 h-12 w-12 items-center bg-bg border-border flex rounded-xl border">
                   {job.company_logo ? (
-                    <img src={job.company_logo} alt={job.company_name} className="w-8 h-8 object-contain" />
+                     <img src={job.company_logo} alt={`${job.company_name} logo`} className="h-8 w-8 object-contain" />
                   ) : (
-                    <span className="material-symbols-outlined text-2xl text-primary">work</span>
+                    <Briefcase className="text-primary" size={24} aria-hidden="true" />
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors truncate">
+                  <h4 className="type-ui truncate transition-colors text-text group-hover:text-primary">
                     {job.title}
                   </h4>
-                  <p className="text-xs text-slate-400 font-medium truncate">
+                  <p className="truncate text-muted type-caption">
                     {job.company_name} • {job.location}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => handleUnsave(job.id)}
-                className="shrink-0 p-1.5 text-primary hover:bg-primary/8 rounded-lg transition-colors"
+                className="text-primary shrink-0 rounded-lg transition-colors p-1.5 hover:bg-primary/8 cursor-pointer"
                 title="Remove from saved"
               >
-                <span className="material-symbols-outlined text-xl">bookmark</span>
+                <Bookmark size={20} className="fill-primary text-primary" aria-hidden="true" />
               </button>
             </div>
 
             {/* Meta */}
-            <div className="flex flex-wrap gap-2 text-[11px] text-slate-400 font-medium">
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">schedule</span>
+            <div className="text-xs text-muted gap-2 flex-wrap flex">
+              <span className="gap-1 flex items-center">
+                <Clock size={14} aria-hidden="true" />
                 {new Date(job.posted_at).toLocaleDateString()}
               </span>
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">payments</span>
+              <span className="gap-1 flex items-center">
+                <Banknote size={14} aria-hidden="true" />
                 {job.currency}{job.salary_min}–{job.salary_max}
               </span>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 mt-auto pt-4 border-t border-slate-50">
-              <button className="flex-1 text-slate-600 text-xs font-bold px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors">
+            <div className="border-t mt-auto items-center gap-2 border-border flex pt-4">
+              <Button 
+                variant="ghost" 
+                className="flex-1 py-2 min-h-0"
+              >
                 View Details
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleApply(job.id)}
                 disabled={applying === job.id}
-                className="flex-1 bg-slate-900 text-white text-xs font-black px-3 py-2.5 rounded-xl hover:bg-slate-700 active:scale-95 transition-all disabled:opacity-50"
+                variant="primary"
+                className="flex-1 py-2 min-h-0"
               >
                 {applying === job.id ? "Applying..." : "Apply Now"}
-              </button>
+              </Button>
             </div>
           </div>
         ))}
 
         {jobs.length === 0 && (
-          <div className="md:col-span-2 xl:col-span-3 py-24 text-center bg-white rounded-2xl border border-dashed border-slate-200">
-            <div className="flex flex-col items-center gap-3">
-              <span className="material-symbols-outlined text-5xl text-slate-200">bookmark_border</span>
-              <p className="text-slate-400 font-medium">You haven&apos;t saved any jobs yet.</p>
-              <a href="/dashboard" className="text-primary font-bold hover:underline text-sm">Discover Jobs →</a>
+          <div className="md:col-span-2 xl:col-span-3 border-dashed rounded-2xl py-24 text-center bg-surface border-border border">
+            <div className="flex gap-3 items-center flex-col">
+              <Bookmark size={48} className="text-muted" aria-hidden="true" />
+              <p className="text-muted">You haven&apos;t saved any jobs yet.</p>
+              <a href="/dashboard" className="type-ui text-primary hover:underline">Discover Jobs →</a>
             </div>
           </div>
         )}

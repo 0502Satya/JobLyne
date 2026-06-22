@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { UserCircle, Camera, MapPin, Calendar } from "lucide-react";
 
 interface CandidateCardProps {
   profileImage?: string;
@@ -18,48 +19,48 @@ export default function CandidateCard({
   memberSince = "Aug 2023"
 }: CandidateCardProps) {
   return (
-    <div className="bg-white rounded-[40px] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center text-center">
+    <div className="rounded-[40px] items-center bg-surface border-border flex-col flex shadow-xl text-center p-8 border">
       {/* Profile Image with Ring */}
       <div className="relative mb-6">
-        <div className="w-32 h-32 rounded-[32px] overflow-hidden p-1 ring-4 ring-slate-50 shadow-inner bg-white">
-          <div className="w-full h-full rounded-[28px] overflow-hidden bg-slate-100 flex items-center justify-center">
+        <div className="w-32 h-32 ring-4 ring-border overflow-hidden rounded-[32px] p-1 bg-surface shadow-inner">
+          <div className="w-full rounded-[28px] justify-center h-full overflow-hidden items-center bg-bg flex">
             {profileImage ? (
               <img src={profileImage} className="w-full h-full object-cover" alt={fullName} />
             ) : (
-              <span className="material-symbols-outlined text-slate-200 text-6xl">account_circle</span>
+              <UserCircle size={64} className="text-muted" aria-hidden="true" />
             )}
           </div>
         </div>
-        <button className="absolute -bottom-2 -right-2 w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center border-4 border-white shadow-lg hover:scale-110 transition-transform">
-          <span className="material-symbols-outlined text-xl">camera_alt</span>
+        <button className="justify-center h-12 rounded-2xl -right-2 absolute -bottom-2 w-12 items-center text-white transition-transform border-white border-4 bg-primary flex shadow-lg hover:scale-110">
+          <Camera size={20} aria-hidden="true" />
         </button>
       </div>
 
-      <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-1">{fullName}</h3>
-      <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-6">{category}</p>
+      <h3 className="type-h2 mb-1 text-text">{fullName}</h3>
+      <p className="text-xs text-primary uppercase mb-6 tracking-decorative">{category}</p>
 
-      <div className="w-full space-y-4 pt-6 border-t border-slate-50">
-        <div className="flex items-center gap-4 text-left">
-          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-            <span className="material-symbols-outlined text-xl">location_on</span>
+      <div className="w-full border-t pt-6 border-border space-y-4">
+        <div className="gap-4 flex text-left items-center">
+          <div className="justify-center h-10 w-10 text-muted items-center bg-bg flex rounded-xl">
+            <MapPin size={20} aria-hidden="true" />
           </div>
           <div>
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Location</p>
-            <p className="text-sm font-bold text-slate-700">{location}</p>
+            <p className="mb-0.5 text-muted type-badge">Location</p>
+            <p className="text-text type-ui">{location}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-left">
-          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-            <span className="material-symbols-outlined text-xl">calendar_today</span>
+        <div className="gap-4 flex text-left items-center">
+          <div className="justify-center h-10 w-10 text-muted items-center bg-bg flex rounded-xl">
+            <Calendar size={20} aria-hidden="true" />
           </div>
           <div>
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Member Since</p>
-            <p className="text-sm font-bold text-slate-700">{memberSince}</p>
+            <p className="mb-0.5 text-muted type-badge">Member Since</p>
+            <p className="text-text type-ui">{memberSince}</p>
           </div>
         </div>
       </div>
 
-      <button className="w-full mt-8 bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-slate-900/20">
+      <button className="w-full bg-card py-4 rounded-2xl uppercase mt-8 transition-all text-white tracking-widest shadow-lg shadow-slate-900/20 type-badge hover:bg-black">
         View Public Profile
       </button>
     </div>

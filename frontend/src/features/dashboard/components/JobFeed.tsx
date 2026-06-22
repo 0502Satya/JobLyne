@@ -5,6 +5,7 @@ import { getJobsAction, applyToJobAction, saveJobAction, unsaveJobAction } from 
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Sparkles, Coins, Bookmark, BookmarkPlus, Clock, SearchX } from "lucide-react";
 
 export default function JobFeed() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -69,85 +70,85 @@ export default function JobFeed() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex gap-6 flex-col">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-44 bg-surface rounded-xl animate-pulse border border-border shadow-sm"></div>
+          <div key={i} className="border-border animate-pulse shadow-sm h-44 bg-surface rounded-xl border"></div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex gap-6 flex-col text-left">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-text flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">auto_awesome</span> 
+        <h3 className="text-text type-h3 items-center gap-2 flex font-bold">
+          <Sparkles size={20} className="text-primary font-bold" aria-hidden="true" />
           Smart Job Feed
         </h3>
-        <Link href="/dashboard/jobs" className="text-primary text-sm font-bold hover:underline">View all</Link>
+        <Link href="/jobs" className="type-ui text-primary hover:underline font-bold">View all</Link>
       </div>
 
       {jobs && jobs.length > 0 ? (
         jobs.map((job) => (
           <div 
             key={job.id} 
-            className="bg-surface rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+            className="border-border group shadow-sm transition-shadow p-6 cursor-pointer bg-surface rounded-xl border hover:shadow-md"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex gap-4">
-                <div className="h-12 w-12 rounded-lg bg-bg flex items-center justify-center p-2 border border-border/40">
+            <div className="mb-4 flex items-start justify-between">
+              <div className="gap-4 flex">
+                <div className="border-border/40 justify-center h-12 w-12 items-center p-2 bg-bg rounded-lg flex border">
                   {job.company_logo ? (
-                    <img src={job.company_logo} alt={job.company_name} className="h-full w-full object-contain" />
+                    <img src={job.company_logo} alt={`${job.company_name} logo`} className="w-full h-full object-contain" />
                   ) : (
-                    <span className="material-symbols-outlined text-3xl text-indigo-600">token</span>
+                    <Coins size={28} className="text-primary font-bold" aria-hidden="true" />
                   )}
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-text group-hover:text-primary transition-colors">{job.title}</h4>
-                  <p className="text-muted text-sm">{job.company_name} • {job.location}</p>
+                  <h4 className="text-text transition-colors type-card-title group-hover:text-primary font-semibold">{job.title}</h4>
+                  <p className="text-sm text-muted">{job.company_name} • {job.location}</p>
                 </div>
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleSave(job.id, !!job.is_saved); }}
-                className={`transition-colors ${job.is_saved ? 'text-primary' : 'text-muted hover:text-primary'}`}
+                className={`transition-colors cursor-pointer ${job.is_saved ? 'text-primary' : 'text-muted hover:text-primary'}`}
               >
-                <span className="material-symbols-outlined filled">{job.is_saved ? 'bookmark' : 'bookmark_add'}</span>
+                {job.is_saved ? <Bookmark size={20} className="fill-current" aria-hidden="true" /> : <BookmarkPlus size={20} aria-hidden="true" />}
               </button>
             </div>
             
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="gap-2 flex mb-4 flex-wrap">
               {job.skills?.length > 0 ? (
                 job.skills.slice(0, 3).map((skill: string) => (
-                  <span key={skill} className="px-2.5 py-1 rounded-md bg-bg text-muted text-xs font-medium">
+                  <span key={skill} className="py-1 bg-bg px-2.5 rounded-md type-caption text-muted font-medium">
                     {skill}
                   </span>
                 ))
               ) : (
                 <>
-                  <span className="px-2.5 py-1 rounded-md bg-bg text-muted text-xs font-medium">React</span>
-                  <span className="px-2.5 py-1 rounded-md bg-bg text-muted text-xs font-medium">TypeScript</span>
+                  <span className="py-1 bg-bg px-2.5 rounded-md type-caption text-muted font-medium">React</span>
+                  <span className="py-1 bg-bg px-2.5 rounded-md type-caption text-muted font-medium">TypeScript</span>
                 </>
               )}
               {job.salary_min && (
-                <span className="px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium">
+                <span className="py-1 text-success bg-success-bg border border-success/10 px-2.5 rounded-md type-caption font-semibold">
                   {job.currency}{job.salary_min.toLocaleString()} - {job.salary_max?.toLocaleString()}
                 </span>
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-border/40">
-              <div className="flex items-center gap-1 text-xs text-muted">
-                <span className="material-symbols-outlined text-sm">schedule</span> 
+            <div className="border-border/40 border-t items-center flex justify-between pt-4">
+              <div className="text-xs gap-1 items-center flex text-muted">
+                <Clock size={14} className="font-bold" aria-hidden="true" />
                 Posted {new Date(job.posted_at).toLocaleDateString()}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+              <div className="gap-2 flex items-center">
+                <span className="px-2 text-primary py-1 type-caption rounded bg-primary/10 font-bold border border-primary/5">
                   {job.match_score || "95"}% Match
                 </span>
                 <button 
                   onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
                   disabled={applying === job.id}
-                  className="bg-text dark:bg-surface text-surface dark:text-text text-sm font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="bg-text rounded-lg type-ui py-2 px-4 text-white transition-opacity dark:text-text dark:bg-surface hover:opacity-90 disabled:opacity-50 font-bold cursor-pointer min-h-[38px] flex items-center"
                 >
                   {applying === job.id ? "Applying..." : "Apply Now"}
                 </button>
@@ -156,9 +157,28 @@ export default function JobFeed() {
           </div>
         ))
       ) : (
-        <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 shadow-sm">
-          <span className="material-symbols-outlined text-5xl text-slate-200 mb-4">search_off</span>
-          <p className="text-slate-400 font-bold text-sm">No matching jobs found today.</p>
+        <div className="border-dashed py-20 text-center bg-surface border-border shadow-sm rounded-xl border dark:bg-card dark:border-border px-6">
+          <div className="flex gap-4 items-center flex-col max-w-sm mx-auto">
+            <SearchX size={40} className="text-muted font-bold" aria-hidden="true" />
+            <div>
+              <p className="type-ui font-semibold text-text">No matching jobs found today</p>
+              <p className="text-xs text-muted mt-1 leading-relaxed">No jobs matched your current profile keywords or search filters.</p>
+            </div>
+            <div className="flex gap-3 mt-2 flex-col w-full sm:flex-row">
+              <Link 
+                href="/dashboard/profile"
+                className="flex-1 text-center justify-center min-h-[40px] px-4 py-2 border border-border text-xs font-bold rounded-lg type-ui transition-colors hover:bg-bg flex items-center"
+              >
+                Update Skills
+              </Link>
+              <Link 
+                href="/jobs" 
+                className="flex-1 text-center justify-center min-h-[40px] px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg type-ui transition-colors hover:bg-primary/95 flex items-center shadow-md shadow-primary/10"
+              >
+                Browse All Jobs
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </div>

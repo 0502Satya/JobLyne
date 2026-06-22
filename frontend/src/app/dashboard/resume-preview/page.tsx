@@ -4,6 +4,24 @@ import React, { useEffect, useState } from "react";
 import { getCandidateProfileAction } from "@/features/auth/actions";
 import { Profile } from "@/types/profile";
 import Link from "next/link";
+import { Button } from "@/shared/ui";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Printer,
+  MapPin,
+  Mail,
+  Smartphone,
+  Globe,
+  Link as LinkIcon,
+  FileText,
+  Briefcase,
+  GraduationCap,
+  Zap,
+  Languages,
+  FolderOpen,
+  Crown
+} from "lucide-react";
 
 export default function ResumePreviewPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -35,10 +53,10 @@ export default function ResumePreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
-          <p className="text-slate-500 font-bold text-sm">Preparing Resume Preview...</p>
+      <div className="justify-center items-center bg-bg flex min-h-screen">
+        <div className="gap-4 flex items-center flex-col">
+          <div className="border-primary h-12 w-12 rounded-full border-t-transparent border-4 animate-spin"></div>
+          <p className="text-muted type-ui">Preparing Resume Preview...</p>
         </div>
       </div>
     );
@@ -46,17 +64,17 @@ export default function ResumePreviewPage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center space-y-4">
-          <span className="material-symbols-outlined text-4xl text-red-500">error</span>
-          <h2 className="text-xl font-black text-slate-800">Profile Not Found</h2>
-          <p className="text-sm text-slate-500 font-bold">We couldn&apos;t load your profile. Please make sure you are logged in.</p>
-          <Link
+      <div className="justify-center items-center bg-bg flex p-4 min-h-screen">
+        <div className="w-full rounded-3xl bg-surface border-border text-center shadow-xl max-w-md p-8 space-y-4 border flex flex-col items-center">
+          <AlertCircle size={40} className="text-red-500" aria-hidden="true" />
+          <h2 className="text-text type-h2">Profile Not Found</h2>
+          <p className="text-muted type-ui">We couldn&apos;t load your profile. Please make sure you are logged in.</p>
+          <Button
+            as={Link}
             href="/dashboard/profile"
-            className="inline-block px-6 py-2.5 bg-primary text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-md min-h-[44px]"
           >
             Back to Profile
-          </Link>
+          </Button>
         </div>
       </div>
     );
@@ -72,7 +90,7 @@ export default function ResumePreviewPage() {
     : "NA";
 
   return (
-    <div className="min-h-screen bg-slate-100/60 p-4 sm:p-8 md:p-12 font-sans text-slate-800 selection:bg-indigo-500 selection:text-white">
+    <div className="bg-bg text-text p-4 min-h-screen sm:p-8 md:p-12 selection:text-white selection:bg-primary">
       {/* Print styles overrides */}
       <style jsx global>{`
         @media print {
@@ -105,58 +123,61 @@ export default function ResumePreviewPage() {
       `}</style>
 
       {/* Screen Toolbar Controls */}
-      <div className="no-print max-w-4xl mx-auto mb-8 bg-white/80 backdrop-blur-md border border-slate-200/60 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <Link
+      <div className="mx-auto mb-8 gap-4 rounded-2xl no-print bg-white/80 items-center backdrop-blur-md flex-wrap shadow-sm max-w-4xl flex justify-between p-4 border-border/60 border">
+        <div className="flex gap-3 items-center text-left">
+          <Button
+            as={Link}
             href="/dashboard/profile"
-            className="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-800 transition-all border border-slate-100 flex items-center justify-center min-h-[44px] min-w-[44px]"
+            variant="outline"
+            className="h-11 w-11 p-0 flex items-center justify-center text-muted"
             title="Back to Profile Editor"
           >
-            <span className="material-symbols-outlined text-xl">arrow_back</span>
-          </Link>
+            <ArrowLeft size={20} aria-hidden="true" />
+          </Button>
           <div>
-            <h1 className="text-sm font-black text-slate-800 tracking-tight leading-none mb-1">Resume Preview</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">A4 Standard Print Layout</p>
+            <h1 className="tracking-tight text-text leading-none type-ui mb-1">Resume Preview</h1>
+            <p className="text-muted text-xs uppercase tracking-wider">A4 Standard Print Layout</p>
           </div>
         </div>
 
-        <button
+        <Button
           onClick={() => window.print()}
-          className="px-6 py-2.5 bg-primary text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/10 flex items-center justify-center gap-2 min-h-[44px]"
+          variant="primary"
+          className="gap-2"
         >
-          <span className="material-symbols-outlined text-sm font-black">print</span>
+          <Printer size={14} aria-hidden="true" />
           Print / Save PDF
-        </button>
+        </Button>
       </div>
 
       {/* Main Resume Container (A4 Proportional Grid) */}
-      <article className="print-shadow-none max-w-4xl mx-auto bg-white border border-slate-200/50 p-8 sm:p-16 rounded-[32px] shadow-xl shadow-slate-200/40 min-h-[297mm] flex flex-col justify-between">
+      <article className="mx-auto min-h-[297mm] rounded-[32px] bg-surface flex-col max-w-4xl print-shadow-none shadow-xl border-border/50 flex justify-between p-8 border sm:p-16">
         
         {/* Top Header Block */}
-        <header className="border-b-2 border-slate-100 pb-8 mb-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
+        <header className="mb-8 pb-8 border-b-2 items-center border-border gap-6 flex justify-between flex-col md:items-start md:flex-row">
+          <div className="items-center text-center flex gap-6 flex-col md:items-start md:flex-row md:text-left">
             {/* Minimalist Print avatar */}
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center text-white text-2xl font-black italic shadow-inner">
+            <div className="justify-center type-h2 italic h-20 rounded-2xl to-primary-dark items-center bg-gradient-to-br from-primary text-white flex w-20 shadow-inner">
               {profile.profile_photo_url ? (
                 <img
                   src={profile.profile_photo_url}
                   alt={profile.full_name}
-                  className="w-full h-full object-cover rounded-2xl"
+                  className="w-full rounded-2xl h-full object-cover"
                 />
               ) : (
                 initials
               )}
             </div>
             <div>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2 leading-none">
+              <h2 className="type-h1 leading-none text-text mb-2">
                 {profile.full_name || "Candidate Name"}
               </h2>
-              <p className="text-sm font-bold text-indigo-600 tracking-wide">
+              <p className="tracking-wide type-ui text-primary">
                 {profile.headline || "Professional Headline"}
               </p>
               {profile.location && (
-                <p className="text-xs text-slate-400 font-bold mt-1.5 flex items-center justify-center md:justify-start gap-1">
-                  <span className="material-symbols-outlined text-[14px]">location_on</span>
+                <p className="justify-center text-muted gap-1 items-center flex type-caption mt-1.5 md:justify-start">
+                  <MapPin size={14} aria-hidden="true" />
                   {profile.location} {profile.nationality ? `• ${profile.nationality}` : ""}
                 </p>
               )}
@@ -164,44 +185,44 @@ export default function ResumePreviewPage() {
           </div>
 
           {/* Contact Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2.5 text-xs text-slate-500 font-bold shrink-0 md:text-right">
+          <div className="type-caption shrink-0 gap-2.5 grid text-muted grid-cols-1 sm:grid-cols-2 md:grid-cols-1 md:text-right">
             {profile.email && (
-              <p className="flex items-center md:justify-end gap-2">
+              <p className="gap-2 flex items-center md:justify-end">
                 <span>{profile.email}</span>
-                <span className="material-symbols-outlined text-sm text-slate-400">mail</span>
+                <Mail size={14} className="text-muted" aria-hidden="true" />
               </p>
             )}
             {profile.phone && (
-              <p className="flex items-center md:justify-end gap-2">
+              <p className="gap-2 flex items-center md:justify-end">
                 <span>{profile.phone}</span>
-                <span className="material-symbols-outlined text-sm text-slate-400">phone_iphone</span>
+                <Smartphone size={14} className="text-muted" aria-hidden="true" />
               </p>
             )}
             {profile.social_links?.linkedin && (
-              <p className="flex items-center md:justify-end gap-2">
+              <p className="gap-2 flex items-center md:justify-end">
                 <span>{profile.social_links.linkedin.replace(/^https?:\/\/(www\.)?/, "")}</span>
-                <span className="material-symbols-outlined text-sm text-slate-400">public</span>
+                <Globe size={14} className="text-muted" aria-hidden="true" />
               </p>
             )}
             {profile.social_links?.portfolio && (
-              <p className="flex items-center md:justify-end gap-2">
+              <p className="gap-2 flex items-center md:justify-end">
                 <span>{profile.social_links.portfolio.replace(/^https?:\/\/(www\.)?/, "")}</span>
-                <span className="material-symbols-outlined text-sm text-slate-400">link</span>
+                <LinkIcon size={14} className="text-muted" aria-hidden="true" />
               </p>
             )}
           </div>
         </header>
 
         {/* Content Body Grid */}
-        <div className="flex-1 space-y-8">
+        <div className="space-y-8 flex-1">
           {/* Summary Section */}
           {profile.bio && (
             <section className="print-break-inside-avoid">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                <span className="material-symbols-outlined text-base text-indigo-600">description</span>
+              <h3 className="border-b type-badge mb-3 text-muted gap-1.5 pb-1 items-center border-border flex">
+                <FileText className="text-primary" size={16} aria-hidden="true" />
                 Professional Summary
               </h3>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium whitespace-pre-line">
+              <p className="text-muted leading-relaxed whitespace-pre-line type-caption">
                 {profile.bio}
               </p>
             </section>
@@ -210,32 +231,32 @@ export default function ResumePreviewPage() {
           {/* Work Experience Section */}
           {profile.experience && profile.experience.length > 0 && (
             <section>
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                <span className="material-symbols-outlined text-base text-indigo-600">work</span>
+              <h3 className="border-b type-badge gap-1.5 text-muted pb-1 items-center mb-4 border-border flex">
+                <Briefcase className="text-primary" size={16} aria-hidden="true" />
                 Work History
               </h3>
               <div className="space-y-6">
                 {profile.experience.map((exp, i) => (
-                  <div key={exp.id || i} className="print-break-inside-avoid flex flex-col md:flex-row justify-between gap-1">
+                  <div key={exp.id || i} className="print-break-inside-avoid gap-1 flex-col flex justify-between md:flex-row">
                     <div>
-                      <h4 className="text-sm font-black text-slate-800 tracking-tight leading-tight">
+                      <h4 className="tracking-tight text-text type-ui leading-tight">
                         {exp.title || "Job Title"}
                       </h4>
-                      <p className="text-xs font-bold text-slate-500 mt-0.5">
+                      <p className="text-muted type-caption mt-0.5">
                         {exp.company || "Company Name"} {exp.employment_type ? `• ${exp.employment_type}` : ""}
                       </p>
                       {exp.description && (
-                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed mt-2 whitespace-pre-line">
+                        <p className="text-muted text-xs mt-2 leading-relaxed whitespace-pre-line">
                           {exp.description}
                         </p>
                       )}
                     </div>
-                    <div className="text-left md:text-right shrink-0">
-                      <span className="px-2.5 py-1 bg-slate-50 border border-slate-100 text-slate-500 font-black text-[9px] uppercase tracking-wider rounded-lg inline-block">
+                    <div className="shrink-0 text-left md:text-right">
+                      <span className="py-1 uppercase text-xs inline-block bg-bg px-2.5 border-border rounded-lg tracking-wider text-muted border">
                         {exp.start_date || "Start"} — {exp.current ? "Present" : exp.end_date || "End"}
                       </span>
                       {exp.location && (
-                        <p className="text-[10px] text-slate-450 font-bold mt-1">
+                        <p className="text-muted text-xs mt-1">
                           {exp.location}
                         </p>
                       )}
@@ -249,27 +270,27 @@ export default function ResumePreviewPage() {
           {/* Education Section */}
           {profile.education && profile.education.length > 0 && (
             <section>
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                <span className="material-symbols-outlined text-base text-indigo-600">school</span>
+              <h3 className="border-b type-badge gap-1.5 text-muted pb-1 items-center mb-4 border-border flex">
+                <span className="mr-1 inline-flex items-center text-primary"><GraduationCap size={16} aria-hidden="true" /></span>
                 Education
               </h3>
               <div className="space-y-4">
                 {profile.education.map((edu, i) => (
-                  <div key={edu.id || i} className="print-break-inside-avoid flex justify-between items-start gap-4">
+                  <div key={edu.id || i} className="print-break-inside-avoid gap-4 items-start flex justify-between">
                     <div>
-                      <h4 className="text-sm font-black text-slate-800 tracking-tight leading-tight">
+                      <h4 className="tracking-tight text-text type-ui leading-tight">
                         {edu.degree || "Degree"} {edu.field ? `in ${edu.field}` : ""}
                       </h4>
-                      <p className="text-xs font-bold text-slate-500 mt-0.5">
+                      <p className="text-muted type-caption mt-0.5">
                         {edu.school || "School / University"}
                       </p>
                       {edu.grade && (
-                        <p className="text-[10px] text-slate-500 font-bold mt-1">
+                        <p className="mt-1 text-muted text-xs">
                           Grade / GPA: {edu.grade}
                         </p>
                       )}
                     </div>
-                    <span className="px-2.5 py-1 bg-slate-50 border border-slate-100 text-slate-500 font-black text-[9px] uppercase tracking-wider rounded-lg inline-block whitespace-nowrap">
+                    <span className="py-1 uppercase text-xs inline-block whitespace-nowrap bg-bg px-2.5 border-border rounded-lg tracking-wider text-muted border">
                       {edu.start_year || "Start"} — {edu.end_year || "End"}
                     </span>
                   </div>
@@ -279,19 +300,19 @@ export default function ResumePreviewPage() {
           )}
 
           {/* Skills & Languages Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
               <section className="print-break-inside-avoid">
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                  <span className="material-symbols-outlined text-base text-indigo-600">bolt</span>
+                <h3 className="border-b type-badge mb-3 text-muted gap-1.5 pb-1 items-center border-border flex">
+                  <Zap className="text-primary" size={16} aria-hidden="true" />
                   Skills & Expertise
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {profile.skills.map((skill, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 bg-indigo-50/50 border border-indigo-100/40 text-indigo-750 text-xs font-bold rounded-lg"
+                      className="py-1 bg-primary-light/50 border-primary/20 rounded-lg px-2.5 text-primary-dark type-caption border"
                     >
                       {skill}
                     </span>
@@ -303,18 +324,18 @@ export default function ResumePreviewPage() {
             {/* Languages */}
             {profile.languages && profile.languages.length > 0 && (
               <section className="print-break-inside-avoid">
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                  <span className="material-symbols-outlined text-base text-indigo-600">language</span>
+                <h3 className="border-b type-badge mb-3 text-muted gap-1.5 pb-1 items-center border-border flex">
+                  <Languages className="text-primary" size={16} aria-hidden="true" />
                   Languages
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="gap-2 flex flex-wrap">
                   {profile.languages.map((lang, i) => (
                     <span
                       key={i}
-                      className="flex items-center gap-1 bg-slate-50 border border-slate-100 text-slate-700 pl-2.5 pr-2 py-1 rounded-lg text-xs font-bold"
+                      className="py-1 gap-1 items-center pl-2.5 bg-bg border-border text-text pr-2 rounded-lg flex type-caption border"
                     >
                       {lang.name}
-                      <span className="px-1.5 py-0.5 bg-primary/5 text-primary text-[8px] font-black uppercase rounded">
+                      <span className="text-xs px-1.5 text-primary uppercase bg-primary/5 py-0.5 rounded">
                         {lang.proficiency}
                       </span>
                     </span>
@@ -327,31 +348,31 @@ export default function ResumePreviewPage() {
           {/* Projects Section */}
           {profile.projects && profile.projects.length > 0 && (
             <section>
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                <span className="material-symbols-outlined text-base text-indigo-600">folder_open</span>
+              <h3 className="border-b type-badge gap-1.5 text-muted pb-1 items-center mb-4 border-border flex">
+                <FolderOpen className="text-primary" size={16} aria-hidden="true" />
                 Key Projects
               </h3>
               <div className="space-y-5">
                 {profile.projects.map((proj, i) => (
                   <div key={proj.id || i} className="print-break-inside-avoid space-y-1">
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-sm font-black text-slate-800 tracking-tight leading-tight">
+                    <div className="flex items-center justify-between">
+                      <h4 className="tracking-tight text-text type-ui leading-tight">
                         {proj.title || "Project Title"}
                       </h4>
                       {proj.duration && (
-                        <span className="text-[10px] text-slate-450 font-bold">{proj.duration}</span>
+                        <span className="text-muted text-xs">{proj.duration}</span>
                       )}
                     </div>
                     {proj.role && (
-                      <p className="text-xs text-indigo-650 font-bold">Role: {proj.role}</p>
+                      <p className="type-caption text-primary-dark">Role: {proj.role}</p>
                     )}
                     {proj.description && (
-                      <p className="text-[11px] text-slate-650 font-medium leading-relaxed whitespace-pre-line">
+                      <p className="text-xs text-muted leading-relaxed whitespace-pre-line">
                         {proj.description}
                       </p>
                     )}
                     {proj.tech_stack && (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
+                      <div className="gap-1 flex flex-wrap mt-1.5">
                         {(Array.isArray(proj.tech_stack)
                           ? proj.tech_stack
                           : typeof proj.tech_stack === "string"
@@ -360,7 +381,7 @@ export default function ResumePreviewPage() {
                         ).map((tech, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-black rounded"
+                            className="px-2 text-xs bg-bg border-border py-0.5 text-muted rounded border"
                           >
                             {tech}
                           </span>
@@ -376,17 +397,17 @@ export default function ResumePreviewPage() {
           {/* Certifications Section */}
           {profile.certifications && profile.certifications.length > 0 && (
             <section>
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                <span className="material-symbols-outlined text-base text-indigo-600">workspace_premium</span>
+              <h3 className="border-b type-badge gap-1.5 text-muted pb-1 items-center mb-4 border-border flex">
+                <Crown className="text-primary" size={16} aria-hidden="true" />
                 Certifications
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
                 {profile.certifications.map((cert, i) => (
-                  <div key={cert.id || i} className="print-break-inside-avoid flex flex-col justify-center bg-slate-50/40 border border-slate-100 p-3.5 rounded-2xl">
-                    <h4 className="text-xs font-black text-slate-800 leading-snug">{cert.name || "Certification Name"}</h4>
-                    <p className="text-[10px] text-slate-500 font-bold mt-0.5">{cert.issuing_organization}</p>
+                  <div key={cert.id || i} className="justify-center border print-break-inside-avoid rounded-2xl bg-bg/40 p-3.5 border-border flex flex-col">
+                    <h4 className="leading-snug text-text type-badge">{cert.name || "Certification Name"}</h4>
+                    <p className="text-muted text-xs mt-0.5">{cert.issuing_organization}</p>
                     {cert.issue_date && (
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                      <p className="mt-1 text-xs text-muted">
                         Issued: {cert.issue_date} {cert.expiry_date ? `• Expires: ${cert.expiry_date}` : ""}
                       </p>
                     )}
@@ -398,7 +419,7 @@ export default function ResumePreviewPage() {
         </div>
 
         {/* Footer Page / CV Info */}
-        <footer className="border-t border-slate-100 pt-6 mt-8 flex justify-between items-center text-[9px] font-black text-slate-450 uppercase tracking-widest">
+        <footer className="border-t text-muted uppercase mt-8 pt-6 items-center text-xs border-border tracking-widest flex justify-between">
           <span>Generated via JobLyne</span>
           <span>{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long" })}</span>
         </footer>

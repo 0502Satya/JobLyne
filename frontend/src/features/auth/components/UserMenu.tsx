@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { logoutAction } from "../actions";
+import { User, Settings, LogOut } from "lucide-react";
 
 /**
  * A premium user menu dropdown with Profile and Logout options.
@@ -34,10 +35,10 @@ export default function UserMenu({
             {/* Avatar Button (click to toggle dropdown) */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="size-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md shadow-primary/20 hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-surface overflow-hidden"
+                className="ring-surface justify-center cursor-pointer shadow-md ring-2 items-center overflow-hidden transition-all text-white type-ui rounded-full shadow-primary/20 bg-primary flex size-10 hover:scale-105 active:scale-95"
             >
                 {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
+                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                     initials
                 )}
@@ -45,18 +46,18 @@ export default function UserMenu({
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 mt-3 w-56 bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-5 py-3 border-b border-border/40">
-                        <p className="text-xs font-bold text-muted uppercase tracking-wider">Account</p>
+                <div className="slide-in-from-top-2 fade-in border-border z-[100] rounded-2xl absolute overflow-hidden duration-200 mt-3 animate-in shadow-2xl w-56 right-0 bg-surface border">
+                    <div className="border-border/40 border-b py-3 px-5">
+                        <p className="uppercase tracking-wider type-caption text-muted">Account</p>
                     </div>
 
                     {/* Edit Profile */}
                     <Link
                         href="/dashboard/profile"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 text-sm font-bold text-text hover:bg-primary/5 hover:text-primary transition-all group"
+                        className="text-text group py-4 items-center transition-all type-ui gap-3 flex px-5 hover:bg-primary/5 hover:text-primary"
                     >
-                        <span className="material-symbols-outlined text-lg text-muted group-hover:text-primary transition-colors">person</span>
+                        <User size={18} className="text-muted transition-colors group-hover:text-primary" aria-hidden="true" />
                         Edit Profile
                     </Link>
 
@@ -64,22 +65,22 @@ export default function UserMenu({
                     <Link
                         href="/dashboard/settings"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 text-sm font-bold text-text hover:bg-primary/5 hover:text-primary transition-all group"
+                        className="text-text group py-4 items-center transition-all type-ui gap-3 flex px-5 hover:bg-primary/5 hover:text-primary"
                     >
-                        <span className="material-symbols-outlined text-lg text-muted group-hover:text-primary transition-colors">settings</span>
+                        <Settings size={18} className="text-muted transition-colors group-hover:text-primary" aria-hidden="true" />
                         Settings
                     </Link>
 
                     {/* Divider */}
-                    <div className="h-px bg-border/40 mx-4"></div>
+                    <div className="bg-border/40 mx-4 h-px"></div>
 
                     {/* Logout */}
                     <form action={logoutAction}>
                         <button
                             type="submit"
-                            className="flex items-center gap-3 px-5 py-4 text-sm font-bold text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group w-full text-left"
+                            className="w-full group type-label py-4 items-center transition-all gap-3 flex text-left px-5 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                         >
-                            <span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">logout</span>
+                            <LogOut size={18} className="transition-transform group-hover:rotate-12" aria-hidden="true" />
                             Logout
                         </button>
                     </form>

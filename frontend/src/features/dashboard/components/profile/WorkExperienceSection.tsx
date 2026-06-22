@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { WorkExperience as Experience } from "@/types/profile";
+import { Button, Input, Select, FormField } from "@/shared/ui";
+import { Briefcase, Plus, BriefcaseBusiness, Star, X, ArrowUp, ArrowDown, Pencil, Trash2 } from "lucide-react";
 
 interface WorkExperienceSectionProps {
   data: Experience[];
@@ -98,6 +100,8 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
     let currentTechs: string[] = [];
     if (Array.isArray(exp.technologies)) {
       currentTechs = exp.technologies;
+    } else if (typeof exp.technologies === "string") {
+      currentTechs = exp.technologies.split(",").map((t) => t.trim()).filter(Boolean);
     }
 
     const updatedTechs = currentTechs.filter((t) => t !== techName);
@@ -132,7 +136,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
       "bg-primary",
       "bg-orange-500",
       "bg-emerald-500",
-      "bg-indigo-500",
+      "bg-primary",
       "bg-purple-500",
       "bg-rose-500",
       "bg-cyan-500",
@@ -180,47 +184,50 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
   };
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="experience">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="experience">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">work</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <Briefcase size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Work History</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Document your career achievements</p>
+            <h3 className="text-text type-card-title leading-tight">Work History</h3>
+            <p className="text-xs text-muted mt-0.5">Document your career achievements</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={addEntry}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 mr-1 min-h-[40px] flex items-center justify-center"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-1"
           >
-            <span className="material-symbols-outlined text-sm font-bold">add</span>
+            <Plus size={14} className="type-ui" aria-hidden="true" />
             Add
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         {experience.length === 0 ? (
-          <div className="text-center py-10 border border-dashed border-border rounded-xl bg-bg/50">
-            <span className="material-symbols-outlined text-3xl text-muted/60 mb-2 block">work_history</span>
-            <span className="text-sm font-bold text-text block mb-0.5">No experience details added yet</span>
-            <span className="text-xs text-muted block mb-4 font-semibold">Adding work history increases shortlisting chance by 4x.</span>
-            <button
+          <div className="border-dashed bg-bg/50 border-border text-center py-10 rounded-xl border">
+            <BriefcaseBusiness size={24} className="text-muted/60 block mb-2" aria-hidden="true" />
+            <span className="text-text mb-0.5 block type-ui">No experience details added yet</span>
+            <span className="block mb-4 type-caption text-muted">Adding work history increases shortlisting chance by 4x.</span>
+            <Button
               type="button"
+              variant="ghost"
               onClick={addEntry}
-              className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[44px] px-4"
+              className="text-primary hover:underline"
             >
               Add first experience card
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className="relative border-l-2 border-border/60 ml-4 pl-6 sm:pl-8 space-y-8 py-2">
+          <div className="space-y-8 border-l-2 relative border-border/60 ml-4 py-2 pl-6 sm:pl-8">
             {experience.map((exp, idx) => {
               const techs = Array.isArray(exp.technologies)
                 ? exp.technologies
@@ -233,106 +240,85 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
               const initials = getInitials(exp.company || "");
 
               return (
-                <div key={exp.id} className="relative group min-w-0">
+                <div key={exp.id} className="min-w-0 relative group">
                   {/* Timeline Dot/Badge */}
-                  <div className={`absolute -left-[43px] sm:-left-[51px] top-1.5 w-8 h-8 sm:w-10 sm:h-10 rounded-full ${companyColor} border-4 border-card shadow-xs flex items-center justify-center text-white text-[10px] sm:text-xs font-extrabold shrink-0 select-none`}>
+                  <div className={`-left-[43px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[51px] sm:w-10 ${companyColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
                     {initials}
                   </div>
 
                   {isEditing ? (
                     /* Editing Form Mode */
-                    <div className="bg-bg/40 border border-border rounded-xl p-5 space-y-4 shadow-inner">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">Job Title</label>
-                          <input
-                            type="text"
-                            value={exp.title || ""}
-                            onChange={(e) => updateEntry(exp.id, "title", e.target.value)}
-                            placeholder="e.g. Lead Frontend Developer"
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">Company Name</label>
-                          <input
-                            type="text"
-                            value={exp.company || ""}
-                            onChange={(e) => updateEntry(exp.id, "company", e.target.value)}
-                            placeholder="e.g. Google"
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                          />
-                        </div>
+                    <div className="border-border bg-bg/40 p-5 shadow-inner space-y-4 rounded-xl border">
+                      <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                        <Input
+                          label="Job Title"
+                          value={exp.title || ""}
+                          onChange={(e) => updateEntry(exp.id, "title", e.target.value)}
+                          placeholder="e.g. Lead Frontend Developer"
+                        />
+                        <Input
+                          label="Company Name"
+                          value={exp.company || ""}
+                          onChange={(e) => updateEntry(exp.id, "company", e.target.value)}
+                          placeholder="e.g. Google"
+                        />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">Employment Type</label>
-                          <select
+                      <div className="gap-4 grid grid-cols-1 md:grid-cols-4">
+                        <FormField label="Employment Type">
+                          <Select
                             value={exp.employment_type || "Full-time"}
                             onChange={(e) => updateEntry(exp.id, "employment_type", e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
-                          >
-                            {employmentTypes.map((t) => (
-                              <option key={t} value={t}>
-                                {t}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">Location</label>
-                          <input
-                            type="text"
-                            value={exp.location || ""}
-                            onChange={(e) => updateEntry(exp.id, "location", e.target.value)}
-                            placeholder="San Francisco, CA"
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
+                            options={employmentTypes.map((t) => ({ value: t, label: t }))}
                           />
-                        </div>
+                        </FormField>
 
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">Start Date</label>
-                          <input
-                            type="date"
-                            value={exp.start_date || ""}
-                            onChange={(e) => updateEntry(exp.id, "start_date", e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
-                          />
-                        </div>
+                        <Input
+                          label="Location"
+                          value={exp.location || ""}
+                          onChange={(e) => updateEntry(exp.id, "location", e.target.value)}
+                          placeholder="San Francisco, CA"
+                        />
 
-                        <div>
-                          <label className="block text-xs font-semibold text-muted mb-1">End Date</label>
-                          <input
-                            type="date"
-                            value={exp.end_date || ""}
-                            disabled={exp.current}
-                            onChange={(e) => updateEntry(exp.id, "end_date", e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text disabled:opacity-50 cursor-pointer"
-                          />
-                        </div>
+                        <Input
+                          label="Start Date"
+                          type="date"
+                          value={exp.start_date || ""}
+                          onChange={(e) => updateEntry(exp.id, "start_date", e.target.value)}
+                          className="cursor-pointer"
+                        />
+
+                        <Input
+                          label="End Date"
+                          type="date"
+                          value={exp.end_date || ""}
+                          disabled={exp.current}
+                          onChange={(e) => updateEntry(exp.id, "end_date", e.target.value)}
+                          className="cursor-pointer"
+                        />
                       </div>
 
-                      <div className="flex items-center justify-between p-3 bg-card border border-border rounded-xl">
+                      <div className="border border-border p-3 items-center bg-card flex rounded-xl justify-between">
                         <div>
-                          <p className="text-xs font-bold text-text">I currently work here</p>
-                          <p className="text-[10px] text-muted font-semibold mt-0.5">This will automatically mark end date as present</p>
+                          <p className="text-text type-caption">I currently work here</p>
+                          <p className="text-xs mt-0.5 text-muted">This will automatically mark end date as present</p>
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={exp.current}
                           onClick={() => {
                             updateEntry(exp.id, "current", !exp.current);
                             if (!exp.current) {
                               updateEntry(exp.id, "end_date", "");
                             }
                           }}
-                          className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 min-h-[44px] cursor-pointer ${
+                          className={`flex-shrink-0 relative min-h-[44px] w-12 h-6 rounded-full transition-colors cursor-pointer ${
                             exp.current ? "bg-primary" : "bg-border"
                           }`}
                         >
                           <span
-                            className={`absolute top-0.5 w-5 h-5 bg-card rounded-full shadow-xs transition-transform ${
+                            className={`top-0.5 h-5 absolute transition-transform w-5 rounded-full shadow-xs bg-card ${
                               exp.current ? "right-0.5" : "left-0.5"
                             }`}
                           ></span>
@@ -342,46 +328,51 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                       {/* Description & AI suggestor */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <label className="block text-xs font-semibold text-muted">Responsibilities & Achievements</label>
-                          <button
+                          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Responsibilities & Achievements</label>
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleGenerateAchievements(exp.id, exp.title || "")}
-                            className="text-xs font-bold text-primary flex items-center gap-0.5 hover:underline cursor-pointer min-h-[40px] px-2"
+                            className="text-primary hover:text-primary-dark gap-0.5"
                           >
-                            <span className="material-symbols-outlined text-sm font-bold">star</span>
+                            <Star size={14} className="type-ui" aria-hidden="true" />
                             Generate with AI
-                          </button>
+                          </Button>
                         </div>
                         <textarea
                           value={exp.description || ""}
                           onChange={(e) => updateEntry(exp.id, "description", e.target.value)}
                           rows={4}
                           placeholder="Detail your responsibilities and achievements..."
-                          className="w-full bg-card border border-border rounded-xl py-3 px-4 text-sm font-medium text-text focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none leading-relaxed resize-none placeholder:text-muted/65"
+                          className="w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted disabled:opacity-50 disabled:cursor-not-allowed resize-none leading-relaxed px-4"
                         />
                       </div>
 
                       {/* Technologies tags used */}
                       <div>
-                        <label className="block text-xs font-semibold text-muted mb-2">Technologies Used</label>
-                        <div className="flex flex-wrap gap-2 mb-2">
+                        <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Technologies Used</label>
+                        <div className="gap-2 flex mb-2 flex-wrap">
                           {techs.map((tech) => (
                             <span
                               key={tech}
-                              className="flex items-center gap-1 bg-card border border-border text-text pl-2.5 pr-1 py-1 rounded-lg text-xs font-medium"
+                              className="text-text py-1 border-border gap-1 items-center pr-1 pl-2.5 rounded-lg bg-card flex type-caption border"
                             >
                               <span>{tech}</span>
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => handleRemoveTech(exp.id, tech)}
-                                className="hover:text-red-500 ml-1 text-muted flex items-center justify-center cursor-pointer min-h-[32px] min-w-[32px]"
+                                className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                                aria-label={`Remove ${tech}`}
                               >
-                                <span className="material-symbols-outlined text-xs">close</span>
-                              </button>
+                                 <X size={12} aria-hidden="true" />
+                              </Button>
                             </span>
                           ))}
                         </div>
-                        <input
+                        <Input
                           type="text"
                           value={techInput[exp.id as string] || ""}
                           onChange={(e) => setTechInput((prev) => ({ ...prev, [exp.id as string]: e.target.value }))}
@@ -392,82 +383,89 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                             }
                           }}
                           placeholder="Type a technology (e.g. React) and press Enter..."
-                          className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                         />
                       </div>
 
-                      <div className="flex justify-end gap-2.5 pt-2">
-                        <button
+                      <div className="pt-2 flex justify-end gap-2.5">
+                        <Button
                           type="button"
+                          variant="danger"
                           onClick={() => removeEntry(exp.id)}
-                          className="px-4 py-2 bg-card text-red-500 hover:bg-red-500/10 text-xs font-bold rounded-lg border border-border transition-all min-h-[44px] cursor-pointer"
                         >
                           Delete Entry
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
+                          variant="primary"
                           onClick={() => setEditingId(null)}
-                          className="px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all min-h-[44px] cursor-pointer shadow-xs"
                         >
                           Done Editing
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ) : (
                     /* Read-only Timeline Presentation Mode */
-                    <div className="relative pl-2">
+                    <div className="pl-2 relative">
                       {/* Hover Action Overlay */}
-                      <div className="absolute right-0 top-0 flex items-center gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10">
-                        <button
+                      <div className="gap-1.5 z-10 absolute opacity-100 items-center transition-opacity flex right-0 top-0 lg:opacity-0 lg:group-hover:opacity-100">
+                        <Button
                           type="button"
+                          variant="outline"
                           disabled={idx === 0}
                           onClick={() => moveEntry(idx, "up")}
-                          className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary disabled:opacity-30 cursor-pointer shadow-xs hover:shadow-sm"
+                          className="h-10 w-10 p-0 rounded-lg"
                           title="Move Up"
+                          aria-label="Move Up"
                         >
-                          <span className="material-symbols-outlined text-base">arrow_upward</span>
-                        </button>
-                        <button
+                           <ArrowUp size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
                           type="button"
+                          variant="outline"
                           disabled={idx === experience.length - 1}
                           onClick={() => moveEntry(idx, "down")}
-                          className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary disabled:opacity-30 cursor-pointer shadow-xs hover:shadow-sm"
+                          className="h-10 w-10 p-0 rounded-lg"
                           title="Move Down"
+                          aria-label="Move Down"
                         >
-                          <span className="material-symbols-outlined text-base">arrow_downward</span>
-                        </button>
-                        <button
+                           <ArrowDown size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
                           type="button"
+                          variant="outline"
                           onClick={() => setEditingId(exp.id || null)}
-                          className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary cursor-pointer shadow-xs hover:shadow-sm"
+                          className="h-10 w-10 p-0 rounded-lg"
                           title="Edit Experience"
+                          aria-label="Edit Experience"
                         >
-                          <span className="material-symbols-outlined text-base">edit</span>
-                        </button>
-                        <button
+                           <Pencil size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
                           type="button"
+                          variant="outline"
                           onClick={() => removeEntry(exp.id)}
-                          className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-red-500 hover:bg-red-500/10 cursor-pointer shadow-xs hover:shadow-sm"
+                          className="h-10 w-10 p-0 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
                           title="Delete Experience"
+                          aria-label="Delete Experience"
                         >
-                          <span className="material-symbols-outlined text-base">delete</span>
-                        </button>
+                           <Trash2 size={16} aria-hidden="true" />
+                        </Button>
                       </div>
 
-                      <div className="space-y-1.5 min-w-0 pr-24">
-                        <h4 className="text-base font-bold text-text tracking-tight leading-snug break-words font-display">
+                      <div className="min-w-0 pr-24 space-y-1.5">
+                        <h4 className="text-text break-words leading-snug tracking-tight type-card-title">
                           {exp.title || "Untitled Role"}
                         </h4>
-                        <p className="text-sm font-semibold text-text/80 break-words">
+                        <p className="break-words type-ui text-text/80">
                           {exp.company || "Untitled Company"}
                         </p>
-                        <p className="text-[10px] font-bold text-muted uppercase tracking-wider leading-relaxed break-words">
+                        <p className="break-words text-xs uppercase leading-relaxed tracking-wider text-muted">
                           {formatExperienceMeta(exp)}
                         </p>
 
                         {/* Description Points */}
                         {exp.description && (
-                          <ul className="list-disc pl-5 mt-2.5 space-y-1.5 text-xs text-text/85 leading-relaxed font-medium">
+                          <ul className="list-disc type-caption mt-2.5 space-y-1.5 leading-relaxed text-text/85 pl-5">
                             {exp.description.split("\n").map((line, lIdx) => {
                               const cleanLine = line.replace(/^[•\-\*\s]+/, "").trim();
                               return cleanLine ? <li key={lIdx}>{cleanLine}</li> : null;
@@ -477,9 +475,9 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
 
                         {/* Tech Badges */}
                         {techs.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 pt-3.5">
+                          <div className="flex pt-3.5 flex-wrap gap-1.5">
                             {techs.map((tech) => (
-                              <span key={tech} className="px-2 py-0.5 bg-bg text-muted text-[10px] font-bold rounded border border-border/80">
+                              <span key={tech} className="px-2 text-xs border-border/80 bg-bg py-0.5 rounded text-muted border">
                                 {tech}
                               </span>
                             ))}
@@ -497,3 +495,4 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
     </section>
   );
 }
+
