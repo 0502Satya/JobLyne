@@ -4,6 +4,8 @@ import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 
+import OverlayProvider from "@/shared/ui/OverlayProvider";
+
 /**
  * Providers component for client-side context providers.
  */
@@ -13,7 +15,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <Toaster position="top-right" reverseOrder={false} />
-      {children}
+      <OverlayProvider>
+        {children}
+      </OverlayProvider>
     </GoogleOAuthProvider>
   );
 }

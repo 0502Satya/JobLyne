@@ -3,6 +3,16 @@
 import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { getRecruiterProfileAction, updateRecruiterProfileAction } from "@/features/auth/actions";
+import {
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle2,
+  User,
+  ArrowRight,
+  Building2,
+  Save
+} from "lucide-react";
+import { Icon } from "@/shared/ui";
 
 type FormStep = "personal" | "agency";
 
@@ -50,9 +60,9 @@ export default function RecruiterSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 gap-4">
-        <div className="size-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin"></div>
-        <p className="text-slate-400 font-bold text-sm tracking-widest uppercase">Fetching Recruiter Profile...</p>
+      <div className="justify-center gap-4 items-center text-muted flex bg-surface min-h-screen flex-col">
+        <div className="border-amber-500/20 border-t-amber-500 size-12 rounded-full border-4 animate-spin"></div>
+        <p className="text-muted uppercase type-ui tracking-widest">Fetching Recruiter Profile...</p>
       </div>
     );
   }
@@ -71,74 +81,74 @@ export default function RecruiterSettingsPage() {
   const completionPercent = getFieldsCompletion();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col box-sizing-border-box overflow-hidden max-w-full pb-20 animate-fade-in">
+    <div className="max-w-full box-sizing-border-box animate-fade-in overflow-hidden pb-20 text-muted flex bg-surface min-h-screen flex-col">
       
       {/* Settings Header */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <Link href="/recruiter/dashboard" className="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
+      <header className="border-b px-6 py-4 items-center backdrop-blur-md bg-card/60 sticky z-50 flex top-0 border-border justify-between">
+        <div className="flex gap-3 items-center">
+          <Link href="/recruiter/dashboard" className="bg-gradient-to-r from-amber-400 to-yellow-500 type-h3 text-transparent bg-clip-text">
             JobLyne Recruiter
           </Link>
-          <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded-full border border-amber-500/20 font-medium">
+          <span className="px-2 bg-amber-500/10 border-amber-500/20 text-amber-400 rounded-full py-0.5 type-caption border">
             Profile Settings
           </span>
         </div>
         <Link 
           href="/recruiter/dashboard" 
-          className="text-sm font-black text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl hover:bg-amber-500/5 active:scale-[0.98]"
+          className="gap-1.5 min-h-[44px] text-amber-400 items-center type-ui transition-colors flex px-4 rounded-xl hover:bg-amber-500/5 hover:text-amber-300 active:scale-[0.98]"
         >
-          <span className="material-symbols-outlined text-lg">arrow_back</span>
+          <ArrowLeft size={18} aria-hidden="true" />
           Dashboard
         </Link>
       </header>
 
-      <main className="p-6 md:p-12 max-w-5xl mx-auto w-full flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <main className="w-full mx-auto flex-1 max-w-5xl p-6 md:p-12">
+        <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
           
           {/* Left Sidebar: Progress and Step Navigation */}
-          <div className="space-y-6 lg:sticky lg:top-28">
-            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl shadow-sm space-y-6">
+          <div className="space-y-6 lg:top-28 lg:sticky">
+            <div className="rounded-3xl bg-card/40 space-y-6 shadow-sm p-6 border-border border">
               
               {/* Profile Card Summary */}
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
+                <div className="flex gap-3 items-center">
                   {profile?.profile_photo_url ? (
                     <img 
                       src={profile.profile_photo_url} 
                       alt="Avatar" 
-                      className="size-12 rounded-2xl object-cover border border-slate-800"
+                      className="object-cover rounded-2xl size-12 border-border border"
                     />
                   ) : (
-                    <div className="size-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-600 text-white flex items-center justify-center font-black shadow-lg shadow-amber-500/10 shrink-0">
+                    <div className="to-yellow-600 from-amber-400 justify-center shrink-0 rounded-2xl bg-gradient-to-tr shadow-amber-500/10 size-12 items-center text-white shadow-lg flex">
                       {profile?.first_name ? profile.first_name.substring(0, 2).toUpperCase() : "RC"}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <h3 className="font-bold text-slate-100 text-base truncate">
+                    <h3 className="text-muted truncate type-card-title">
                       {profile?.first_name ? `${profile.first_name} ${profile.last_name}` : "Recruiter"}
                     </h3>
-                    <p className="text-xs text-slate-400 font-medium tracking-tight truncate">{profile?.agency_name || "Agency Hub"}</p>
+                    <p className="tracking-tight text-muted truncate type-caption">{profile?.agency_name || "Agency Hub"}</p>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase">
+                  <div className="text-muted uppercase items-center flex type-caption justify-between">
                     <span>Completeness</span>
                     <span className="text-amber-400">{completionPercent}%</span>
                   </div>
-                  <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-850">
+                  <div className="w-full h-2 overflow-hidden border-border rounded-full bg-surface border">
                     <div 
-                      className="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-amber-400 h-full to-yellow-500 transition-all rounded-full duration-500"
                       style={{ width: `${completionPercent}%` }}
                     ></div>
                   </div>
                 </div>
               </div>
 
-              <hr className="border-slate-800" />
+              <hr className="border-border" />
 
               {/* Wizard Steps Navigation */}
-              <nav className="flex flex-col gap-1.5">
+              <nav className="flex gap-1.5 flex-col">
                 {[
                   { id: "personal", label: "Personal Profile", icon: "person" },
                   { id: "agency", label: "Agency Details", icon: "business" },
@@ -147,13 +157,13 @@ export default function RecruiterSettingsPage() {
                     key={step.id}
                     type="button"
                     onClick={() => setActiveStep(step.id as FormStep)}
-                    className={`w-full py-3.5 px-4 rounded-2xl text-sm font-bold flex items-center gap-3 transition-all min-h-[48px] text-left active:scale-[0.98] ${
+                    className={`w-full min-h-[48px] rounded-2xl py-3.5 items-center transition-all type-ui gap-3 flex px-4 text-left active:scale-[0.98] ${
                       activeStep === step.id 
-                        ? "bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/15" 
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+                        ? "bg-amber-500 text-text shadow-lg shadow-amber-500/15" 
+                        : "text-muted hover:bg-card/40 hover:text-muted"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-lg">{step.icon}</span>
+                    <Icon name={step.icon} size={18} aria-hidden="true" />
                     {step.label}
                   </button>
                 ))}
@@ -167,93 +177,93 @@ export default function RecruiterSettingsPage() {
             
             {/* Page Header */}
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-100">Recruiter Profile</h1>
-              <p className="text-slate-400 text-sm font-semibold mt-1">Manage your identity and hiring agency configurations.</p>
+              <h1 className="text-muted type-h1">Recruiter Profile</h1>
+              <p className="type-ui text-muted mt-1">Manage your identity and hiring agency configurations.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 md:p-10 shadow-sm space-y-8 box-sizing">
+            <form onSubmit={handleSubmit} className="space-y-8 box-sizing rounded-3xl bg-card/40 shadow-sm p-6 border-border border md:p-10">
               
               {/* Error Alert */}
               {error && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex gap-3 animate-in slide-in-from-top-2">
-                  <span className="material-symbols-outlined text-[20px]">error</span>
+                <div className="slide-in-from-top-2 rounded-2xl text-red-400 animate-in gap-3 border-red-500/20 type-ui flex p-4 bg-red-500/10 border">
+                  <AlertCircle size={20} aria-hidden="true" />
                   {error}
                 </div>
               )}
 
               {/* Success Alert */}
               {success && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-sm font-bold flex gap-3 animate-in slide-in-from-top-2">
-                  <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                <div className="slide-in-from-top-2 rounded-2xl text-emerald-400 animate-in gap-3 bg-emerald-500/10 type-ui border-emerald-500/20 flex p-4 border">
+                  <CheckCircle2 size={20} aria-hidden="true" />
                   Recruiter details updated successfully!
                 </div>
               )}
 
               {/* Step 1: Personal Details */}
               {activeStep === "personal" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <span className="material-symbols-outlined text-[28px] font-black">person</span>
-                    <h3 className="text-xl font-bold tracking-tight text-slate-100">Personal Profile</h3>
+                <div className="fade-in animate-in space-y-6 duration-200">
+                  <div className="gap-2 flex text-amber-400 items-center">
+                    <User size={24} aria-hidden="true" />
+                    <h3 className="text-muted tracking-tight type-h3">Personal Profile</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">First Name</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">First Name</label>
                       <input 
                         name="first_name"
                         required
                         value={profile?.first_name || ""}
                         onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-amber-400 outline-none transition-all font-medium text-sm min-h-[48px]"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
                         placeholder="e.g. Surya"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Last Name</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">Last Name</label>
                       <input 
                         name="last_name"
                         required
                         value={profile?.last_name || ""}
                         onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-amber-400 outline-none transition-all font-medium text-sm min-h-[48px]"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
                         placeholder="e.g. Shukla"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Email (Read Only)</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">Email (Read Only)</label>
                       <input 
                         name="email"
                         disabled
                         value={profile?.email || ""}
-                        className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl outline-none font-medium text-sm min-h-[48px] opacity-65 cursor-not-allowed"
+                        className="w-full outline-none opacity-65 min-h-[48px] rounded-2xl py-3.5 cursor-not-allowed type-ui bg-surface px-4 border-border border"
                         placeholder="recruiter@agency.com"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Phone Number</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">Phone Number</label>
                       <input 
                         name="phone"
                         required
                         value={profile?.phone || ""}
                         onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-amber-400 outline-none transition-all font-medium text-sm min-h-[48px]"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
                         placeholder="e.g. +1 (555) 123-4567"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Avatar / Photo URL</label>
+                    <label className="text-muted uppercase tracking-wider type-caption">Avatar / Photo URL</label>
                     <input 
                       name="profile_photo_url"
                       type="url"
                       value={profile?.profile_photo_url || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-amber-400 outline-none transition-all font-medium text-sm min-h-[48px]"
+                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
                       placeholder="https://example.com/photo.jpg"
                     />
                   </div>
@@ -262,9 +272,9 @@ export default function RecruiterSettingsPage() {
                     <button
                       type="button"
                       onClick={() => setActiveStep("agency")}
-                      className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 py-3.5 rounded-2xl font-bold text-sm hover:scale-[1.02] shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all min-h-[48px] flex items-center justify-center gap-1"
+                      className="w-full bg-amber-500 justify-center text-text shadow-amber-500/20 min-h-[48px] gap-1 rounded-2xl py-3.5 items-center transition-all type-ui flex shadow-lg hover:scale-[1.02] hover:bg-amber-400 active:scale-[0.98]"
                     >
-                      Continue to Agency Details <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                      Continue to Agency Details <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -272,46 +282,46 @@ export default function RecruiterSettingsPage() {
 
               {/* Step 2: Agency Details */}
               {activeStep === "agency" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <span className="material-symbols-outlined text-[28px] font-black">business</span>
-                    <h3 className="text-xl font-bold tracking-tight text-slate-100">Agency Details</h3>
+                <div className="fade-in animate-in space-y-6 duration-200">
+                  <div className="gap-2 flex text-amber-400 items-center">
+                    <Building2 size={24} aria-hidden="true" />
+                    <h3 className="text-muted tracking-tight type-h3">Agency Details</h3>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Recruiting Agency / Corporate Group</label>
+                    <label className="text-muted uppercase tracking-wider type-caption">Recruiting Agency / Corporate Group</label>
                     <input 
                       name="agency_name"
                       required
                       value={profile?.agency_name || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-amber-400 outline-none transition-all font-medium text-sm min-h-[48px]"
+                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
                       placeholder="e.g. Dataminerz Sourcing"
                     />
                   </div>
 
-                  <div className="pt-4 flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                     <button
                       type="button"
                       onClick={() => setActiveStep("personal")}
-                      className="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 py-3.5 px-6 rounded-2xl font-bold text-sm transition-all min-h-[48px] flex items-center justify-center gap-1 active:scale-[0.98]"
+                      className="justify-center min-h-[48px] px-6 gap-1 rounded-2xl py-3.5 items-center transition-all type-ui text-muted flex bg-surface border-border border hover:bg-card active:scale-[0.98]"
                     >
-                      <span className="material-symbols-outlined text-sm">arrow_back</span> Back
+                      <ArrowLeft size={14} aria-hidden="true" /> Back
                     </button>
                     
                     <button 
                       type="submit"
                       disabled={isPending}
-                      className="flex-1 bg-gradient-to-r from-amber-400 to-yellow-600 text-slate-950 py-3.5 rounded-2xl font-bold text-base hover:scale-[1.02] shadow-xl shadow-amber-500/20 active:scale-[0.98] transition-all min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="bg-gradient-to-r to-yellow-600 from-amber-400 text-text flex-1 shadow-amber-500/20 min-h-[48px] justify-center rounded-2xl type-card-title py-3.5 transition-all items-center gap-2 shadow-xl flex hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isPending ? (
                         <>
-                          <div className="size-4 rounded-full border-2 border-slate-950/20 border-t-slate-950 animate-spin"></div>
+                          <div className="size-4 border-t-slate-950 border-border/20 border-2 rounded-full animate-spin"></div>
                           Syncing Profile...
                         </>
                       ) : (
                         <>
-                          <span className="material-symbols-outlined">save</span>
+                          <Save size={18} aria-hidden="true" />
                           Save Changes
                         </>
                       )}

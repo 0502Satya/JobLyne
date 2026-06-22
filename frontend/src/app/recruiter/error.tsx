@@ -1,25 +1,26 @@
 'use client';
 
 import React from 'react';
+import { AlertCircle } from 'lucide-react';
 
 export default function RecruiterError({ error, reset }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 text-center p-8 bg-surface rounded-[24px] border border-border shadow-sm max-w-md mx-auto my-12">
-      <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500">
-        <span className="material-symbols-outlined text-3xl">error</span>
+    <div className="justify-center min-h-[400px] mx-auto my-12 border border-border items-center text-center shadow-sm rounded-[24px] max-w-md flex gap-6 p-8 bg-surface flex-col">
+      <div className="justify-center h-16 w-16 items-center text-red-500 rounded-full flex bg-red-50 dark:bg-red-950/30">
+        <AlertCircle size={30} aria-hidden="true" />
       </div>
       <div>
-        <h3 className="text-xl font-black text-text tracking-tight mb-2">Something went wrong</h3>
-        <p className="text-sm font-bold text-text-muted leading-relaxed">
+        <h3 className="text-text type-h2 mb-2">Something went wrong</h3>
+        <p className="leading-relaxed type-ui text-text-muted">
           An error occurred while loading the recruiter portal components.
         </p>
       </div>
       <button 
         onClick={reset} 
-        className="px-6 py-3 bg-red-500 hover:bg-red-600 active:scale-95 text-white font-black text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-md shadow-red-500/20"
+        className="text-xs px-6 shadow-md uppercase shadow-red-500/20 transition-all py-3 text-white tracking-widest bg-red-500 rounded-xl hover:bg-red-600 active:scale-95 cursor-pointer"
       >
         Try again
       </button>

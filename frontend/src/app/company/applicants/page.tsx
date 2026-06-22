@@ -5,11 +5,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logoutAction } from "@/features/auth/actions";
 import { 
+  Network, 
+  LayoutDashboard, 
+  Users, 
+  List, 
+  Columns3, 
+  Search, 
+  GripVertical, 
+  X 
+} from "lucide-react";
+import { 
   getApplicantsAction, 
   bulkUpdateApplicantStatusAction, 
   scheduleInterviewAction, 
   compareCandidatesAction 
 } from "@/features/company/actions";
+import { toast } from "react-hot-toast";
+import { Button } from "@/shared/ui";
 
 interface Application {
   id: string;
@@ -80,7 +92,7 @@ export default function CompanyApplicantsPage() {
     setLoading(true);
     const res = await bulkUpdateApplicantStatusAction(selectedIds, newStatus, `Bulk action: ${newStatus}`);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else {
       setSelectedIds([]);
       await loadData();
@@ -92,7 +104,7 @@ export default function CompanyApplicantsPage() {
     setLoading(true);
     const res = await bulkUpdateApplicantStatusAction([appId], newStatus, `Stage changed in Kanban.`);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else {
       await loadData();
     }
@@ -110,7 +122,7 @@ export default function CompanyApplicantsPage() {
     const data = await compareCandidatesAction(candidateIds);
     setLoading(false);
     if (data.error) {
-      alert(data.error);
+      toast.error(data.error);
     } else {
       setCompareData(data);
       setShowCompareModal(true);
@@ -124,7 +136,7 @@ export default function CompanyApplicantsPage() {
     setLoading(true);
     const res = await scheduleInterviewAction(schedulingAppId, interviewDate);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else {
       setShowSchedulerModal(false);
       setSchedulingAppId(null);
@@ -164,89 +176,89 @@ export default function CompanyApplicantsPage() {
 
   if (loading && applications.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text gap-4">
-        <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-        <p className="text-muted font-bold text-sm tracking-widest uppercase">Loading Applicants...</p>
+      <div className="text-text justify-center gap-4 items-center bg-bg flex min-h-screen flex-col">
+        <div className="border-t-primary size-12 border-primary/20 rounded-full border-4 animate-spin"></div>
+        <p className="type-label uppercase tracking-widest">Loading Applicants...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg text-text flex flex-col font-sans transition-colors">
+    <div className="text-text bg-bg transition-colors flex min-h-screen flex-col">
       
       {/* Sticky Header */}
-      <header className="flex items-center justify-between border-b border-border bg-surface px-6 md:px-12 py-4 sticky top-0 z-40">
-        <div className="flex items-center gap-6">
-          <Link href="/company" className="flex items-center gap-2 text-primary font-black hover:opacity-90 transition-opacity">
-            <span className="material-symbols-outlined text-3xl">hub</span>
+      <header className="border-b border-border px-6 py-4 items-center sticky z-40 flex top-0 bg-surface justify-between md:px-12">
+        <div className="flex gap-6 items-center">
+          <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+            <Network size={30} aria-hidden="true" />
             <span className="text-2xl tracking-tight">JobLyne</span>
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hidden md:inline-block">Company Hub</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <span className="text-primary px-3 hidden py-1.5 rounded-full type-badge bg-primary/10 md:inline-block">Company Hub</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/company" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">dashboard</span>
+        <div className="gap-4 flex items-center">
+          <Link href="/company" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <LayoutDashboard size={18} aria-hidden="true" />
             Dashboard
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <Link href="/company/team" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">group</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <Link href="/company/team" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <Users size={18} aria-hidden="true" />
             Team
           </Link>
           <button 
             onClick={() => logoutAction()} 
-            className="text-xs font-black text-muted hover:text-red-500 transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-red-500/5 active:scale-[0.98] min-h-[44px]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
           >
             Logout
           </button>
         </div>
       </header>
 
-      <main className="p-6 md:p-12 max-w-7xl mx-auto w-full flex-1 space-y-8">
+      <main className="w-full space-y-8 mx-auto max-w-7xl flex-1 p-6 md:p-12">
         
         {/* Welcome Details */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex justify-between gap-6 flex-col sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-text">Applicant Tracking Pipelines</h1>
-            <p className="text-muted text-sm font-semibold">Vet developer applications, schedule interviews, and select matches.</p>
+            <h1 className="text-text type-h1">Applicant Tracking Pipelines</h1>
+            <p className="type-label">Vet developer applications, schedule interviews, and select matches.</p>
           </div>
           
           {/* View Toggles */}
-          <div className="flex bg-surface border border-border p-1 rounded-2xl">
+          <div className="border-border rounded-2xl p-1 flex bg-surface border">
             <button 
               onClick={() => setViewMode("list")}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 min-h-[40px] cursor-pointer ${
-                viewMode === "list" ? "bg-primary text-surface shadow-md" : "text-muted hover:text-text"
+              className={`min-h-[40px] type-badge cursor-pointer gap-1.5 uppercase items-center transition-all tracking-wider flex py-2 px-4 rounded-xl ${
+                viewMode === "list" ? "bg-primary text-white shadow-md" : "text-muted hover:text-text"
               }`}
             >
-              <span className="material-symbols-outlined text-base">format_list_bulleted</span>
+              <List size={16} aria-hidden="true" />
               List view
             </button>
             <button 
               onClick={() => setViewMode("kanban")}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 min-h-[40px] cursor-pointer ${
-                viewMode === "kanban" ? "bg-primary text-surface shadow-md" : "text-muted hover:text-text"
+              className={`min-h-[40px] type-badge cursor-pointer gap-1.5 uppercase items-center transition-all tracking-wider flex py-2 px-4 rounded-xl ${
+                viewMode === "kanban" ? "bg-primary text-white shadow-md" : "text-muted hover:text-text"
               }`}
             >
-              <span className="material-symbols-outlined text-base">view_week</span>
+              <Columns3 size={16} aria-hidden="true" />
               Kanban Board
             </button>
           </div>
         </div>
 
         {/* Filter Operations */}
-        <section className="bg-surface border border-border p-6 rounded-card shadow-sm flex flex-col md:flex-row gap-4 flex-wrap items-center">
+        <section className="rounded-card border-border gap-4 items-center flex-wrap shadow-sm flex-col p-6 flex bg-surface border md:flex-row">
           
           {/* Sourcing Query */}
-          <div className="relative flex-1 min-w-[240px] w-full">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted">search</span>
+          <div className="min-w-[240px] relative flex-1 w-full">
+            <Search className="left-4 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Query name, skills, title..."
-              className="w-full pl-12 pr-4 py-3.5 bg-bg border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary font-medium text-xs min-h-[48px]"
+              className="w-full outline-none pl-12 min-h-[48px] border-border rounded-2xl py-3.5 bg-bg pr-4 type-caption border focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -255,7 +267,7 @@ export default function CompanyApplicantsPage() {
             <select
               value={jobFilter}
               onChange={(e) => setJobFilter(e.target.value)}
-              className="w-full p-3.5 bg-bg border border-border rounded-2xl font-semibold text-xs min-h-[48px] outline-none cursor-pointer"
+              className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border"
             >
               <option value="ALL">All Jobs</option>
               {distinctJobs.map(title => (
@@ -270,7 +282,7 @@ export default function CompanyApplicantsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-3.5 bg-bg border border-border rounded-2xl font-semibold text-xs min-h-[48px] outline-none cursor-pointer"
+                className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="PENDING">Pending</option>
@@ -286,27 +298,30 @@ export default function CompanyApplicantsPage() {
 
         {/* Bulk action drawer */}
         {selectedIds.length > 0 && viewMode === "list" && (
-          <div className="bg-gradient-to-r from-primary to-[#4c33cf] text-surface p-4 rounded-3xl flex flex-wrap justify-between items-center gap-4 animate-in slide-in-from-bottom-6 duration-300">
-            <span className="text-xs font-black uppercase tracking-wider pl-2">{selectedIds.length} Applicants Selected</span>
+          <div className="bg-gradient-to-r gap-4 rounded-3xl items-center from-primary flex-wrap animate-in slide-in-from-bottom-6 to-[#4c33cf] duration-300 flex p-4 text-white justify-between">
+            <span className="pl-2 uppercase tracking-wider type-badge">{selectedIds.length} Applicants Selected</span>
             <div className="flex gap-2.5">
-              <button 
+              <Button 
                 onClick={handleCompareTrigger}
-                className="px-4 py-2 bg-surface text-primary font-black text-xs rounded-xl hover:scale-105 active:scale-98 transition-all min-h-[40px]"
+                variant="secondary"
+                size="sm"
               >
                 Compare Side-by-Side
-              </button>
-              <button 
+              </Button>
+              <Button 
                 onClick={() => handleBulkStatusUpdate("INTERVIEW")}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 text-surface border border-white/20 font-black text-xs rounded-xl hover:scale-105 active:scale-98 transition-all min-h-[40px]"
+                variant="primary"
+                size="sm"
               >
                 Shortlist (Interview)
-              </button>
-              <button 
+              </Button>
+              <Button 
                 onClick={() => handleBulkStatusUpdate("REJECTED")}
-                className="px-4 py-2 bg-red-500 hover:bg-red-650 text-surface font-black text-xs rounded-xl hover:scale-105 active:scale-98 transition-all min-h-[40px]"
+                variant="danger"
+                size="sm"
               >
                 Bulk Reject
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -314,101 +329,108 @@ export default function CompanyApplicantsPage() {
         {/* Dynamic Display Panel */}
         {viewMode === "list" ? (
           /* List View Representation */
-          <div className="bg-surface border border-border rounded-card overflow-hidden shadow-sm">
+          <div className="rounded-card border-border overflow-hidden shadow-sm bg-surface border">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table className="w-full border-collapse min-w-[700px] text-left">
                 <thead>
-                  <tr className="border-b border-border bg-bg/50">
-                    <th className="p-4 w-12 text-center">
+                  <tr className="border-b bg-bg/50 border-border">
+                    <th className="text-center p-4 w-12">
                       <input 
                         type="checkbox"
                         checked={selectedIds.length > 0 && selectedIds.length === filteredApps.length}
                         onChange={toggleSelectAll}
-                        className="cursor-pointer size-4"
+                        className="size-4 cursor-pointer"
                       />
                     </th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Candidate</th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Job Position</th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Vetting skills</th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Experience</th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted">Status</th>
-                    <th className="p-4 text-xs font-black uppercase tracking-wider text-muted text-right">Actions</th>
+                    <th className="type-badge p-4">Candidate</th>
+                    <th className="type-badge p-4">Job Position</th>
+                    <th className="type-badge p-4">Vetting skills</th>
+                    <th className="type-badge p-4">Experience</th>
+                    <th className="type-badge p-4">Status</th>
+                    <th className="text-right type-badge p-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredApps.map(app => (
-                    <tr key={app.id} className="border-b border-border last:border-0 hover:bg-bg/10 transition-colors">
-                      <td className="p-4 text-center">
+                    <tr key={app.id} className="border-b transition-colors border-border last:border-0 hover:bg-bg/10">
+                      <td className="text-center p-4">
                         <input 
                           type="checkbox"
                           checked={selectedIds.includes(app.id)}
                           onChange={() => toggleSelect(app.id)}
-                          className="cursor-pointer size-4"
+                          className="size-4 cursor-pointer"
                         />
                       </td>
                       <td className="p-4">
                         <div className="space-y-1">
-                          <h4 className="font-black text-sm text-text leading-tight">{app.candidate_name}</h4>
-                          <p className="text-[10px] text-muted font-semibold leading-normal truncate max-w-xs">{app.candidate_headline || "Software Engineer"}</p>
-                          <div className="flex gap-2 text-[10px] text-slate-500 font-medium">
+                          <h4 className="text-text type-ui leading-tight">{app.candidate_name}</h4>
+                          <p className="text-xs leading-normal truncate max-w-xs text-muted">{app.candidate_headline || "Software Engineer"}</p>
+                          <div className="text-muted text-xs gap-2 flex">
                             <a href={`mailto:${app.candidate_email}`} className="hover:underline">{app.candidate_email}</a>
                             <span>&bull;</span>
                             <span>{app.candidate_phone || "Not provided"}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 text-sm font-semibold">{app.job_title}</td>
+                      <td className="type-ui p-4">{app.job_title}</td>
                       <td className="p-4">
-                        <div className="flex flex-wrap gap-1 max-w-xs">
+                        <div className="gap-1 flex max-w-xs flex-wrap">
                           {app.candidate_skills.slice(0, 3).map((s, i) => (
-                            <span key={i} className="bg-bg text-text font-black text-[9px] uppercase px-2 py-0.5 rounded-full border border-border">{s}</span>
+                            <span key={i} className="text-text px-2 border-border uppercase text-xs bg-bg rounded-full py-0.5 border">{s}</span>
                           ))}
                         </div>
                       </td>
-                      <td className="p-4 text-sm font-semibold">{app.candidate_experience ?? 3} Years</td>
+                      <td className="type-ui p-4">{app.candidate_experience ?? 3} Years</td>
                       <td className="p-4">
-                        <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                          app.status === "PENDING" ? "bg-blue-500/10 text-blue-500" :
+                        <span className={`py-1 px-2.5 rounded-full type-badge ${
+                          app.status === "PENDING" ? "text-blue-500 bg-blue-500/10" :
                           app.status === "INTERVIEW" ? "bg-warning/10 text-warning" :
-                          app.status === "OFFER" ? "bg-purple-500/10 text-purple-500" :
-                          app.status === "PLACED" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                          app.status === "OFFER" ? "text-purple-500 bg-purple-500/10" :
+                          app.status === "PLACED" ? "bg-emerald-500/10 text-emerald-500" : "text-red-500 bg-red-500/10"
                         }`}>{app.status}</span>
                         {app.interview_schedule && app.status === "INTERVIEW" && (
-                          <div className="text-[10px] text-amber-500 font-bold mt-1">
+                          <div className="mt-1 text-amber-500 text-xs">
                             Slot: {new Date(app.interview_schedule).toLocaleDateString()}
                           </div>
                         )}
                       </td>
-                      <td className="p-4 text-right space-x-1.5 whitespace-nowrap">
-                        <button
+                      <td className="p-4 whitespace-nowrap space-x-1.5 text-right">
+                        <Button
                           onClick={() => {
                             setSchedulingAppId(app.id);
                             setShowSchedulerModal(true);
                           }}
-                          className="px-3 py-2 bg-primary/10 hover:bg-primary text-primary hover:text-surface font-black text-[10px] uppercase rounded-xl transition-all min-h-[44px]"
+                          variant="primary"
+                          size="sm"
+                          className="text-xs uppercase min-h-0 py-2"
                         >
                           Schedule
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          disabled={!app.candidate_user_id}
+                          title={!app.candidate_user_id ? "This candidate does not have a user profile established yet." : "Chat with candidate"}
                           onClick={async () => {
+                            if (!app.candidate_user_id) return;
                             const { startThreadAction } = await import("@/features/auth/actions");
-                            const res = await startThreadAction(app.candidate_user_id || "");
+                            const res = await startThreadAction(app.candidate_user_id);
                             if (res.thread_id) {
                               router.push(`/company/messages?thread=${res.thread_id}`);
                             } else {
-                              alert("Cannot start direct chat. No user account linked.");
+                              toast.error("Cannot start direct chat. No user account linked.");
                             }
                           }}
-                          className="px-3 py-2 bg-surface hover:bg-bg border border-border text-text font-black text-[10px] uppercase rounded-xl transition-all min-h-[44px]"
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs uppercase min-h-0 py-2"
                         >
                           Chat
-                        </button>
+                        </Button>
                         {app.candidate_resume && (
                           <a
                             href={app.candidate_resume}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center px-3 py-2 bg-surface border border-border text-muted hover:text-text font-black text-[10px] uppercase rounded-xl transition-all min-h-[44px]"
+                            className="justify-center rounded-xl border-border inline-flex text-xs px-3 uppercase items-center h-9 transition-all text-muted py-2 bg-surface border hover:text-text"
                           >
                             Resume
                           </a>
@@ -418,7 +440,7 @@ export default function CompanyApplicantsPage() {
                   ))}
                   {filteredApps.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="p-12 text-center text-muted font-semibold text-sm">
+                      <td colSpan={7} className="type-label p-12 text-center">
                         No applicants found matching current filter preferences.
                       </td>
                     </tr>
@@ -429,39 +451,39 @@ export default function CompanyApplicantsPage() {
           </div>
         ) : (
           /* Kanban Board Representation */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          <div className="items-start gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {(["PENDING", "INTERVIEW", "OFFER", "PLACED"] as const).map(stage => {
               const stageApps = filteredApps.filter(a => a.status === stage);
               return (
-                <div key={stage} className="bg-surface border border-border rounded-card p-5 space-y-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-border/60">
-                    <h4 className="font-black text-sm text-text uppercase tracking-wider">
+                <div key={stage} className="rounded-card border-border p-5 space-y-4 bg-surface border">
+                  <div className="border-b items-center border-border/60 flex pb-2 justify-between">
+                    <h4 className="text-text type-badge">
                       {stage === "PENDING" ? "Sourced" : stage === "INTERVIEW" ? "Interviewing" : stage === "OFFER" ? "Offered" : "Placed"}
                     </h4>
-                    <span className="bg-bg text-muted font-black text-xs px-2.5 py-0.5 rounded-full">{stageApps.length}</span>
+                    <span className="bg-bg px-2.5 rounded-full py-0.5 type-badge text-muted">{stageApps.length}</span>
                   </div>
                   <div className="space-y-3 min-h-[250px]">
                     {stageApps.map(app => (
-                      <div key={app.id} className="bg-bg border border-border/80 p-4 rounded-2xl hover:border-primary/40 transition-all space-y-3 relative group shadow-sm">
+                      <div key={app.id} className="group rounded-2xl relative border-border/80 bg-bg transition-all shadow-sm space-y-3 p-4 border hover:border-primary/40">
                         <div className="space-y-1">
-                          <h5 className="font-black text-sm text-text leading-tight">{app.candidate_name}</h5>
-                          <p className="text-[10px] text-muted font-semibold truncate leading-tight">{app.candidate_headline || "Candidate"}</p>
-                          <p className="text-[9px] text-slate-500 font-extrabold uppercase">{app.job_title.split(" ")[0]}</p>
+                          <h5 className="text-text type-ui leading-tight">{app.candidate_name}</h5>
+                          <p className="text-xs truncate text-muted leading-tight">{app.candidate_headline || "Candidate"}</p>
+                          <p className="text-muted type-badge">{app.job_title.split(" ")[0]}</p>
                         </div>
                         {app.candidate_skills.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
+                          <div className="gap-1 flex flex-wrap">
                             {app.candidate_skills.slice(0, 2).map((s, idx) => (
-                              <span key={idx} className="bg-surface text-muted font-black text-[8px] uppercase px-1.5 py-0.5 rounded-full border border-border">{s}</span>
+                              <span key={idx} className="text-xs px-1.5 border-border uppercase rounded-full py-0.5 bg-surface text-muted border">{s}</span>
                             ))}
                           </div>
                         )}
-                        <div className="flex justify-between items-center pt-2 border-t border-border/50">
+                        <div className="border-t border-border/50 items-center pt-2 flex justify-between">
                           <button
                             onClick={() => {
                               setSchedulingAppId(app.id);
                               setShowSchedulerModal(true);
                             }}
-                            className="text-[10px] font-black text-primary hover:underline"
+                            className="text-primary text-xs hover:underline"
                           >
                             Schedule
                           </button>
@@ -470,7 +492,7 @@ export default function CompanyApplicantsPage() {
                           <select
                             value={app.status}
                             onChange={(e) => transitionStage(app.id, e.target.value)}
-                            className="bg-surface border border-border text-[9px] font-black uppercase rounded-lg px-2 py-1 outline-none cursor-pointer text-muted hover:text-text"
+                            className="px-2 py-1 outline-none border-border uppercase text-xs rounded-lg text-muted cursor-pointer bg-surface border hover:text-text"
                           >
                             <option value="PENDING">Sourced</option>
                             <option value="INTERVIEW">Interview</option>
@@ -482,8 +504,8 @@ export default function CompanyApplicantsPage() {
                       </div>
                     ))}
                     {stageApps.length === 0 && (
-                      <div className="border border-dashed border-border/60 rounded-2xl p-8 text-center text-xs text-muted font-semibold flex flex-col justify-center items-center min-h-[150px]">
-                        <span className="material-symbols-outlined text-border mb-2 text-2xl">drag_indicator</span>
+                      <div className="type-caption justify-center border-dashed rounded-2xl min-h-[150px] items-center border-border/60 text-center flex-col flex p-8 text-muted border">
+                        <GripVertical className="mb-2 text-border" size={24} aria-hidden="true" />
                         No candidates
                       </div>
                     )}
@@ -498,65 +520,66 @@ export default function CompanyApplicantsPage() {
 
       {/* MODAL 1: Candidate Comparison Side-by-Side */}
       {showCompareModal && compareData && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-surface border border-border rounded-card p-8 w-full max-w-5xl shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
+          <div className="w-full rounded-card overflow-y-auto border-border max-w-5xl relative duration-200 animate-in max-h-[90vh] shadow-2xl zoom-in-95 p-8 bg-surface border">
             <button 
               onClick={() => { setShowCompareModal(false); setCompareData(null); }}
-              className="absolute top-6 right-6 p-2 text-muted hover:text-text hover:bg-bg rounded-xl min-h-[40px]"
+              className="min-h-[40px] rounded-xl absolute p-2 right-6 top-6 text-muted hover:bg-bg hover:text-text"
+              aria-label="Close modal"
             >
-              <span className="material-symbols-outlined">close</span>
+              <X size={18} aria-hidden="true" />
             </button>
-            <div className="space-y-1 mb-8">
-              <h3 className="text-2xl font-black tracking-tight text-text">Candidate Comparison Matrix</h3>
-              <p className="text-muted text-sm font-semibold">Side-by-side comparative analysis of selected shortlisted developers.</p>
+            <div className="mb-8 space-y-1">
+              <h3 className="text-text type-h2">Candidate Comparison Matrix</h3>
+              <p className="type-label">Side-by-side comparative analysis of selected shortlisted developers.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+            <div className="items-start gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {compareData.map((cand) => (
-                <div key={cand.id} className="bg-bg border border-border rounded-3xl p-6 space-y-5 shadow-sm">
-                  <div className="space-y-2 text-center pb-4 border-b border-border/80">
-                    <div className="size-16 rounded-full bg-gradient-to-tr from-primary to-[#4c33cf] text-white flex items-center justify-center font-black text-xl mx-auto shadow-md">
+                <div key={cand.id} className="border-border rounded-3xl bg-bg shadow-sm p-6 space-y-5 border">
+                  <div className="border-b space-y-2 border-border/80 text-center pb-4">
+                    <div className="justify-center mx-auto type-h2 shadow-md bg-gradient-to-tr items-center from-primary text-white rounded-full flex to-[#4c33cf] size-16">
                       {cand.full_name?.substring(0, 2).toUpperCase() || "CN"}
                     </div>
                     <div>
-                      <h4 className="font-black text-lg text-text leading-tight">{cand.full_name || "Candidate"}</h4>
-                      <p className="text-xs text-muted font-bold mt-0.5">{cand.headline || "Developer"}</p>
+                      <h4 className="text-text type-card-title leading-tight">{cand.full_name || "Candidate"}</h4>
+                      <p className="type-caption text-muted mt-0.5">{cand.headline || "Developer"}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-4 text-xs font-semibold text-text">
+                  <div className="text-text type-caption space-y-4">
                     <div className="space-y-1">
-                      <span className="text-[10px] text-muted font-black uppercase tracking-wider block">Sourcing details</span>
+                      <span className="block type-badge text-muted">Sourcing details</span>
                       <p>Exp: {cand.experience_years ?? 3} Years</p>
                       <p>Location: {cand.location || cand.city || "Remote"}</p>
                       <p>Notice period: {cand.notice_period || "Immediate"}</p>
                     </div>
 
                     <div className="space-y-1.5">
-                      <span className="text-[10px] text-muted font-black uppercase tracking-wider block">Core Skills</span>
-                      <div className="flex flex-wrap gap-1">
+                      <span className="block type-badge text-muted">Core Skills</span>
+                      <div className="gap-1 flex flex-wrap">
                         {cand.skills ? cand.skills.map((s: any, idx: number) => (
-                          <span key={idx} className="bg-surface text-text font-black text-[9px] uppercase px-2 py-0.5 rounded-full border border-border">{s}</span>
+                          <span key={idx} className="text-text px-2 border-border uppercase text-xs rounded-full py-0.5 bg-surface border">{s}</span>
                         )) : <span>No skills added</span>}
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-[10px] text-muted font-black uppercase tracking-wider block">Work History</span>
+                      <span className="block type-badge text-muted">Work History</span>
                       {cand.experience && cand.experience.slice(0, 2).map((exp: any, i: number) => (
-                        <div key={i} className="border-l-2 border-primary/20 pl-2 space-y-0.5">
-                          <p className="font-black text-text">{exp.designation}</p>
-                          <p className="text-[10px] text-muted">{exp.company_name} &bull; {exp.start_date}</p>
+                        <div key={i} className="border-l-2 pl-2 border-primary/20 space-y-0.5">
+                          <p className="text-text">{exp.designation}</p>
+                          <p className="text-xs text-muted">{exp.company_name} &bull; {exp.start_date}</p>
                         </div>
                       ))}
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-[10px] text-muted font-black uppercase tracking-wider block">Education</span>
+                      <span className="block type-badge text-muted">Education</span>
                       {cand.education && cand.education.slice(0, 1).map((edu: any, i: number) => (
-                        <div key={i} className="border-l-2 border-amber-500/20 pl-2 space-y-0.5">
-                          <p className="font-black text-text">{edu.degree} in {edu.field_of_study}</p>
-                          <p className="text-[10px] text-muted">{edu.institution} &bull; {edu.end_year}</p>
+                        <div key={i} className="space-y-0.5 border-l-2 pl-2 border-amber-500/20">
+                          <p className="text-text">{edu.degree} in {edu.field_of_study}</p>
+                          <p className="text-xs text-muted">{edu.institution} &bull; {edu.end_year}</p>
                         </div>
                       ))}
                     </div>
@@ -570,33 +593,34 @@ export default function CompanyApplicantsPage() {
 
       {/* MODAL 2: Interview Scheduler */}
       {showSchedulerModal && schedulingAppId && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-surface border border-border rounded-card p-8 w-full max-w-md shadow-2xl relative animate-in zoom-in-95 duration-200">
+        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
+          <div className="w-full rounded-card border-border relative duration-200 animate-in max-w-md shadow-2xl zoom-in-95 p-8 bg-surface border">
             <button 
               onClick={() => { setShowSchedulerModal(false); setSchedulingAppId(null); setInterviewDate(""); }}
-              className="absolute top-6 right-6 p-2 text-muted hover:text-text hover:bg-bg rounded-xl min-h-[40px]"
+              className="min-h-[40px] rounded-xl absolute p-2 right-6 top-6 text-muted hover:bg-bg hover:text-text"
+              aria-label="Close modal"
             >
-              <span className="material-symbols-outlined">close</span>
+              <X size={18} aria-hidden="true" />
             </button>
             <div className="space-y-2 mb-6">
-              <h3 className="text-xl font-black tracking-tight">Schedule Vetting Interview</h3>
-              <p className="text-muted text-sm font-semibold">Book a virtual meeting slot with this developer.</p>
+              <h3 className="type-h2">Schedule Vetting Interview</h3>
+              <p className="type-label">Book a virtual meeting slot with this developer.</p>
             </div>
             
             <form onSubmit={handleScheduleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Date & Time</label>
+                <label className="type-badge">Date & Time</label>
                 <input 
                   type="datetime-local" 
                   required
                   value={interviewDate}
                   onChange={(e) => setInterviewDate(e.target.value)}
-                  className="w-full p-3.5 bg-bg border border-border rounded-2xl font-semibold text-xs min-h-[48px] outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
                 />
               </div>
               <button 
                 type="submit"
-                className="w-full py-4 bg-primary text-surface font-black text-sm rounded-2xl hover:scale-[1.02] transition-all min-h-[48px] shadow-lg shadow-primary/10 cursor-pointer"
+                className="w-full min-h-[48px] py-4 rounded-2xl transition-all type-ui shadow-primary/10 shadow-lg bg-primary cursor-pointer text-white hover:scale-[1.02]"
               >
                 Confirm Booking
               </button>

@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Language } from "@/types/profile";
+import { Button, Input, Select } from "@/shared/ui";
+import { Languages, Check, Pencil, X, Plus } from "lucide-react";
 
 interface LanguagesSectionProps {
   data: Language[];
@@ -30,117 +32,130 @@ export default function LanguagesSection({ data = [], onChange }: LanguagesSecti
   };
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="languages">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="languages">
       {/* Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">language</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <Languages size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Languages Known</h3>
+            <h3 className="text-text type-card-title leading-tight">Languages Known</h3>
             <p className="text-xs text-muted mt-0.5">Languages you can communicate in</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => setIsEditing(!isEditing)}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-2"
           >
-            <span className="material-symbols-outlined text-sm font-bold">
-              {isEditing ? "check" : "edit"}
-            </span>
+            {isEditing ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Pencil size={16} aria-hidden="true" />
+            )}
             {isEditing ? "Done" : "Edit"}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         {isEditing ? (
           /* EDIT MODE */
           <div className="space-y-5">
-            <div className="flex flex-wrap gap-2 min-h-[40px]">
+            <div className="gap-2 flex min-h-[40px] flex-wrap">
               {data.length === 0 ? (
-                <p className="text-xs text-muted italic my-2">No languages added yet.</p>
+                <p className="italic my-2 text-xs text-muted">No languages added yet.</p>
               ) : (
                 data.map((lang, idx) => (
                   <span
                     key={idx}
-                    className="flex items-center gap-1.5 bg-bg border border-border text-text pl-3 pr-1 py-1 rounded-lg text-xs font-semibold"
+                    className="text-text py-1 gap-1.5 border-border items-center pr-1 bg-bg pl-3 rounded-lg flex type-caption border"
                   >
                     <span>{lang.name}</span>
-                    <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wide">
+                    <span className="text-primary px-1.5 text-xs uppercase tracking-wide py-0.5 rounded bg-primary/10">
                       {lang.proficiency}
                     </span>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleRemoveLanguage(idx)}
-                      className="hover:text-red-500 text-muted shrink-0 flex items-center justify-center cursor-pointer min-h-[32px] min-w-[32px]"
+                      className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
                       title="Remove Language"
+                      aria-label={`Remove ${lang.name}`}
                     >
-                      <span className="material-symbols-outlined text-xs">close</span>
-                    </button>
+                      <X size={12} aria-hidden="true" />
+                    </Button>
                   </span>
                 ))
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-border/40">
-              <input
-                type="text"
-                value={langInput}
-                onChange={(e) => setLangInput(e.target.value)}
-                placeholder="Add Language (e.g. Spanish)"
-                className="flex-1 px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-              />
-              <select
-                value={langProficiency}
-                onChange={(e) => setLangProficiency(e.target.value)}
-                className="px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text cursor-pointer"
-              >
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-                <option value="Expert">Expert</option>
-              </select>
-              <button
+            <div className="border-border/40 border-t pt-3 gap-3 flex flex-col sm:flex-row items-end">
+              <div className="flex-1 w-full">
+                <Input
+                  type="text"
+                  value={langInput}
+                  onChange={(e) => setLangInput(e.target.value)}
+                  placeholder="Add Language (e.g. Spanish)"
+                />
+              </div>
+              <div className="w-full sm:w-48">
+                <Select
+                  value={langProficiency}
+                  onChange={(e) => setLangProficiency(e.target.value)}
+                  options={[
+                    { value: "Beginner", label: "Beginner" },
+                    { value: "Intermediate", label: "Intermediate" },
+                    { value: "Advanced", label: "Advanced" },
+                    { value: "Expert", label: "Expert" },
+                  ]}
+                />
+              </div>
+              <Button
                 type="button"
+                variant="primary"
                 onClick={handleAddLanguage}
-                className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/95 flex items-center justify-center gap-1 min-h-[44px] cursor-pointer"
+                className="gap-2 min-h-[40px] w-full sm:w-auto"
               >
-                <span className="material-symbols-outlined text-sm">add</span>
+                <Plus size={16} aria-hidden="true" />
                 Add Language
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
           /* VIEW MODE */
           <div>
             {data.length === 0 ? (
-              <div className="text-center py-6 border border-dashed border-border rounded-xl bg-bg/50">
-                <span className="material-symbols-outlined text-2xl text-muted/60 mb-1.5 block">language</span>
-                <span className="text-xs font-semibold text-text block mb-0.5">No languages added yet</span>
-                <button
+              <div className="border-dashed bg-bg/50 border-border text-center py-6 rounded-xl border">
+                <Languages size={24} className="mb-1.5 text-muted/60 block mx-auto" aria-hidden="true" />
+                <span className="text-text mb-0.5 block type-caption">No languages added yet</span>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsEditing(true)}
-                  className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[32px] px-3 mt-1.5"
+                  className="text-primary mt-1.5 hover:underline"
                 >
                   Add languages now
-                </button>
+                </Button>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex gap-2.5 flex-wrap">
                 {data.map((lang, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 px-3.5 py-2 bg-bg border border-border rounded-xl shadow-xs transition-all hover:bg-bg/85"
+                    className="px-3.5 border-border items-center gap-2 bg-bg transition-all shadow-xs flex py-2 rounded-xl border hover:bg-bg/85"
                   >
-                    <span className="material-symbols-outlined text-sm text-primary">language</span>
-                    <span className="text-xs font-bold text-text">{lang.name}</span>
-                    <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-full border border-primary/10 uppercase tracking-wider">
+                    <Languages size={14} className="text-primary" aria-hidden="true" />
+                    <span className="text-text type-caption">{lang.name}</span>
+                    <span className="px-2 text-primary border text-xs uppercase border-primary/10 rounded-full py-0.5 tracking-wider bg-primary/10">
                       {lang.proficiency}
                     </span>
                   </div>
@@ -153,3 +168,4 @@ export default function LanguagesSection({ data = [], onChange }: LanguagesSecti
     </section>
   );
 }
+

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Profile } from "@/types/profile";
+import { User, Check, Pencil, Camera, FileUp, CheckCircle2, Link as LinkIcon, Briefcase, Code2 } from "lucide-react";
 
 interface PersonalInfoSectionProps {
   profile: Profile | null;
@@ -85,7 +86,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
       <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">person</span>
+            <User size={20} aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-base font-bold text-text leading-tight font-display">Personal Details & Resume</h3>
@@ -96,11 +97,13 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
           <button
             type="button"
             onClick={() => setIsEditing(!isEditing)}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
+            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-2 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
           >
-            <span className="material-symbols-outlined text-sm font-bold">
-              {isEditing ? "check" : "edit"}
-            </span>
+            {isEditing ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Pencil size={16} aria-hidden="true" />
+            )}
             {isEditing ? "Done" : "Edit"}
           </button>
         </div>
@@ -120,14 +123,14 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="material-symbols-outlined text-3xl text-muted/60">add_a_photo</span>
+                <Camera size={32} className="text-muted/60" aria-hidden="true" />
               )}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="absolute inset-0 bg-slate-900/60 text-white opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-[10px] font-bold cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base mb-1">edit</span>
+                <Pencil size={16} className="mb-1" aria-hidden="true" />
                 Upload Photo
               </button>
               <input
@@ -146,7 +149,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
               className="w-full border border-dashed border-border hover:border-primary/50 transition-all rounded-xl p-4 text-center cursor-pointer bg-bg/50 hover:bg-bg/90"
               onClick={() => resumeInputRef.current?.click()}
             >
-              <span className="material-symbols-outlined text-xl text-primary/80 mb-1 block">upload_file</span>
+              <FileUp size={24} className="text-primary/80 mx-auto mb-1 block" aria-hidden="true" />
               <span className="text-xs font-semibold text-text block mb-0.5">Drag Resume Here</span>
               <span className="text-[10px] text-muted block">PDF, DOC or DOCX (Max 5MB)</span>
               <input
@@ -168,8 +171,8 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                 </div>
               )}
               {resumeFile && !isParsing && (
-                <div className="mt-3 flex items-center justify-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 py-1.5 px-2 rounded-lg border border-emerald-500/20 truncate">
-                  <span className="material-symbols-outlined text-xs">check_circle</span>
+                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 py-1.5 px-2 rounded-lg border border-emerald-500/20 truncate">
+                  <CheckCircle2 size={12} aria-hidden="true" />
                   <span className="truncate">{resumeFile}</span>
                 </div>
               )}
@@ -183,7 +186,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">First Name</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">First Name</label>
                     <input
                       type="text"
                       value={profile?.first_name || ""}
@@ -193,7 +196,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Middle Name</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Middle Name</label>
                     <input
                       type="text"
                       value={profile?.middle_name || ""}
@@ -203,7 +206,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Last Name</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Last Name</label>
                     <input
                       type="text"
                       value={profile?.last_name || ""}
@@ -215,7 +218,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted mb-1.5">Professional Headline</label>
+                  <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Professional Headline</label>
                   <input
                     type="text"
                     value={profile?.headline || ""}
@@ -227,7 +230,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Email Address</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Email Address</label>
                     <div className="relative">
                       <input
                         type="email"
@@ -236,13 +239,13 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                         placeholder="john.doe@example.com"
                         className="w-full pl-3.5 pr-20 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                       />
-                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-0.5">
-                        <span className="material-symbols-outlined text-xs font-bold">check_circle</span> Verified
+                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-1">
+                        <CheckCircle2 size={12} aria-hidden="true" /> Verified
                       </span>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Phone Number</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Phone Number</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -251,8 +254,8 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                         placeholder="+1 (555) 019-2834"
                         className="w-full pl-3.5 pr-20 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
                       />
-                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-0.5">
-                        <span className="material-symbols-outlined text-xs font-bold">check_circle</span> Verified
+                      <span className="absolute right-2 top-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 flex items-center gap-1">
+                        <CheckCircle2 size={12} aria-hidden="true" /> Verified
                       </span>
                     </div>
                   </div>
@@ -260,7 +263,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Date of Birth</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Date of Birth</label>
                     <input
                       type="date"
                       value={profile?.date_of_birth || ""}
@@ -269,7 +272,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Gender</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Gender</label>
                     <select
                       value={profile?.gender || ""}
                       onChange={(e) => onChange("gender", e.target.value)}
@@ -283,7 +286,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Nationality</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Nationality</label>
                     <input
                       type="text"
                       value={profile?.nationality || ""}
@@ -296,7 +299,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Current Location</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Current Location</label>
                     <input
                       type="text"
                       value={profile?.location || ""}
@@ -306,7 +309,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Hometown</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Hometown</label>
                     <input
                       type="text"
                       value={profile?.hometown || ""}
@@ -316,7 +319,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-muted mb-1.5">Pincode</label>
+                    <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Pincode</label>
                     <input
                       type="text"
                       value={profile?.pincode || ""}
@@ -328,10 +331,10 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                 </div>
 
                 <div className="space-y-3 pt-3 border-t border-border/40">
-                  <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Websites & Portfolios</h4>
+                  <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Websites & Portfolios</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-muted mb-1">Portfolio</label>
+                      <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Portfolio</label>
                       <input
                         type="text"
                         value={profile?.social_links?.portfolio || ""}
@@ -344,7 +347,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-muted mb-1">LinkedIn</label>
+                      <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">LinkedIn</label>
                       <input
                         type="text"
                         value={profile?.social_links?.linkedin || ""}
@@ -357,7 +360,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-muted mb-1">GitHub</label>
+                      <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1">GitHub</label>
                       <input
                         type="text"
                         value={profile?.social_links?.github || ""}
@@ -376,63 +379,67 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
               /* READONLY VIEW MODE */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">First Name</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">First Name</span>
                   <span className="font-semibold text-text">{profile?.first_name || "Not specified"}</span>
                 </div>
                 {profile?.middle_name && (
                   <div>
-                    <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Middle Name</span>
+                    <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Middle Name</span>
                     <span className="font-semibold text-text">{profile.middle_name}</span>
                   </div>
                 )}
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Last Name</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Last Name</span>
                   <span className="font-semibold text-text">{profile?.last_name || "Not specified"}</span>
                 </div>
                 <div className="md:col-span-2">
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Professional Headline</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Professional Headline</span>
                   <span className="font-semibold text-text break-words block">{profile?.headline || "Not specified"}</span>
                 </div>
-                <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Email Address</span>
+                 <div>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Email Address</span>
                   <span className="font-semibold text-text flex items-center gap-1.5">
                     {profile?.email || "Not specified"}
                     {profile?.email && (
-                      <span className="material-symbols-outlined text-sm text-emerald-500 font-bold" title="Verified">check_circle</span>
+                      <span title="Verified">
+                        <CheckCircle2 size={16} className="text-emerald-500" aria-hidden="true" />
+                      </span>
                     )}
                   </span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Phone Number</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Phone Number</span>
                   <span className="font-semibold text-text flex items-center gap-1.5">
                     {profile?.phone || "Not specified"}
                     {profile?.phone && (
-                      <span className="material-symbols-outlined text-sm text-emerald-500 font-bold" title="Verified">check_circle</span>
+                      <span title="Verified">
+                        <CheckCircle2 size={16} className="text-emerald-500" aria-hidden="true" />
+                      </span>
                     )}
                   </span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Date of Birth</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Date of Birth</span>
                   <span className="font-semibold text-text">{profile?.date_of_birth || "Not specified"}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Gender</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Gender</span>
                   <span className="font-semibold text-text">{profile?.gender || "Not specified"}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Nationality</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Nationality</span>
                   <span className="font-semibold text-text">{profile?.nationality || "Not specified"}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Current Location</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Current Location</span>
                   <span className="font-semibold text-text">{profile?.location || "Not specified"}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Hometown</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Hometown</span>
                   <span className="font-semibold text-text">{profile?.hometown || "Not specified"}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-0.5">Pincode</span>
+                  <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Pincode</span>
                   <span className="font-semibold text-text">{profile?.pincode || "Not specified"}</span>
                 </div>
 
@@ -440,14 +447,14 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                 <div className="md:col-span-2 lg:col-span-3 pt-5 border-t border-border/60">
                   <span className="text-xs font-bold text-muted uppercase tracking-wider block mb-3">Websites & Portfolios</span>
                   <div className="flex flex-wrap gap-3">
-                    {profile?.social_links?.portfolio && (
+                     {profile?.social_links?.portfolio && (
                       <a
                         href={profile.social_links.portfolio}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-primary rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
                       >
-                        <span className="material-symbols-outlined text-sm">link</span>
+                        <LinkIcon size={14} aria-hidden="true" />
                         Portfolio Website
                       </a>
                     )}
@@ -458,7 +465,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-[#0A66C2] rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
                       >
-                        <span className="material-symbols-outlined text-sm">work</span>
+                        <Briefcase size={14} aria-hidden="true" />
                         LinkedIn Profile
                       </a>
                     )}
@@ -469,7 +476,7 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3.5 py-2 bg-bg border border-border text-xs font-bold text-text rounded-xl hover:bg-bg/80 hover:shadow-xs transition-all"
                       >
-                        <span className="material-symbols-outlined text-sm">code</span>
+                        <Code2 size={14} aria-hidden="true" />
                         GitHub Profile
                       </a>
                     )}

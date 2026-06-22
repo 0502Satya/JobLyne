@@ -1,4 +1,5 @@
 import { Button } from "@/shared/ui";
+import { ExternalLink, Star } from "lucide-react";
 
 /**
  * This section shows some recommended courses.
@@ -34,51 +35,51 @@ export default function CourseShowcase() {
     ];
 
     return (
-        <section className="py-24 bg-background-light dark:bg-slate-900/40 transition-colors">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="bg-background-light transition-colors py-24 dark:bg-card/40">
+            <div className="mx-auto px-4 max-w-7xl sm:px-6 lg:px-8">
                 {/* Title and a link to see all courses */}
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div className="items-end flex-col mb-12 flex gap-6 justify-between md:flex-row">
                     <div>
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Bridge Your Skill Gap</h2>
-                        <p className="text-slate-600 dark:text-slate-400">Learn new skills to get better jobs.</p>
+                        <h2 className="text-text mb-2 type-h1">Bridge Your Skill Gap</h2>
+                        <p className="text-muted">Learn new skills to get better jobs.</p>
                     </div>
-                    <a className="text-primary font-bold flex items-center gap-1 hover:underline" href="#">
+                    <a className="text-primary gap-1.5 items-center flex hover:underline" href="#">
                         Explore all courses
-                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                        <ExternalLink size={14} aria-hidden="true" />
                     </a>
                 </div>
 
                 {/* Grid showing the list of courses */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     {courses.map((course) => (
-                        <div key={course.title} className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all group min-w-0">
+                        <div key={course.title} className="group rounded-2xl overflow-hidden transition-all bg-surface border-border shadow-sm min-w-0 border dark:border-border dark:bg-card hover:shadow-xl">
                             {/* Image with a 'Bestseller' tag if needed */}
-                            <div className="h-40 sm:h-48 overflow-hidden relative">
+                            <div className="h-40 relative overflow-hidden sm:h-48">
                                 <img
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     alt={course.title}
                                     src={course.image}
                                 />
                                 {course.tag && (
-                                    <div className="absolute top-4 left-4 bg-accent text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">
+                                    <div className="px-2 py-1 left-4 top-4 absolute text-white rounded-full type-badge bg-accent">
                                         {course.tag}
                                     </div>
                                 )}
                             </div>
                             {/* Details like Category, Rating, Title, and Price */}
                             <div className="p-5 sm:p-6">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <span className="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded">{course.category}</span>
-                                    <div className="flex items-center text-yellow-500">
-                                        <span className="material-symbols-outlined text-sm">star</span>
-                                        <span className="text-xs font-bold ml-1">{course.rating}</span>
+                                <div className="gap-2 flex mb-3 items-center">
+                                    <span className="px-2 py-1 text-primary type-caption rounded bg-primary/10">{course.category}</span>
+                                    <div className="flex text-yellow-500 items-center">
+                                        <Star size={14} className="fill-current text-yellow-500" aria-hidden="true" />
+                                        <span className="ml-1 type-caption">{course.rating}</span>
                                     </div>
                                 </div>
-                                <h4 className="text-lg font-bold mb-2 text-slate-900 dark:text-white truncate">{course.title}</h4>
-                                <p className="text-slate-500 text-sm mb-6 leading-relaxed line-clamp-2">{course.description}</p>
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-xl font-black text-slate-900 dark:text-white">{course.price}</span>
-                                    <button className="text-primary font-bold text-sm hover:underline min-h-[44px]">Enroll Now</button>
+                                <h4 className="type-card-title truncate text-text mb-2">{course.title}</h4>
+                                <p className="text-sm leading-relaxed line-clamp-2 text-muted mb-6">{course.description}</p>
+                                <div className="gap-4 flex items-center justify-between">
+                                    <span className="text-text type-h2">{course.price}</span>
+                                    <button className="type-ui text-primary min-h-[44px] hover:underline">Enroll Now</button>
                                 </div>
                             </div>
                         </div>

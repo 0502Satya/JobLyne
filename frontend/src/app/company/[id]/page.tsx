@@ -6,6 +6,18 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getPublicCompanyProfileAction } from "@/features/company/actions";
+import { 
+  Building2, 
+  Network, 
+  Home, 
+  BadgeCheck, 
+  Link as LinkIcon, 
+  Info, 
+  Palette, 
+  Crown, 
+  Briefcase, 
+  ArrowRight 
+} from "lucide-react";
 
 interface JobPost {
   id: string;
@@ -62,20 +74,20 @@ export default function PublicCompanyProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text gap-4">
-        <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-        <p className="text-muted font-bold text-sm tracking-widest uppercase">Fetching Employer Details...</p>
+      <div className="text-text justify-center gap-4 items-center bg-bg flex min-h-screen flex-col">
+        <div className="border-t-primary size-12 border-primary/20 rounded-full border-4 animate-spin"></div>
+        <p className="type-label uppercase tracking-widest">Fetching Employer Details...</p>
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-bg text-text flex flex-col justify-center items-center p-6 text-center max-w-md mx-auto">
-        <span className="material-symbols-outlined text-red-500 text-6xl mb-4">business</span>
-        <h2 className="text-2xl font-black mb-2">Workspace Unresolved</h2>
-        <p className="text-muted text-sm font-semibold mb-6">{error || "The requested employer workspace does not exist or has been cancelled."}</p>
-        <Link href="/" className="px-6 py-3 bg-primary text-surface rounded-2xl font-black text-xs min-h-[44px] flex items-center justify-center">
+      <div className="text-text justify-center mx-auto items-center bg-bg text-center p-6 max-w-md flex min-h-screen flex-col">
+        <Building2 className="text-red-500 mb-4" size={60} aria-hidden="true" />
+        <h2 className="mb-2 type-h2">Workspace Unresolved</h2>
+        <p className="mb-6 type-label">{error || "The requested employer workspace does not exist or has been cancelled."}</p>
+        <Link href="/" className="justify-center type-badge px-6 rounded-2xl min-h-[44px] items-center py-3 bg-primary flex text-white">
           Return Home
         </Link>
       </div>
@@ -85,108 +97,108 @@ export default function PublicCompanyProfilePage() {
   const logoInitials = profile.name ? profile.name.substring(0, 2).toUpperCase() : "CO";
 
   return (
-    <div className="min-h-screen bg-bg text-text transition-colors flex flex-col font-sans pb-20">
+    <div className="text-text bg-bg pb-20 transition-colors flex min-h-screen flex-col">
       
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-border bg-surface px-6 md:px-12 py-4 sticky top-0 z-40">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 text-primary font-black hover:opacity-90 transition-opacity">
-            <span className="material-symbols-outlined text-3xl">hub</span>
+      <header className="border-b border-border px-6 py-4 items-center sticky z-40 flex top-0 bg-surface justify-between md:px-12">
+        <div className="flex gap-6 items-center">
+          <Link href="/" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+            <Network size={30} aria-hidden="true" />
             <span className="text-2xl tracking-tight">JobLyne</span>
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hidden md:inline-block">Employer Profile</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <span className="text-primary px-3 hidden py-1.5 rounded-full type-badge bg-primary/10 md:inline-block">Employer Profile</span>
         </div>
-        <Link href="/" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">home</span>
+        <Link href="/" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+          <Home size={18} aria-hidden="true" />
           Talent Home
         </Link>
       </header>
 
       {/* Main Content Layout */}
-      <main className="max-w-5xl mx-auto w-full px-6 py-12 space-y-12">
+      <main className="w-full py-12 mx-auto space-y-12 px-6 max-w-5xl">
         
         {/* Banner Section */}
-        <section className="bg-gradient-to-r from-primary/15 to-[#4c33cf]/10 border border-primary/20 rounded-card p-8 md:p-12 shadow-sm flex flex-col md:flex-row items-center md:items-start justify-between gap-8 relative overflow-hidden">
+        <section className="bg-gradient-to-r rounded-card gap-8 relative border-primary/20 from-primary/15 items-center to-[#4c33cf]/10 overflow-hidden shadow-sm flex-col flex justify-between p-8 border md:items-start md:p-12 md:flex-row">
           
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10 text-center md:text-left">
+          <div className="z-10 relative items-center text-center flex gap-6 flex-col md:items-start md:flex-row md:text-left">
             {/* Logo */}
             {profile.logo_url ? (
               <img 
                 src={profile.logo_url} 
                 alt={profile.name} 
-                className="size-20 rounded-3xl object-cover border-2 border-border shadow-md bg-surface shrink-0" 
+                className="shrink-0 object-cover border-border shadow-md rounded-3xl border-2 bg-surface size-20" 
               />
             ) : (
-              <div className="size-20 rounded-3xl bg-gradient-to-tr from-primary to-[#4c33cf] text-white flex items-center justify-center font-black text-2xl shadow-lg shrink-0">
+              <div className="justify-center shrink-0 type-h2 rounded-3xl bg-gradient-to-tr items-center from-primary text-white shadow-lg to-[#4c33cf] flex size-20">
                 {logoInitials}
               </div>
             )}
             
-            <div className="space-y-2 max-w-xl overflow-wrap break-word">
-              <div className="flex items-center gap-3 justify-center md:justify-start flex-wrap">
-                <h1 className="text-3xl font-black tracking-tight text-text">{profile.name}</h1>
+            <div className="max-w-xl break-word space-y-2 overflow-wrap">
+              <div className="justify-center items-center flex-wrap gap-3 flex md:justify-start">
+                <h1 className="text-text type-h1">{profile.name}</h1>
                 {profile.verified_badge && (
-                  <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <span className="material-symbols-outlined text-xs">verified</span>
+                  <span className="py-1 gap-1 uppercase text-xs text-emerald-500 items-center px-2.5 bg-emerald-500/10 tracking-widest rounded-full border-emerald-500/20 flex border">
+                    <BadgeCheck size={12} aria-hidden="true" />
                     Vetted Employer
                   </span>
                 )}
               </div>
-              <p className="text-sm text-muted font-bold tracking-tight uppercase tracking-wider">{profile.industry} &bull; {profile.city || "Remote"}{profile.country ? `, ${profile.country}` : ""}</p>
+              <p className="tracking-tight type-label uppercase tracking-wider">{profile.industry} &bull; {profile.city || "Remote"}{profile.country ? `, ${profile.country}` : ""}</p>
               
               {profile.website && (
                 <a 
                   href={profile.website} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:underline mt-1"
+                  className="text-primary gap-1.5 mt-1 inline-flex items-center type-badge hover:underline"
                 >
-                  <span className="material-symbols-outlined text-base">link</span>
+                  <LinkIcon size={16} aria-hidden="true" />
                   {profile.website.replace(/^https?:\/\//i, "")}
                 </a>
               )}
             </div>
           </div>
 
-          <div className="absolute right-0 top-0 size-72 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <div className="blur-3xl size-72 translate-x-1/3 absolute bg-primary/5 rounded-full -translate-y-1/2 right-0 top-0"></div>
         </section>
 
         {/* Details Grid split */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <section className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
           
           {/* Left Column: About & values */}
           <div className="lg:col-span-2 space-y-8">
             
-            <div className="bg-surface border border-border p-8 rounded-card shadow-sm space-y-4">
-              <h3 className="text-xl font-black text-text tracking-tight flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl">info</span>
+            <div className="rounded-card border-border shadow-sm p-8 space-y-4 bg-surface border">
+              <h3 className="text-text type-h2 items-center gap-2 flex">
+                <Info className="text-primary" size={20} aria-hidden="true" />
                 About the Organization
               </h3>
-              <p className="text-muted text-sm font-medium leading-relaxed overflow-wrap break-word">
+              <p className="break-word type-label leading-relaxed overflow-wrap">
                 {profile.description || "No company bio provided yet."}
               </p>
             </div>
 
             {profile.culture && (
-              <div className="bg-surface border border-border p-8 rounded-card shadow-sm space-y-4">
-                <h3 className="text-xl font-black text-text tracking-tight flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-xl">palette</span>
+              <div className="rounded-card border-border shadow-sm p-8 space-y-4 bg-surface border">
+                <h3 className="text-text type-h2 items-center gap-2 flex">
+                  <Palette className="text-primary" size={20} aria-hidden="true" />
                   Culture & Corporate Values
                 </h3>
-                <p className="text-muted text-sm font-medium leading-relaxed overflow-wrap break-word">
+                <p className="break-word type-label leading-relaxed overflow-wrap">
                   {profile.culture}
                 </p>
               </div>
             )}
 
             {profile.benefits && (
-              <div className="bg-surface border border-border p-8 rounded-card shadow-sm space-y-4">
-                <h3 className="text-xl font-black text-text tracking-tight flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-xl">workspace_premium</span>
+              <div className="rounded-card border-border shadow-sm p-8 space-y-4 bg-surface border">
+                <h3 className="text-text type-h2 items-center gap-2 flex">
+                  <Crown className="text-primary" size={20} aria-hidden="true" />
                   Perks & Compensation
                 </h3>
-                <p className="text-muted text-sm font-medium leading-relaxed overflow-wrap break-word">
+                <p className="break-word type-label leading-relaxed overflow-wrap">
                   {profile.benefits}
                 </p>
               </div>
@@ -195,20 +207,20 @@ export default function PublicCompanyProfilePage() {
           </div>
 
           {/* Right Column: Open Positions */}
-          <div className="space-y-6 lg:sticky lg:top-28">
-            <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl">work</span>
+          <div className="space-y-6 lg:top-28 lg:sticky">
+            <h3 className="type-h2 items-center gap-2 flex">
+              <Briefcase className="text-primary" size={20} aria-hidden="true" />
               Active Requisitions
             </h3>
             
             <div className="space-y-4">
               {jobs.map((job) => (
-                <div key={job.id} className="bg-surface border border-border p-6 rounded-2xl hover:border-primary/40 transition-all space-y-4 shadow-sm">
+                <div key={job.id} className="border-border rounded-2xl transition-all shadow-sm p-6 space-y-4 bg-surface border hover:border-primary/40">
                   <div className="space-y-1">
-                    <h4 className="font-black text-base text-text leading-tight">{job.title}</h4>
-                    <p className="text-xs text-muted font-bold tracking-tight">{job.location} &bull; {job.employment_type}</p>
+                    <h4 className="text-text leading-tight text-base">{job.title}</h4>
+                    <p className="tracking-tight type-caption text-muted">{job.location} &bull; {job.employment_type}</p>
                     {job.salary_min && (
-                      <p className="text-xs text-emerald-500 font-extrabold mt-1">
+                      <p className="weight-display mt-1 text-xs text-emerald-500">
                         Salary: {job.currency || "$"}{Number(job.salary_min).toLocaleString()}
                         {job.salary_max ? ` - ${Number(job.salary_max).toLocaleString()}` : "+"}
                       </p>
@@ -217,16 +229,16 @@ export default function PublicCompanyProfilePage() {
                   
                   <Link 
                     href={`/jobs/${job.id}`} 
-                    className="w-full py-3 bg-primary text-surface font-black text-xs rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1 min-h-[40px] shadow-sm cursor-pointer"
+                    className="w-full min-h-[40px] justify-center type-badge cursor-pointer gap-1.5 items-center transition-all py-3 shadow-sm bg-primary flex text-white rounded-xl hover:scale-[1.02] active:scale-[0.98]"
                   >
                     View Details
-                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    <ArrowRight size={14} aria-hidden="true" />
                   </Link>
                 </div>
               ))}
               
               {jobs.length === 0 && (
-                <div className="bg-surface border border-border p-8 rounded-card text-center text-muted text-xs font-semibold">
+                <div className="type-caption rounded-card border-border text-center text-muted p-8 bg-surface border">
                   No active listings open at this moment. Please subscribe to alerts to stay updated.
                 </div>
               )}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Icon from "@/shared/ui/Icon";
 
 interface QuickInfoBarProps {
   profile: any;
@@ -15,15 +16,15 @@ export default function QuickInfoBar({ profile }: QuickInfoBarProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="gap-4 grid-cols-2 grid mb-6 md:grid-cols-4">
       {stats.map((stat, i) => (
-        <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-            <span className="material-symbols-outlined text-xl">{stat.icon}</span>
+        <div key={i} className="group gap-4 rounded-3xl items-center transition-all bg-surface border-border shadow-sm flex p-5 border hover:shadow-md">
+          <div className="justify-center text-primary h-12 rounded-2xl w-12 items-center bg-primary/5 transition-all flex group-hover:bg-primary group-hover:text-white">
+            <Icon name={stat.icon} size={20} />
           </div>
           <div>
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight">{stat.label}</div>
-            <div className="text-sm font-black text-slate-900 mt-0.5">{stat.value}</div>
+            <div className="text-muted type-badge leading-tight">{stat.label}</div>
+            <div className="type-ui text-text mt-0.5">{stat.value}</div>
           </div>
         </div>
       ))}

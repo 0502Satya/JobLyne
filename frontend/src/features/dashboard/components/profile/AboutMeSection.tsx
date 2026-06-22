@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/shared/ui";
+import { FileText, Check, Pencil, List, Link, Star, ArrowRight, Lightbulb } from "lucide-react";
 
 interface AboutMeSectionProps {
   data: {
@@ -37,64 +39,66 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
     onChange("bio", suggestion);
   };
 
-  const isComplete = !!data.bio;
-
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="about">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="about">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">description</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <FileText size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">About / Professional Summary</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Introduce yourself to recruiters</p>
+            <h3 className="text-text type-card-title leading-tight">About / Professional Summary</h3>
+            <p className="text-xs text-muted mt-0.5">Introduce yourself to recruiters</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => {
               setIsEditing(!isEditing);
               if (isEditing) setIsPreview(false); // Reset preview toggle when done editing
             }}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 min-h-[40px]"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-2"
           >
-            <span className="material-symbols-outlined text-sm font-bold">
-              {isEditing ? "check" : "edit"}
-            </span>
+            {isEditing ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Pencil size={16} aria-hidden="true" />
+            )}
             {isEditing ? "Done" : "Edit"}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         {isEditing ? (
           /* EDIT MODE */
           <div className="space-y-6">
             <div className="flex justify-end">
               {/* Toggle Mode */}
-              <div className="flex bg-bg rounded-xl p-1 border border-border">
-                <button
+              <div className="border-border bg-bg p-1 flex rounded-xl border">
+                <Button
                   type="button"
+                  variant={!isPreview ? "secondary" : "ghost"}
+                  size="sm"
                   onClick={() => setIsPreview(false)}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer min-h-[36px] flex items-center justify-center ${
-                    !isPreview ? "bg-card text-text shadow-xs" : "text-muted hover:text-text"
-                  }`}
+                  className="min-h-[36px]"
                 >
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant={isPreview ? "secondary" : "ghost"}
+                  size="sm"
                   onClick={() => setIsPreview(true)}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer min-h-[36px] flex items-center justify-center ${
-                    isPreview ? "bg-card text-text shadow-xs" : "text-muted hover:text-text"
-                  }`}
+                  className="min-h-[36px]"
                 >
                   Preview
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -102,39 +106,51 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
               {!isPreview ? (
                 <div className="space-y-3">
                   {/* Formatting Toolbar */}
-                  <div className="flex flex-wrap items-center gap-1.5 bg-bg p-2 rounded-lg border border-border">
-                    <button
+                  <div className="gap-1.5 border-border items-center p-2 bg-bg flex-wrap rounded-lg flex border">
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleToolbarClick("bold")}
-                      className="w-8 h-8 rounded hover:bg-border/60 flex items-center justify-center text-text font-bold cursor-pointer"
+                      className="h-8 w-8 p-0 min-w-8 font-bold text-text hover:bg-border/60"
                       title="Bold"
+                      aria-label="Bold text"
                     >
                       B
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleToolbarClick("italic")}
-                      className="w-8 h-8 rounded hover:bg-border/60 flex items-center justify-center text-text italic cursor-pointer"
+                      className="h-8 w-8 p-0 min-w-8 italic text-text hover:bg-border/60"
                       title="Italic"
+                      aria-label="Italic text"
                     >
                       I
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleToolbarClick("list")}
-                      className="w-8 h-8 rounded hover:bg-border/60 flex items-center justify-center text-text cursor-pointer"
+                      className="h-8 w-8 p-0 min-w-8 text-text hover:bg-border/60"
                       title="Bullet List"
+                      aria-label="Bullet list"
                     >
-                      <span className="material-symbols-outlined text-base">format_list_bulleted</span>
-                    </button>
-                    <button
+                      <List size={16} aria-hidden="true" />
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleToolbarClick("link")}
-                      className="w-8 h-8 rounded hover:bg-border/60 flex items-center justify-center text-text cursor-pointer"
+                      className="h-8 w-8 p-0 min-w-8 text-text hover:bg-border/60"
                       title="Link"
+                      aria-label="Insert link"
                     >
-                      <span className="material-symbols-outlined text-base">link</span>
-                    </button>
+                      <Link size={16} aria-hidden="true" />
+                    </Button>
                   </div>
 
                   {/* Input Area */}
@@ -144,9 +160,9 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
                       onChange={(e) => onChange("bio", e.target.value.slice(0, characterLimit))}
                       rows={6}
                       placeholder="I am a passionate software engineer specialized in..."
-                      className="w-full bg-bg/50 border border-border rounded-xl py-3 px-4 text-sm font-medium text-text placeholder:text-muted/65 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all leading-relaxed resize-none"
+                      className="w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted resize-none leading-relaxed px-4"
                     />
-                    <span className={`absolute bottom-3 right-4 text-xs font-semibold ${
+                    <span className={`bottom-3 absolute right-4 type-caption ${
                       bioLength >= characterLimit ? "text-red-500" : "text-muted"
                     }`}>
                       {bioLength} / {characterLimit} Chars
@@ -154,42 +170,43 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
                   </div>
 
                   {/* AI Generator Suggestions Drawer */}
-                  <div className="bg-bg/40 border border-border rounded-xl p-4 space-y-3">
+                  <div className="border-border space-y-3 bg-bg/40 p-4 rounded-xl border">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-muted flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-sm text-primary font-bold">star</span>
+                      <span className="gap-1.5 items-center flex type-caption text-muted">
+                        <Star size={14} className="text-primary fill-primary" aria-hidden="true" />
                         AI summary suggestions
                       </span>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                       {aiSuggestions.map((s, idx) => (
-                        <button
+                        <Button
                           key={idx}
                           type="button"
+                          variant="outline"
                           onClick={() => handleApplySuggestion(s)}
-                          className="p-3.5 text-left bg-card hover:bg-bg border border-border rounded-lg transition-all text-xs font-medium text-text/80 leading-normal shadow-xs flex flex-col justify-between cursor-pointer min-h-[100px]"
+                          className="text-text/80 h-auto min-h-[100px] p-3.5 leading-normal transition-all rounded-lg flex-col items-stretch text-left hover:bg-bg bg-card text-xs font-normal shadow-xs border hover:border-primary/40"
                         >
-                          <span className="line-clamp-3 mb-2">{s}</span>
-                          <span className="text-xs font-semibold text-primary flex items-center gap-0.5">
-                            Apply <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                          <span className="mb-2 line-clamp-3">{s}</span>
+                          <span className="text-primary items-center gap-1 flex type-caption font-semibold mt-auto">
+                            Apply <ArrowRight size={12} aria-hidden="true" />
                           </span>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
                 </div>
               ) : (
                 /* Preview Area */
-                <div className="bg-bg/50 border border-border rounded-xl p-4 min-h-[150px] leading-relaxed text-text text-sm font-medium whitespace-pre-line">
-                  {data.bio || <span className="text-muted italic">No summary written yet. Click edit to write one.</span>}
+                <div className="text-text bg-bg/50 border-border min-h-[150px] leading-relaxed type-ui whitespace-pre-line p-4 rounded-xl border">
+                  {data.bio || <span className="italic text-muted">No summary written yet. Click edit to write one.</span>}
                 </div>
               )}
 
               {/* Tone Recommendation tips */}
-              <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/10 rounded-xl">
-                <span className="material-symbols-outlined text-primary font-bold mt-0.5">tips_and_updates</span>
-                <div className="text-xs text-text/85 leading-normal">
-                  <span className="font-bold block mb-0.5 text-primary">Tone recommendation</span>
+              <div className="items-start bg-primary/5 border-primary/10 gap-3 flex p-4 rounded-xl border">
+                <Lightbulb size={20} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="text-text/85 text-xs leading-normal">
+                  <span className="block text-primary mb-0.5">Tone recommendation</span>
                   Keep it active and outcome-oriented. Highlight your top 3 stack expertise and major production-scale projects.
                 </div>
               </div>
@@ -198,18 +215,20 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
         ) : (
           /* VIEW MODE */
           <div className="space-y-4">
-            <div className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium">
+            <div className="leading-relaxed type-ui text-text/90 whitespace-pre-line">
               {data.bio || (
-                <div className="text-center py-6 border border-dashed border-border rounded-xl bg-bg/50">
-                  <span className="material-symbols-outlined text-2xl text-muted/60 mb-1.5 block">description</span>
-                  <span className="text-xs font-semibold text-text block mb-0.5">No summary added yet</span>
-                  <button
+                <div className="border-dashed bg-bg/50 border-border text-center py-6 rounded-xl border">
+                  <FileText size={24} className="mb-1.5 text-muted/60 block mx-auto" aria-hidden="true" />
+                  <span className="text-text mb-0.5 block type-caption">No summary added yet</span>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsEditing(true)}
-                    className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[32px] px-3 mt-1.5"
+                    className="text-primary mt-1.5 hover:underline"
                   >
                     Add summary now
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -219,3 +238,4 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
     </section>
   );
 }
+

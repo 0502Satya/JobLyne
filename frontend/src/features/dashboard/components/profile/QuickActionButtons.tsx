@@ -1,27 +1,30 @@
 "use client";
 
 import React from "react";
+import { Button } from "@/shared/ui";
+import Icon from "@/shared/ui/Icon";
 
 const actions = [
-  { icon: "school", label: "Add Degree", color: "bg-indigo-50 text-indigo-600 ring-indigo-100" },
+  { icon: "school", label: "Add Degree", color: "bg-primary-light text-primary ring-primary/10" },
   { icon: "work_history", label: "Add Position", color: "bg-primary/5 text-primary ring-primary/10" },
   { icon: "person_add", label: "Add Role", color: "bg-violet-50 text-violet-600 ring-violet-100" },
-  { icon: "info", label: "Add Info", color: "bg-slate-50 text-slate-600 ring-slate-100" },
+  { icon: "info", label: "Add Info", color: "bg-bg text-muted ring-border" },
 ];
 
 export default function QuickActionButtons() {
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-8">
+    <div className="mb-8 gap-4 items-center flex-wrap flex">
       {actions.map((action, i) => (
-        <button 
+        <Button 
           key={i}
-          className={`group flex items-center gap-3 px-6 py-4 rounded-[24px] font-bold text-sm transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-md ring-1 ${action.color}`}
+          variant="outline"
+          className={`px-6 py-4 ring-1 items-center transition-all shadow-sm gap-3 rounded-[24px] hover:scale-105 active:scale-95 ${action.color} h-auto min-h-0 border-transparent`}
         >
-          <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center shadow-sm group-hover:bg-white transition-colors">
-            <span className="material-symbols-outlined text-xl">{action.icon}</span>
+          <div className="justify-center h-10 w-10 bg-white/80 items-center shadow-sm transition-colors flex rounded-xl">
+            <Icon name={action.icon} size={20} />
           </div>
           {action.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

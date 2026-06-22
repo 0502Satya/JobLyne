@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui";
+import { PageSection, Container, Button } from "@/shared/ui";
 
 /**
  * This section is the final step on the page.
@@ -6,30 +6,30 @@ import { Button } from "@/shared/ui";
  */
 export default function CTASection() {
     return (
-        <section className="py-24 relative overflow-hidden bg-bg transition-colors">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <PageSection spacing="lg" className="relative overflow-hidden bg-bg transition-colors">
+            <Container size="md" className="z-10 relative text-center">
                 {/* Big question to catch user's interest */}
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-text mb-6 leading-tight tracking-tight">
+                <h2 className="text-text mb-6 type-h1">
                     Ready to transform your career intelligence?
                 </h2>
-                <p className="text-lg sm:text-xl text-muted mb-10 leading-relaxed font-medium">
+                <p className="mb-10 leading-relaxed text-lg text-muted sm:text-xl">
                     Join us and find the best opportunities for your professional growth.
                 </p>
 
                 {/* Main action buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-                    <button className="px-6 py-4 sm:px-10 sm:py-5 bg-primary text-surface font-black rounded-2xl hover:brightness-110 shadow-xl shadow-primary/20 transition-all text-base sm:text-lg min-h-[56px] sm:min-h-[64px] active:scale-[0.98]">
+                <div className="justify-center gap-4 flex items-stretch flex-col sm:flex-row sm:items-center">
+                    <Button variant="primary" size="lg" className="rounded-2xl sm:min-h-[64px] sm:text-lg sm:py-5 sm:px-10 shadow-lg shadow-primary/25">
                         Create Free Account
-                    </button>
-                    <button className="px-6 py-4 sm:px-10 sm:py-5 bg-surface text-text font-black rounded-2xl border border-border hover:bg-bg transition-all text-base sm:text-lg min-h-[56px] sm:min-h-[64px] active:scale-[0.98]">
-                        Contact Sales
-                    </button>
+                    </Button>
+                    <Button variant="outline" size="lg" className="rounded-2xl sm:min-h-[64px] sm:text-lg sm:py-5 sm:px-10">
+                        Talk to Sales
+                    </Button>
                 </div>
-            </div>
+            </Container>
 
             {/* Decorative blurred circles for style */}
-            <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] max-w-[256px] bg-accent/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-[60vw] h-[60vw] max-w-[384px] bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-        </section>
+            <div className="blur-3xl -translate-x-1/2 w-[40vw] bg-primary/10 absolute max-w-[256px] h-[40vw] left-0 pointer-events-none rounded-full top-1/2 -translate-y-1/2"></div>
+            <div className="blur-3xl max-w-[384px] translate-x-1/2 absolute translate-y-1/2 pointer-events-none w-[60vw] bg-primary/10 rounded-full bottom-0 right-0 h-[60vw]"></div>
+        </PageSection>
     );
 }

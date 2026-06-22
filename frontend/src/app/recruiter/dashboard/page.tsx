@@ -3,6 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { logoutAction, getRecruiterProfileAction } from "@/features/auth/actions";
+import {
+  Network,
+  Search,
+  CreditCard,
+  Settings,
+  Zap,
+  List,
+  TrendingUp
+} from "lucide-react";
+import { Icon } from "@/shared/ui";
 
 /**
  * Specialized Dashboard for Recruiters.
@@ -22,51 +32,51 @@ export default function RecruiterDashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-text transition-colors">
+    <div className="bg-bg text-text min-h-screen transition-colors">
       
       {/* Dashboard Header */}
-      <header className="flex items-center justify-between border-b border-border bg-surface px-6 md:px-12 py-4 sticky top-0 z-50">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 text-primary font-bold">
-            <span className="material-symbols-outlined text-3xl">hub</span>
-            <span className="text-xl">JobLyne</span>
+      <header className="border-b border-border px-6 py-4 items-center sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+        <div className="flex gap-6 items-center">
+          <Link href="/recruiter/dashboard" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+            <Network size={28} aria-hidden="true" />
+            <span className="text-2xl tracking-tight font-bold">JobLyne</span>
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Recruiter Portal</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <span className="px-2 text-primary py-1 type-badge rounded bg-primary/10">Recruiter Portal</span>
         </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center">
-            <span className="material-symbols-outlined">search</span>
+        <div className="gap-4 flex items-center">
+          <button className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary cursor-pointer">
+            <Search size={20} aria-hidden="true" />
           </button>
           <Link 
             href="/recruiter/billing" 
-            className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary"
             title="Billing & Wallet"
           >
-            <span className="material-symbols-outlined">credit_card</span>
+            <CreditCard size={20} aria-hidden="true" />
           </Link>
           <Link 
             href="/recruiter/settings" 
-            className="p-2 text-muted hover:text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary"
             title="Settings"
           >
-            <span className="material-symbols-outlined">settings</span>
+            <Settings size={20} aria-hidden="true" />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex gap-3 items-center">
              {profile?.profile_photo_url ? (
                <img 
                  src={profile.profile_photo_url} 
-                 alt="Avatar" 
-                 className="size-10 rounded-full object-cover border border-border"
+                 alt={`${profile?.first_name || "Recruiter"}'s avatar`} 
+                 className="object-cover border-border rounded-full size-10 border"
                />
              ) : (
-               <div className="size-10 bg-primary rounded-full flex items-center justify-center text-surface font-bold">
+               <div className="justify-center items-center rounded-full bg-primary flex size-10 text-white font-semibold">
                  {profile?.first_name ? profile.first_name.substring(0, 2).toUpperCase() : "RC"}
                </div>
              )}
              <button 
                onClick={() => logoutAction()} 
-               className="text-xs font-bold text-muted hover:text-red-500 transition-colors uppercase tracking-wider min-h-[44px] px-2 flex items-center"
+               className="px-2 uppercase min-h-[44px] items-center transition-colors tracking-wider flex type-caption text-muted hover:text-red-500 cursor-pointer"
              >
                Logout
              </button>
@@ -74,11 +84,11 @@ export default function RecruiterDashboardPage() {
         </div>
       </header>
 
-      <main className="p-6 md:p-12 max-w-7xl mx-auto space-y-8">
+      <main className="mx-auto space-y-8 max-w-7xl p-6 md:p-12">
         
         {/* Welcome Section */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-black tracking-tight text-text">
+          <h1 className="text-text type-h1">
             Welcome back, {profile?.first_name || "Recruiter"}!
           </h1>
           <p className="text-muted">
@@ -86,51 +96,51 @@ export default function RecruiterDashboardPage() {
           </p>
         </div>
 
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <section className="gap-6 grid grid-cols-1 md:grid-cols-4">
           {[
             { label: "Total Candidates", value: "1,284", icon: "person", color: "text-blue-500" },
             { label: "Active Pipelines", value: "12", icon: "reorder", color: "text-primary" },
             { label: "Interviewed", value: "45", icon: "event", color: "text-green-500" },
             { label: "Placements", value: "8", icon: "verified", color: "text-orange-500" },
           ].map((stat, i) => (
-            <div key={i} className="bg-surface border border-border p-6 rounded-2xl shadow-sm">
-              <span className={`material-symbols-outlined mb-2 ${stat.color}`}>{stat.icon}</span>
-              <h4 className="text-2xl font-black text-text">{stat.value}</h4>
-              <p className="text-xs font-bold text-muted uppercase tracking-widest">{stat.label}</p>
+            <div key={i} className="border-border rounded-2xl shadow-sm p-6 bg-surface border">
+              <Icon name={stat.icon} className={`mb-2 ${stat.color}`} size={24} aria-hidden="true" />
+              <h4 className="text-text type-h2">{stat.value}</h4>
+              <p className="uppercase tracking-widest type-caption text-muted">{stat.label}</p>
             </div>
           ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-surface border border-border rounded-2xl p-8 space-y-6">
-            <h3 className="text-xl font-bold text-text">Quick Sourcing</h3>
+        <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="border-border rounded-2xl space-y-6 p-8 bg-surface border">
+            <h3 className="type-h3 text-text">Quick Sourcing</h3>
             <div className="space-y-4">
-              <button className="w-full flex items-center gap-4 p-4 rounded-xl border border-border hover:border-primary transition-all text-left group">
-                <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">bolt</span>
+              <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
+                <Zap className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
                 <div>
-                  <h4 className="font-bold text-text">AI Talent Match</h4>
+                  <h4 className="text-text">AI Talent Match</h4>
                   <p className="text-xs text-muted">Find the 1% for your active jobs instantly.</p>
                 </div>
               </button>
-              <button className="w-full flex items-center gap-4 p-4 rounded-xl border border-border hover:border-primary transition-all text-left group">
-                <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">list</span>
+              <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
+                <List className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
                 <div>
-                  <h4 className="font-bold text-text">Browse Pre-vetted Talent</h4>
+                  <h4 className="text-text">Browse Pre-vetted Talent</h4>
                   <p className="text-xs text-muted">Explore specialists ready to be interviewed.</p>
                 </div>
               </button>
             </div>
           </div>
           
-          <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-8 text-text space-y-4 relative overflow-hidden">
-            <h3 className="text-xl font-bold text-primary">Recruiter Intelligence</h3>
-            <p className="text-muted text-sm leading-relaxed">
+          <div className="text-text rounded-2xl relative border-primary/20 border-2 overflow-hidden bg-primary/5 p-8 space-y-4">
+            <h3 className="type-h3 text-primary">Recruiter Intelligence</h3>
+            <p className="leading-relaxed text-sm text-muted">
               Your placement rate is 12% higher than the platform average this month! Keep it up to earn the "Top Tier Sourced" badge.
             </p>
-            <button className="bg-btn-primary text-surface font-bold px-6 py-3 rounded-xl hover:bg-btn-primary-hover transition-all">
+            <button className="px-6 transition-all py-3 text-white rounded-xl bg-btn-primary hover:bg-btn-primary-hover cursor-pointer">
               View Analytics
             </button>
-            <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-primary/10">insights</span>
+            <TrendingUp className="-right-4 absolute text-primary/10 -bottom-4" size={96} aria-hidden="true" />
           </div>
         </section>
 

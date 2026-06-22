@@ -7,6 +7,32 @@ import { getCompanyProfileAction, logoutAction } from "@/features/auth/actions";
 import { getJobsAction } from "@/features/auth/jobActions";
 import { createJobAction, updateJobAction } from "@/features/company/actions";
 import { getRecruiterDashboardAction, postRecruiterCandidateAction } from "@/features/recruiter/actions";
+import { toast } from "react-hot-toast";
+import { EmptyState } from "@/shared/ui";
+import { 
+  Network, 
+  Columns3, 
+  MessageSquare, 
+  Users, 
+  CreditCard, 
+  Settings, 
+  LayoutDashboard, 
+  Briefcase, 
+  Search, 
+  PlusCircle, 
+  Calendar, 
+  TrendingUp, 
+  ArrowRight, 
+  Folder, 
+  MapPin, 
+  Banknote, 
+  Crown, 
+  BriefcaseBusiness, 
+  CheckCircle, 
+  Mail, 
+  SearchX, 
+  X 
+} from "lucide-react";
 
 interface JobPost {
   id: string;
@@ -193,7 +219,7 @@ export default function CompanyDashboardPage() {
     setLoading(true);
     const res = await createJobAction(payload);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
       setLoading(false);
     } else {
       setShowJobModal(false);
@@ -217,7 +243,7 @@ export default function CompanyDashboardPage() {
 
     const res = await postRecruiterCandidateAction(candidateId, 'invite');
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
       loadCompanyDashboardData();
     } else {
       loadCompanyDashboardData();
@@ -227,14 +253,14 @@ export default function CompanyDashboardPage() {
   // Start chat with candidate
   const handleStartChat = async (recipientId?: string) => {
     if (!recipientId) {
-      alert("This candidate does not have a user profile established yet.");
+      toast.error("This candidate does not have a user profile established yet.");
       return;
     }
 
     const { startThreadAction } = await import("@/features/auth/actions");
     const res = await startThreadAction(recipientId);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else if (res.thread_id) {
       router.push(`/company/messages?thread=${res.thread_id}`);
     }
@@ -266,7 +292,7 @@ export default function CompanyDashboardPage() {
 
     const res = await updateJobAction(id, { status: nextDbStatus });
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
       loadCompanyDashboardData();
     } else {
       loadCompanyDashboardData();
@@ -275,67 +301,67 @@ export default function CompanyDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text gap-4">
-        <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-        <p className="text-muted font-bold text-sm tracking-widest uppercase">Loading Workspace...</p>
+      <div className="text-text justify-center gap-4 items-center bg-bg flex min-h-screen flex-col">
+        <div className="border-t-primary size-12 border-primary/20 rounded-full border-4 animate-spin"></div>
+        <p className="type-label uppercase tracking-widest">Loading Workspace...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg text-text transition-colors flex flex-col font-sans">
+    <div className="text-text bg-bg transition-colors flex min-h-screen flex-col">
       
       {/* Dashboard Sticky Header */}
-      <header className="flex items-center justify-between border-b border-border bg-surface px-6 md:px-12 py-4 sticky top-0 z-50 transition-all">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 text-primary font-black hover:opacity-90 transition-opacity">
-            <span className="material-symbols-outlined text-3xl">hub</span>
+      <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+        <div className="flex gap-6 items-center">
+          <Link href="/" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+            <Network size={30} aria-hidden="true" />
             <span className="text-2xl tracking-tight">JobLyne</span>
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hidden md:inline-block">Company Hub</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <span className="text-primary px-3 hidden py-1.5 rounded-full type-badge bg-primary/10 md:inline-block">Company Hub</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/company/applicants" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">view_week</span>
+        <div className="gap-4 flex items-center">
+          <Link href="/company/applicants" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <Columns3 size={18} aria-hidden="true" />
             Applicants Pipeline
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <Link href="/company/messages" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">chat</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <Link href="/company/messages" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <MessageSquare size={18} aria-hidden="true" />
             Messages
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <Link href="/company/team" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">group</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <Link href="/company/team" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <Users size={18} aria-hidden="true" />
             Team
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          <Link href="/company/billing" className="text-xs font-black text-muted hover:text-primary transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-primary/5 active:scale-[0.98] min-h-[44px] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">credit_card</span>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
+          <Link href="/company/billing" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
+            <CreditCard size={18} aria-hidden="true" />
             Billing
           </Link>
-          <div className="h-6 w-px bg-border hidden md:block"></div>
+          <div className="h-6 hidden w-px bg-border md:block"></div>
           <Link 
             href="/company/settings/organization" 
-            className="p-2.5 text-muted hover:text-primary transition-colors hover:bg-bg rounded-xl flex items-center justify-center size-11"
+            className="justify-center items-center size-11 text-muted transition-colors p-2.5 flex rounded-xl hover:bg-bg hover:text-primary"
             title="Organization Settings"
           >
-            <span className="material-symbols-outlined text-[24px]">settings</span>
+            <Settings size={24} aria-hidden="true" />
           </Link>
           <div className="h-10 w-px bg-border"></div>
-          <div className="flex items-center gap-3">
-            <div className="size-11 rounded-2xl bg-gradient-to-tr from-primary to-[#4c33cf] text-white flex items-center justify-center font-black shadow-lg shadow-primary/20 cursor-pointer">
+          <div className="flex gap-3 items-center">
+            <div className="justify-center cursor-pointer rounded-2xl bg-gradient-to-tr items-center size-11 from-primary text-white shadow-primary/20 shadow-lg to-[var(--color-accent-gradient)] flex">
               {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "CO"}
             </div>
-            <div className="hidden lg:block text-left">
-              <h4 className="text-sm font-black tracking-tight">{profile?.name || "Company Portal"}</h4>
-              <p className="text-[10px] text-muted font-bold uppercase tracking-widest">{profile?.industry || "Unverified"}</p>
+            <div className="hidden text-left lg:block">
+              <h4 className="type-ui tracking-tight">{profile?.name || "Company Portal"}</h4>
+              <p className="text-xs uppercase tracking-widest text-muted">{profile?.industry || "Unverified"}</p>
             </div>
           </div>
           <button 
             onClick={() => logoutAction()} 
-            className="text-xs font-black text-muted hover:text-red-500 transition-colors uppercase tracking-widest px-4 py-3 rounded-xl hover:bg-red-500/5 active:scale-[0.98] min-h-[44px]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
           >
             Logout
           </button>
@@ -343,35 +369,35 @@ export default function CompanyDashboardPage() {
       </header>
 
       {/* Navigation Sub-Tabs */}
-      <div className="bg-surface border-b border-border px-6 md:px-12 py-1">
-        <div className="max-w-7xl mx-auto flex gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+      <div className="border-b py-1 px-6 border-border bg-surface md:px-12">
+        <div className="no-scrollbar scroll-smooth mx-auto max-w-7xl overflow-x-auto gap-2 flex">
           {(["overview", "jobs", "sourcing"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-4 px-5 font-black text-sm tracking-tight border-b-2 transition-all flex items-center gap-2 uppercase whitespace-nowrap min-h-[48px] ${
+              className={`min-h-[48px] tracking-tight py-4 uppercase border-b-2 items-center transition-all gap-2 whitespace-nowrap type-ui flex px-5 ${
                 activeTab === tab 
-                  ? "border-primary text-primary" 
+                  ? "text-primary border-primary" 
                   : "border-transparent text-muted hover:text-text hover:border-border"
               }`}
             >
-              <span className="material-symbols-outlined text-lg">
-                {tab === "overview" ? "dashboard" : tab === "jobs" ? "work" : "group_search"}
-              </span>
+              {tab === "overview" && <LayoutDashboard size={18} aria-hidden="true" />}
+              {tab === "jobs" && <Briefcase size={18} aria-hidden="true" />}
+              {tab === "sourcing" && <Search size={18} aria-hidden="true" />}
               {tab === "overview" ? "Overview" : tab === "jobs" ? "Jobs Hub" : "AI Sourcing"}
             </button>
           ))}
         </div>
       </div>
 
-      <main className="p-6 md:p-12 max-w-7xl mx-auto w-full flex-1 space-y-8 box-sizing">
+      <main className="w-full space-y-8 mx-auto max-w-7xl flex-1 box-sizing p-6 md:p-12">
         
         {/* Profile Completion Warning Notification */}
         {isProfileIncomplete && (
-          <div className="bg-gradient-to-r from-warning/10 to-warning/5 border border-warning/30 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-top-4 duration-500 max-w-full">
-            <div className="flex items-center gap-5 flex-wrap md:flex-nowrap">
+          <div className="bg-gradient-to-r max-w-full slide-in-from-top-4 rounded-3xl items-center flex-col animate-in gap-6 p-6 duration-500 from-warning/10 flex justify-between border-warning/30 to-warning/5 border md:flex-row">
+            <div className="flex gap-5 flex-wrap items-center md:flex-nowrap">
               {/* Circular Gauge */}
-              <div className="relative size-16 flex items-center justify-center shrink-0">
+              <div className="justify-center shrink-0 relative items-center flex size-16">
                 <svg className="size-full -rotate-90">
                   <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(245, 158, 11, 0.15)" strokeWidth="6" />
                   <circle 
@@ -387,18 +413,18 @@ export default function CompanyDashboardPage() {
                     className="transition-all duration-1000 ease-out"
                   />
                 </svg>
-                <span className="absolute text-xs font-black text-warning">{completeness}%</span>
+                <span className="text-warning type-badge absolute">{completeness}%</span>
               </div>
-              <div className="space-y-1 max-w-[100%] overflow-wrap break-word">
-                <h4 className="font-black text-text text-base">Complete your profile credentials</h4>
-                <p className="text-sm text-muted font-medium max-w-xl">
+              <div className="break-word max-w-[100%] space-y-1 overflow-wrap">
+                <h4 className="text-text text-base">Complete your profile credentials</h4>
+                <p className="max-w-xl type-label">
                   Profiles at 100% completion receive a verification badge, increasing developer application rates by up to 250%. Add missing culture details and HQ coordinates.
                 </p>
               </div>
             </div>
             <Link 
               href="/company/settings/organization" 
-              className="bg-warning text-surface px-6 py-3.5 rounded-2xl font-black text-sm shadow-xl shadow-warning/20 hover:scale-[1.03] transition-all whitespace-nowrap active:scale-[0.98] min-h-[48px] flex items-center justify-center w-full md:w-auto"
+              className="w-full justify-center min-h-[48px] px-6 rounded-2xl py-3.5 whitespace-nowrap transition-all shadow-warning/20 items-center type-ui flex shadow-xl bg-warning text-on-warning hover:scale-[1.03] active:scale-[0.98] md:w-auto"
             >
               Complete Workspace
             </Link>
@@ -407,99 +433,102 @@ export default function CompanyDashboardPage() {
 
         {/* Tab Content Rendering */}
         {activeTab === "overview" && (
-          <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="fade-in animate-in space-y-8 duration-300">
             {/* Welcome Banner */}
-            <section className="bg-gradient-to-r from-primary to-[#4c33cf] rounded-card p-8 md:p-12 text-surface relative overflow-hidden shadow-2xl shadow-primary/25 max-w-full">
-              <div className="relative z-10 space-y-5">
-                <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full inline-flex items-center gap-2 border border-white/15">
-                  <span className="size-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span className="text-[11px] font-black tracking-widest uppercase">System Operational</span>
+            <section className="bg-gradient-to-r rounded-card max-w-full relative overflow-hidden from-primary shadow-primary/25 shadow-2xl to-[var(--color-accent-gradient)] p-8 text-white md:p-12">
+              <div className="space-y-5 relative z-10">
+                <div className="bg-white/10 inline-flex items-center backdrop-blur-md gap-2 py-1.5 rounded-full border-white/15 px-4 border">
+                  <span className="animate-ping rounded-full size-2 bg-emerald-400"></span>
+                  <span className="text-xs tracking-widest uppercase">System Operational</span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                <h1 className="type-h1">
                   {getGreeting()}{profile?.name ? `, ${profile.name}` : ""}!
                 </h1>
-                <p className="text-surface/90 text-base md:text-lg max-w-2xl font-medium leading-relaxed">
+                <p className="max-w-2xl leading-relaxed text-white/90 type-body md:text-lg">
                   Your workspace is synchronized. You currently have {jobs.filter(j => j.status === "Active").length} active engineer pipelines with new applications ready for review.
                 </p>
-                <div className="pt-4 flex flex-wrap gap-4">
+                <div className="gap-4 flex flex-wrap pt-4">
                   <button 
                     onClick={() => { setActiveTab("jobs"); setShowJobModal(true); }}
-                    className="bg-surface text-primary font-black px-6 py-4 rounded-2xl hover:scale-[1.03] hover:shadow-2xl transition-all flex items-center gap-2 active:scale-[0.98] min-h-[48px]"
+                    className="text-primary min-h-[48px] px-6 py-4 rounded-2xl items-center transition-all gap-2 flex bg-surface hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98]"
                   >
-                    <span className="material-symbols-outlined font-black">add_circle</span>
+                    <PlusCircle size={18} aria-hidden="true" />
                     Post Live Position
                   </button>
                   <button 
                     onClick={() => setActiveTab("sourcing")}
-                    className="bg-white/10 backdrop-blur-md text-surface border border-white/20 font-black px-6 py-4 rounded-2xl hover:bg-white/20 hover:scale-[1.03] transition-all active:scale-[0.98] min-h-[48px]"
+                    className="bg-white/10 min-h-[48px] px-6 py-4 rounded-2xl backdrop-blur-md transition-all border-white/20 text-white border hover:scale-[1.03] hover:bg-white/20 active:scale-[0.98]"
                   >
                     Launch Sourcing
                   </button>
                 </div>
               </div>
               {/* Decorative dynamic circles */}
-              <div className="absolute top-0 right-0 size-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl"></div>
-              <div className="absolute -bottom-20 -left-20 size-80 bg-black/10 rounded-full blur-3xl"></div>
+              <div className="blur-3xl bg-white/5 translate-x-1/3 size-96 absolute rounded-full -translate-y-1/2 right-0 top-0"></div>
+              <div className="blur-3xl size-80 absolute bg-black/10 rounded-full -bottom-20 -left-20"></div>
             </section>
 
             {/* Quick Summary Cards */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section className="gap-6 grid grid-cols-1 md:grid-cols-3">
               {[
-                { title: "Active Positions", count: jobs.filter(j => j.status === "Active").length, icon: "work", color: "text-[#3b82f6]", bg: "bg-[#3b82f6]/10", border: "border-[#3b82f6]/20", trend: "Interactive" },
-                { title: "Developer Pool", count: candidates.length, icon: "groups", color: "text-[#8b5cf6]", bg: "bg-[#8b5cf6]/10", border: "border-[#8b5cf6]/20", trend: "Live database" },
-                { title: "Interviews Booked", count: candidates.filter(c => c.interviewStatus === "Invited").length, icon: "calendar_today", color: "text-[#f59e0b]", bg: "bg-[#f59e0b]/10", border: "border-[#f59e0b]/20", trend: "Active pipeline" },
-              ].map((stat, i) => (
-                <div key={i} className={`bg-surface border ${stat.border} p-8 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 relative group`}>
-                  <div className="flex justify-between items-start mb-6">
-                    <div className={`size-14 rounded-2xl ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-110 duration-300`}>
-                      <span className={`material-symbols-outlined text-[28px] ${stat.color}`}>{stat.icon}</span>
+                { title: "Active Positions", count: jobs.filter(j => j.status === "Active").length, icon: Briefcase, color: "text-info", bg: "bg-info/10", border: "border-info/20", trend: "Interactive" },
+                { title: "Developer Pool", count: candidates.length, icon: Users, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20", trend: "Live database" },
+                { title: "Interviews Booked", count: candidates.filter(c => c.interviewStatus === "Invited").length, icon: Calendar, color: "text-warning", bg: "bg-warning/10", border: "border-warning/20", trend: "Active pipeline" },
+              ].map((stat, i) => {
+                const StatIcon = stat.icon;
+                return (
+                  <div key={i} className={`bg-surface border ${stat.border} group rounded-3xl relative transition-all shadow-sm duration-300 p-8 hover:shadow-lg`}>
+                    <div className="flex mb-6 items-start justify-between">
+                      <div className={`rounded-2xl size-14 ${stat.bg} justify-center items-center transition-transform duration-300 flex group-hover:scale-110`}>
+                        <StatIcon className={stat.color} size={24} aria-hidden="true" />
+                      </div>
+                      <span className="text-text tracking-tight type-h1">{stat.count}</span>
                     </div>
-                    <span className="text-4xl font-black tracking-tight text-text">{stat.count}</span>
+                    <h4 className="type-label uppercase tracking-wider mb-1">{stat.title}</h4>
+                    <div className="type-badge gap-1.5 items-center text-emerald-500 flex">
+                      <TrendingUp size={14} aria-hidden="true" />
+                      {stat.trend}
+                    </div>
                   </div>
-                  <h4 className="font-bold text-muted text-sm uppercase tracking-wider mb-1">{stat.title}</h4>
-                  <div className="flex items-center gap-1.5 text-xs font-black text-emerald-500">
-                    <span className="material-symbols-outlined text-sm">trending_up</span>
-                    {stat.trend}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </section>
 
             {/* Layout Split: Live jobs & Sourcing widgets */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
               
               {/* Left 2 Columns: Live postings */}
               <div className="lg:col-span-2 space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-black tracking-tight">Active Postings Overview</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="type-h2">Active Postings Overview</h3>
                   <button 
                     onClick={() => setActiveTab("jobs")} 
-                    className="text-primary hover:underline text-sm font-bold flex items-center gap-1"
+                    className="text-primary gap-1 items-center type-ui flex hover:underline"
                   >
-                    View All Positions <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    View All Positions <ArrowRight size={14} aria-hidden="true" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   {jobs.slice(0, 3).map((job) => (
-                    <div key={job.id} className="bg-surface border border-border p-6 rounded-2xl hover:border-primary/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div key={job.id} className="border-border gap-4 rounded-2xl items-start transition-all flex-col p-6 flex justify-between bg-surface border hover:border-primary/40 md:flex-row md:items-center">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          <h4 className="font-black text-base text-text">{job.title}</h4>
-                          <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                        <div className="flex gap-2.5 flex-wrap items-center">
+                          <h4 className="text-text text-base">{job.title}</h4>
+                          <span className={`py-1 px-2.5 rounded-full type-badge ${
                             job.status === "Active" ? "bg-emerald-500/10 text-emerald-500" : "bg-warning/10 text-warning"
                           }`}>{job.status}</span>
                         </div>
-                        <p className="text-xs text-muted font-bold tracking-tight">{job.department} &bull; {job.location} &bull; {job.salary}</p>
+                        <p className="tracking-tight type-caption text-muted">{job.department} &bull; {job.location} &bull; {job.salary}</p>
                       </div>
-                      <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                      <div className="w-full gap-4 items-center flex justify-between md:justify-end md:w-auto">
                         <div className="text-right">
-                          <span className="text-base font-black text-text block">{job.applicants}</span>
-                          <span className="text-[10px] text-muted font-bold uppercase tracking-widest">Applicants</span>
+                          <span className="text-text block text-base">{job.applicants}</span>
+                          <span className="text-xs uppercase tracking-widest text-muted">Applicants</span>
                         </div>
                         <button 
                           onClick={() => toggleJobStatus(job.id)}
-                          className="bg-bg text-text hover:bg-primary hover:text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-all min-h-[40px]"
+                          className="text-text min-h-[40px] type-caption bg-bg transition-all py-2.5 px-4 rounded-xl hover:bg-primary hover:text-white"
                         >
                           Toggle Status
                         </button>
@@ -507,46 +536,51 @@ export default function CompanyDashboardPage() {
                     </div>
                   ))}
                   {jobs.length === 0 && (
-                    <div className="bg-surface border border-border p-8 rounded-2xl text-center text-muted font-semibold text-sm">
-                      No active listings found. Create a requisition to get started.
-                    </div>
+                    <EmptyState
+                      title="No active listings found"
+                      description="Create a requisition to get started with recruitment."
+                      icon="work_off"
+                      actionLabel="Create Requisition"
+                      onAction={() => { setActiveTab("jobs"); setShowJobModal(true); }}
+                      className="w-full max-w-lg mt-4"
+                    />
                   )}
                 </div>
               </div>
 
               {/* Right Column: Mini candidate cards */}
               <div className="space-y-6">
-                <h3 className="text-xl font-black tracking-tight">Hot Talent Picks</h3>
-                <div className="space-y-4 bg-surface border border-border p-6 rounded-3xl">
+                <h3 className="type-h2">Hot Talent Picks</h3>
+                <div className="border-border rounded-3xl p-6 space-y-4 bg-surface border">
                   {candidates.slice(0, 2).map((c) => (
-                    <div key={c.id} className="border-b border-border last:border-0 pb-4 last:pb-0 space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`size-10 rounded-xl ${c.avatarColor} text-white flex items-center justify-center font-black shadow-md`}>
+                    <div key={c.id} className="space-y-3 border-b pb-4 border-border last:border-0 last:pb-0">
+                      <div className="flex gap-3 items-center">
+                        <div className={`size-10 rounded-xl ${c.avatarColor} justify-center shadow-md items-center text-white flex`}>
                           {c.name.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <h4 className="text-sm font-black text-text">{c.name}</h4>
-                          <p className="text-xs text-muted font-semibold">{c.role}</p>
+                          <h4 className="text-text type-ui">{c.name}</h4>
+                          <p className="type-caption text-muted">{c.role}</p>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="gap-1 flex flex-wrap">
                         {c.skills.slice(0, 3).map((s, idx) => (
-                          <span key={idx} className="bg-bg text-muted font-black text-[9px] uppercase px-2 py-0.5 rounded-full">{s}</span>
+                          <span key={idx} className="px-2 uppercase text-xs bg-bg rounded-full py-0.5 text-muted">{s}</span>
                         ))}
                       </div>
-                      <div className="flex justify-between items-center pt-2">
-                        <span className="text-xs font-black text-primary bg-primary/10 px-2 py-1 rounded-full">{c.matchScore}% Match</span>
+                      <div className="pt-2 flex items-center justify-between">
+                        <span className="px-2 text-primary py-1 rounded-full type-badge bg-primary/10">{c.matchScore}% Match</span>
                         <button 
                           onClick={() => setActiveTab("sourcing")}
-                          className="text-xs font-bold text-muted hover:text-primary transition-colors flex items-center gap-0.5"
+                          className="items-center gap-1 transition-colors flex type-caption text-muted hover:text-primary"
                         >
-                          Source <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                          Source <ArrowRight size={14} aria-hidden="true" />
                         </button>
                       </div>
                     </div>
                   ))}
                   {candidates.length === 0 && (
-                    <div className="text-center text-muted text-xs font-semibold py-4">
+                    <div className="py-4 text-center type-caption text-muted">
                       Loading sourcing picks...
                     </div>
                   )}
@@ -556,21 +590,21 @@ export default function CompanyDashboardPage() {
             </div>
 
             {/* Support section */}
-            <section className="bg-surface rounded-card p-8 border border-dashed border-border flex flex-col md:flex-row justify-between items-center gap-8 max-w-full">
-              <div className="space-y-2 text-center md:text-left overflow-wrap break-word max-w-full">
-                <h3 className="text-2xl font-black text-text tracking-tight">Access talent intelligence specialists</h3>
-                <p className="text-muted font-medium text-sm max-w-lg">Need dedicated guidance? Our staffing specialists can assist you in composing the ideal JD and vetting workflows.</p>
+            <section className="rounded-card border-dashed max-w-full border-border gap-8 items-center flex-col flex justify-between p-8 bg-surface border md:flex-row">
+              <div className="break-word max-w-full space-y-2 text-center overflow-wrap md:text-left">
+                <h3 className="text-text type-h2">Access talent intelligence specialists</h3>
+                <p className="max-w-lg type-label">Need dedicated guidance? Our staffing specialists can assist you in composing the ideal JD and vetting workflows.</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <div className="w-full flex gap-3 flex-col sm:flex-row md:w-auto">
                 <button 
-                  onClick={() => alert("Staffing guidebook downloaded!")}
-                  className="bg-bg border border-border px-6 py-4 rounded-2xl font-black text-sm text-text hover:bg-surface hover:shadow-lg transition-all min-h-[48px] w-full sm:w-auto"
+                  onClick={() => toast.success("Staffing guidebook downloaded!")}
+                  className="w-full text-text min-h-[48px] border-border px-6 py-4 rounded-2xl bg-bg transition-all type-ui border hover:shadow-lg hover:bg-surface sm:w-auto"
                 >
                   Documentation Guide
                 </button>
                 <button 
-                  onClick={() => alert("Talent strategist has been notified! We will contact you within 2 business hours.")}
-                  className="bg-primary text-surface px-6 py-4 rounded-2xl font-black text-sm hover:scale-[1.03] transition-all min-h-[48px] w-full sm:w-auto"
+                  onClick={() => toast.success("Talent strategist has been notified! We will contact you within 2 business hours.")}
+                  className="w-full min-h-[48px] px-6 py-4 rounded-2xl transition-all type-ui bg-primary text-white hover:scale-[1.03] sm:w-auto"
                 >
                   Contact Support
                 </button>
@@ -581,49 +615,49 @@ export default function CompanyDashboardPage() {
 
         {/* Tab 2: Job management hub */}
         {activeTab === "jobs" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="fade-in animate-in space-y-6 duration-300">
+            <div className="gap-4 flex justify-between flex-col sm:flex-row sm:items-center">
               <div>
-                <h2 className="text-2xl font-black tracking-tight">Active Postings Hub</h2>
-                <p className="text-muted text-sm font-semibold">Monitor applications, modify status flags, and post new open requisitions.</p>
+                <h2 className="type-h2">Active Postings Hub</h2>
+                <p className="type-label">Monitor applications, modify status flags, and post new open requisitions.</p>
               </div>
               <button 
                 onClick={() => setShowJobModal(true)}
-                className="bg-primary text-surface px-6 py-3.5 rounded-2xl font-black hover:scale-[1.03] transition-all flex items-center justify-center gap-2 min-h-[48px]"
+                className="justify-center min-h-[48px] px-6 rounded-2xl py-3.5 items-center transition-all gap-2 bg-primary flex text-white hover:scale-[1.03]"
               >
-                <span className="material-symbols-outlined">add_circle</span>
+                <PlusCircle size={18} aria-hidden="true" />
                 New Requisition
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="gap-4 grid grid-cols-1">
               {jobs.map((job) => (
-                <div key={job.id} className="bg-surface border border-border p-8 rounded-3xl shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div key={job.id} className="border-border rounded-3xl items-start transition-all shadow-sm flex-col gap-6 flex justify-between p-8 bg-surface border hover:shadow-md md:flex-row md:items-center">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="text-xl font-black text-text">{job.title}</h3>
-                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                        job.status === "Active" ? "bg-emerald-500/10 text-emerald-500" : job.status === "Draft" ? "bg-warning/10 text-warning" : "bg-red-500/10 text-red-500"
+                    <div className="flex gap-3 flex-wrap items-center">
+                      <h3 className="text-text type-h2">{job.title}</h3>
+                      <span className={`py-1 px-2.5 rounded-full type-badge ${
+                        job.status === "Active" ? "bg-emerald-500/10 text-emerald-500" : job.status === "Draft" ? "bg-warning/10 text-warning" : "text-red-500 bg-red-500/10"
                       }`}>{job.status}</span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted font-bold">
-                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">folder</span>{job.department}</span>
+                    <div className="type-label items-center flex-wrap gap-3 flex">
+                      <span className="gap-1 flex items-center"><Folder size={16} aria-hidden="true" />{job.department}</span>
                       <span>&bull;</span>
-                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">location_on</span>{job.location}</span>
+                      <span className="gap-1 flex items-center"><MapPin size={16} aria-hidden="true" />{job.location}</span>
                       <span>&bull;</span>
-                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">payments</span>{job.salary}</span>
+                      <span className="gap-1 flex items-center"><Banknote size={16} aria-hidden="true" />{job.salary}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t border-border md:border-t-0 pt-4 md:pt-0">
+                  <div className="w-full border-t border-border gap-4 items-center flex pt-4 justify-between md:border-t-0 md:justify-end md:w-auto md:pt-0">
                     <div className="text-left md:text-right">
-                      <span className="text-2xl font-black text-text block">{job.applicants}</span>
-                      <span className="text-xs text-muted font-bold uppercase tracking-widest">Active Applicants</span>
+                      <span className="text-text type-h2 block">{job.applicants}</span>
+                      <span className="uppercase tracking-widest type-caption text-muted">Active Applicants</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="gap-2 flex items-center">
                       <button 
                         onClick={() => toggleJobStatus(job.id)}
-                        className="bg-bg hover:bg-primary hover:text-white text-text font-black px-5 py-3 rounded-2xl text-sm transition-all min-h-[44px]"
+                        className="text-text rounded-2xl min-h-[44px] bg-bg transition-all py-3 type-ui px-5 hover:bg-primary hover:text-white"
                       >
                         Toggle State
                       </button>
@@ -632,13 +666,14 @@ export default function CompanyDashboardPage() {
                 </div>
               ))}
               {jobs.length === 0 && (
-                <div className="bg-surface border border-border p-12 rounded-3xl text-center space-y-4">
-                  <span className="material-symbols-outlined text-6xl text-muted">work_off</span>
-                  <div className="space-y-1">
-                    <h4 className="text-lg font-black font-sans">No live postings found</h4>
-                    <p className="text-sm text-muted">Create a requisition to attract elite engineering candidates.</p>
-                  </div>
-                </div>
+                <EmptyState
+                  title="No live postings found"
+                  description="Create a requisition to attract elite engineering candidates."
+                  icon="work_off"
+                  actionLabel="New Requisition"
+                  onAction={() => setShowJobModal(true)}
+                  className="w-full max-w-lg mt-6"
+                />
               )}
             </div>
           </div>
@@ -646,34 +681,34 @@ export default function CompanyDashboardPage() {
 
         {/* Tab 3: Talent sourcing and matchmaking */}
         {activeTab === "sourcing" && (
-          <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="fade-in animate-in space-y-8 duration-300">
             <div>
-              <h2 className="text-2xl font-black tracking-tight">AI Talent Sourcing Portal</h2>
-              <p className="text-muted text-sm font-semibold">Match instantly with top tier software engineers, designers, and managers.</p>
+              <h2 className="type-h2">AI Talent Sourcing Portal</h2>
+              <p className="type-label">Match instantly with top tier software engineers, designers, and managers.</p>
             </div>
 
             {/* Sourcing filters */}
-            <div className="bg-surface border border-border p-6 rounded-3xl flex flex-col md:flex-row gap-4 items-center">
-              <div className="relative flex-1 w-full">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted">search</span>
+            <div className="border-border gap-4 rounded-3xl items-center flex-col p-6 flex bg-surface border md:flex-row">
+              <div className="w-full relative flex-1">
+                <Search className="left-4 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
                 <input 
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter by name, skills, location (e.g. Next.js, Stripe, Remote)..."
-                  className="w-full pl-12 pr-4 py-3.5 bg-bg border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary font-medium transition-all text-sm min-h-[48px]"
+                  className="w-full outline-none pl-12 min-h-[48px] border-border rounded-2xl py-3.5 bg-bg transition-all type-ui pr-4 border focus:ring-2 focus:ring-primary"
                 />
               </div>
               <button 
                 onClick={() => setSearchQuery("")}
-                className="bg-bg text-text hover:bg-border px-6 py-3.5 rounded-2xl font-black text-sm transition-all min-h-[48px] w-full md:w-auto whitespace-nowrap"
+                className="w-full text-text min-h-[48px] px-6 rounded-2xl py-3.5 whitespace-nowrap bg-bg transition-all type-ui hover:bg-border md:w-auto"
               >
                 Clear Filters
               </button>
             </div>
 
             {/* Candidate list */}
-            <div className="grid grid-cols-1 gap-6">
+            <div className="gap-6 grid grid-cols-1">
               {candidates
                 .filter(c => {
                   const term = searchQuery.toLowerCase();
@@ -683,50 +718,50 @@ export default function CompanyDashboardPage() {
                          c.location.toLowerCase().includes(term);
                 })
                 .map((c) => (
-                  <div key={c.id} className="bg-surface border border-border p-8 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col lg:flex-row justify-between items-start gap-6">
-                    <div className="space-y-4 flex-1">
+                  <div key={c.id} className="border-border rounded-3xl items-start transition-all shadow-sm flex-col gap-6 duration-300 flex justify-between p-8 bg-surface border hover:shadow-lg lg:flex-row">
+                    <div className="flex-1 space-y-4">
                       
                       {/* Core header */}
-                      <div className="flex items-start gap-4">
-                        <div className={`size-14 rounded-2xl ${c.avatarColor} text-white flex items-center justify-center font-black text-lg shadow-md shrink-0`}>
+                      <div className="gap-4 flex items-start">
+                        <div className={`rounded-2xl size-14 ${c.avatarColor} justify-center shrink-0 shadow-md type-card-title items-center text-white flex`}>
                           {c.name.substring(0, 2).toUpperCase()}
                         </div>
                         <div className="space-y-1">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="text-xl font-black text-text leading-tight">{c.name}</h3>
-                            <span className="bg-primary/10 text-primary text-xs font-black px-3 py-1 rounded-full flex items-center gap-1">
-                              <span className="material-symbols-outlined text-sm">workspace_premium</span>
+                          <div className="flex gap-3 flex-wrap items-center">
+                            <h3 className="text-text type-h2 leading-tight">{c.name}</h3>
+                            <span className="py-1 text-primary type-badge gap-1.5 px-3 items-center rounded-full flex bg-primary/10">
+                              <Crown size={14} aria-hidden="true" />
                               {c.matchScore}% Match
                             </span>
                           </div>
-                          <p className="text-sm text-muted font-bold tracking-tight">{c.role} &bull; {c.experience} Exp</p>
+                          <p className="type-label tracking-tight">{c.role} &bull; {c.experience} Exp</p>
                         </div>
                       </div>
 
                       {/* Bio */}
-                      <p className="text-sm font-medium text-muted leading-relaxed max-w-2xl">{c.bio}</p>
+                      <p className="type-label max-w-2xl leading-relaxed">{c.bio}</p>
 
                       {/* Skill badges */}
-                      <div className="flex flex-wrap gap-2 pt-2">
+                      <div className="gap-2 flex flex-wrap pt-2">
                         {c.skills.map((skill, idx) => (
-                          <span key={idx} className="bg-bg text-text font-black text-xs uppercase px-3 py-1.5 rounded-full border border-border">{skill}</span>
+                          <span key={idx} className="text-text border-border uppercase px-3 bg-bg py-1.5 rounded-full type-badge border">{skill}</span>
                         ))}
                       </div>
 
                       {/* Details row */}
-                      <div className="flex items-center gap-4 text-xs text-muted font-bold pt-2">
-                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">location_on</span>{c.location}</span>
+                      <div className="gap-4 items-center pt-2 flex type-caption text-muted">
+                        <span className="gap-1 flex items-center"><MapPin size={14} aria-hidden="true" />{c.location}</span>
                         <span>&bull;</span>
-                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">work_history</span>{c.experience}</span>
+                        <span className="gap-1 flex items-center"><BriefcaseBusiness size={14} aria-hidden="true" />{c.experience}</span>
                       </div>
 
                     </div>
 
                     {/* Interactive CTAs */}
-                    <div className="lg:border-l border-border lg:pl-8 flex flex-col gap-3 w-full lg:w-64 shrink-0 pt-4 lg:pt-0">
-                      <div className="text-left lg:text-right space-y-1 pb-2">
-                        <span className="text-[10px] text-muted font-black uppercase tracking-widest block">Status</span>
-                        <span className={`text-xs font-black uppercase ${
+                    <div className="lg:pl-8 lg:w-64 lg:pt-0 lg:border-l w-full shrink-0 border-border gap-3 flex pt-4 flex-col">
+                      <div className="pb-2 text-left space-y-1 lg:text-right">
+                        <span className="block type-badge text-muted">Status</span>
+                        <span className={`type-badge uppercase ${
                           c.interviewStatus === "Invited" ? "text-emerald-500" : "text-muted"
                         }`}>
                           {c.interviewStatus === "Invited" ? "Interview Requested" : "Open to Sourcing"}
@@ -736,32 +771,34 @@ export default function CompanyDashboardPage() {
                       <button 
                         onClick={() => handleInviteCandidate(c.id)}
                         disabled={c.interviewStatus === "Invited"}
-                        className={`w-full py-3.5 px-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 min-h-[48px] transition-all active:scale-[0.98] ${
+                        className={`w-full justify-center min-h-[48px] rounded-2xl py-3.5 items-center gap-2 transition-all type-ui flex px-4 active:scale-[0.98] ${
                           c.interviewStatus === "Invited" 
-                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default" 
-                            : "bg-primary text-surface hover:scale-[1.02] shadow-lg shadow-primary/10"
+                            ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20 cursor-default border" 
+                            : "bg-primary shadow-lg text-white shadow-primary/10 hover:scale-[1.02]"
                         }`}
                       >
-                        <span className="material-symbols-outlined">
-                          {c.interviewStatus === "Invited" ? "check_circle" : "mail"}
-                        </span>
+                        {c.interviewStatus === "Invited" ? (
+                          <CheckCircle size={18} aria-hidden="true" />
+                        ) : (
+                          <Mail size={18} aria-hidden="true" />
+                        )}
                         {c.interviewStatus === "Invited" ? "Invited" : "Request Interview"}
                       </button>
 
                       <button
                         onClick={() => handleStartChat(c.user_id)}
-                        className="w-full bg-surface border border-border hover:bg-bg text-text font-black py-3.5 px-4 rounded-2xl text-xs transition-all min-h-[48px] flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                        className="w-full text-text justify-center type-badge min-h-[48px] gap-1.5 border-border rounded-2xl py-3.5 items-center transition-all flex px-4 bg-surface border hover:bg-bg active:scale-[0.98]"
                       >
-                        <span className="material-symbols-outlined text-sm">chat</span>
+                        <MessageSquare size={14} aria-hidden="true" />
                         Send Message
                       </button>
 
                       <button 
                         onClick={() => {
                           postRecruiterCandidateAction(c.id, 'toggle_shortlist');
-                          alert(`${c.name} saved to workspace portfolio!`);
+                          toast.success(`${c.name} saved to workspace portfolio!`);
                         }}
-                        className="w-full bg-bg hover:bg-border text-text font-black py-3.5 px-4 rounded-2xl text-sm transition-all min-h-[48px]"
+                        className="w-full text-text min-h-[48px] rounded-2xl py-3.5 bg-bg transition-all type-ui px-4 hover:bg-border"
                       >
                         Save Candidate
                       </button>
@@ -776,10 +813,10 @@ export default function CompanyDashboardPage() {
                        c.skills.some(s => s.toLowerCase().includes(term)) ||
                        c.location.toLowerCase().includes(term);
               }).length === 0 && (
-                <div className="bg-surface border border-border p-12 rounded-3xl text-center space-y-4">
-                  <span className="material-symbols-outlined text-6xl text-muted">search_off</span>
+                <div className="border-border rounded-3xl p-12 text-center space-y-4 bg-surface border">
+                  <SearchX className="text-muted mx-auto" size={48} aria-hidden="true" />
                   <div className="space-y-1">
-                    <h4 className="text-lg font-black font-sans">No engineers found matching filter</h4>
+                    <h4 className="type-card-title">No engineers found matching filter</h4>
                     <p className="text-sm text-muted">Try removing tags or adjusting your search parameters.</p>
                   </div>
                 </div>
@@ -793,40 +830,41 @@ export default function CompanyDashboardPage() {
 
       {/* Interactive Modal: New Job Requisition */}
       {showJobModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-surface border border-border rounded-card p-8 w-full max-w-xl shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
+          <div className="w-full rounded-card overflow-y-auto border-border relative duration-200 animate-in max-h-[90vh] shadow-2xl zoom-in-95 max-w-xl p-8 bg-surface border">
             <button 
               onClick={() => setShowJobModal(false)}
-              className="absolute top-6 right-6 p-2 text-muted hover:text-text hover:bg-bg rounded-xl min-h-[40px] min-w-[40px] flex items-center justify-center"
+              className="min-h-[40px] justify-center rounded-xl min-w-[40px] absolute items-center p-2 right-6 flex top-6 text-muted hover:bg-bg hover:text-text"
+              aria-label="Close modal"
             >
-              <span className="material-symbols-outlined">close</span>
+              <X size={18} aria-hidden="true" />
             </button>
 
             <div className="space-y-2 mb-6">
-              <h3 className="text-2xl font-black tracking-tight">Create Job Requisition</h3>
-              <p className="text-muted text-sm font-semibold">Post a new position live into our software engineering taxonomy.</p>
+              <h3 className="type-h2">Create Job Requisition</h3>
+              <p className="type-label">Post a new position live into our software engineering taxonomy.</p>
             </div>
 
             <form onSubmit={handleCreateJob} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Job Title</label>
+                <label className="type-badge">Job Title</label>
                 <input 
                   type="text" 
                   required
                   value={newJob.title}
                   onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
                   placeholder="e.g. Lead Frontend Engineer"
-                  className="w-full px-4 py-3 bg-bg border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary font-medium text-sm min-h-[48px]"
+                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-muted uppercase tracking-wider">Department</label>
+                  <label className="type-badge">Department</label>
                   <select 
                     value={newJob.department}
                     onChange={(e) => setNewJob({ ...newJob, department: e.target.value })}
-                    className="w-full px-4 py-3 bg-bg border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary font-bold text-sm min-h-[48px]"
+                    className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
                   >
                     <option>Engineering</option>
                     <option>Design</option>
@@ -836,11 +874,11 @@ export default function CompanyDashboardPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-muted uppercase tracking-wider">Employment Type</label>
+                  <label className="type-badge">Employment Type</label>
                   <select 
                     value={newJob.type}
                     onChange={(e) => setNewJob({ ...newJob, type: e.target.value })}
-                    className="w-full px-4 py-3 bg-bg border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary font-bold text-sm min-h-[48px]"
+                    className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
                   >
                     <option>Full-time</option>
                     <option>Contract</option>
@@ -850,40 +888,40 @@ export default function CompanyDashboardPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Location</label>
+                <label className="type-badge">Location</label>
                 <input 
                   type="text" 
                   required
                   value={newJob.location}
                   onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
                   placeholder="e.g. Remote / New York, NY"
-                  className="w-full px-4 py-3 bg-bg border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary font-medium text-sm min-h-[48px]"
+                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-muted uppercase tracking-wider">Salary Range</label>
+                <label className="type-badge">Salary Range</label>
                 <input 
                   type="text" 
                   required
                   value={newJob.salary}
                   onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
                   placeholder="e.g. $130,000 - $160,000"
-                  className="w-full px-4 py-3 bg-bg border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary font-medium text-sm min-h-[48px]"
+                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
                 />
               </div>
 
-              <div className="pt-4 flex gap-3">
+              <div className="flex gap-3 pt-4">
                 <button 
                   type="button" 
                   onClick={() => setShowJobModal(false)}
-                  className="flex-1 bg-bg hover:bg-border text-text font-black py-3.5 rounded-2xl text-sm min-h-[48px]"
+                  className="text-text flex-1 min-h-[48px] rounded-2xl py-3.5 bg-bg type-ui hover:bg-border"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="flex-1 bg-primary text-surface font-black py-3.5 rounded-2xl text-sm hover:scale-[1.02] shadow-lg shadow-primary/25 active:scale-[0.98] transition-all min-h-[48px]"
+                  className="flex-1 min-h-[48px] rounded-2xl py-3.5 transition-all type-ui shadow-lg shadow-primary/25 bg-primary text-white hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Post Position
                 </button>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getApplicationsAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
+import { Calendar, ClipboardCheck } from "lucide-react";
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -20,70 +21,145 @@ export default function ApplicationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
+        {/* Skeleton Header */}
+        <div className="mb-8 animate-pulse">
+          <div className="h-8 bg-border/20 rounded w-48 mb-2"></div>
+          <div className="h-4 bg-border/20 rounded w-64"></div>
+        </div>
+        
+        {/* Skeleton Table Container */}
+        <div className="rounded-2xl overflow-hidden bg-surface border-border shadow-sm border p-6 space-y-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="animate-pulse flex items-center justify-between py-4 border-b border-border/40 last:border-0">
+              <div className="space-y-2 flex-1 max-w-[240px]">
+                <div className="h-4 bg-border/25 rounded w-3/4"></div>
+                <div className="h-3 bg-border/20 rounded w-1/2"></div>
+              </div>
+              <div className="h-4 bg-border/20 rounded w-24 hidden md:block"></div>
+              <div className="h-4 bg-border/20 rounded w-20"></div>
+              <div className="h-6 bg-border/20 rounded-full w-16"></div>
+              <div className="h-4 bg-border/20 rounded w-12"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
+  const getStatusClass = (status: string) => {
+    const s = status?.toUpperCase() || "";
+    if (s === "APPLIED") return "text-info bg-info-bg border-info/20";
+    if (s === "INTERVIEW") return "text-warning bg-warning-bg border-warning/20";
+    if (s === "OFFER") return "text-success bg-success-bg border-success/20";
+    if (s === "REJECTED" || s === "DECLINED") return "text-error bg-error-bg border-error/20";
+    return "text-muted bg-bg border-border/40";
+  };
+
   return (
-    <div className="p-4 md:p-8 lg:p-10 max-w-[1400px] mx-auto">
+    <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1">My Applications</h1>
-        <p className="text-slate-500 font-medium">Track the status of your active job applications.</p>
+        <h1 className="type-h2 mb-1 text-text">My Applications</h1>
+        <p className="text-muted">Track the status of your active job applications.</p>
       </div>
 
-      {/* Table Card */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Responsive Layout wrapper */}
+      <div className="rounded-2xl overflow-hidden bg-surface border-border shadow-sm border">
+        
+        {/* Mobile View: Card List (md:hidden) */}
+        <div className="block md:hidden divide-y divide-border">
+          {applications.map((app) => (
+            <div key={app.id} className="p-5 hover:bg-bg/40 transition-colors flex flex-col gap-3">
+              <div className="flex justify-between items-start gap-4">
+                <span className="type-ui font-semibold text-text leading-snug">
+                  {app.job_title}
+                </span>
+                <span className={`py-1 text-[10px] font-bold uppercase tracking-wider px-2.5 rounded-full border shrink-0 ${getStatusClass(app.status)}`}>
+                  {app.status}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center text-xs text-muted">
+                <span>{app.company_name}</span>
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} aria-hidden="true" />
+                  {new Date(app.applied_at).toLocaleDateString()}
+                </span>
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <button className="type-ui text-primary hover:underline text-xs min-h-[40px] px-3 flex items-center font-bold">
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {applications.length === 0 && (
+            <div className="text-center py-20 px-6">
+              <div className="flex gap-4 items-center flex-col max-w-xs mx-auto">
+                <ClipboardCheck size={48} className="text-muted" aria-hidden="true" />
+                <div>
+                  <p className="text-text font-semibold type-ui">No applications yet</p>
+                  <p className="text-xs text-muted mt-1 leading-relaxed">You haven&apos;t applied to any job listings on our platform yet.</p>
+                </div>
+                <a href="/jobs" className="type-ui text-primary hover:underline font-bold mt-2">Browse Jobs →</a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Table (hidden md:block) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-bg border-b border-border">
               <tr>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Job Role</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Company</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Date Applied</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Actions</th>
+                <th className="text-xs text-muted px-6 py-4 uppercase tracking-wider font-semibold">Job Role</th>
+                <th className="text-xs text-muted px-6 py-4 uppercase tracking-wider font-semibold">Company</th>
+                <th className="text-xs text-muted px-6 py-4 uppercase tracking-wider font-semibold">Date Applied</th>
+                <th className="text-xs text-muted px-6 py-4 uppercase tracking-wider font-semibold">Status</th>
+                <th className="text-xs text-muted px-6 py-4 uppercase tracking-wider font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-border">
               {applications.map((app) => (
-                <tr key={app.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
+                <tr key={app.id} className="hover:bg-bg/40 transition-colors group">
+                  <td className="py-4 px-6">
+                    <span className="type-ui transition-colors text-text group-hover:text-primary font-semibold">
                       {app.job_title}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-600">{app.company_name}</span>
+                  <td className="py-4 px-6">
+                    <span className="text-muted text-sm">{app.company_name}</span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-400">
+                  <td className="py-4 px-6">
+                    <span className="text-sm text-muted">
                       {new Date(app.applied_at).toLocaleDateString()}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide
-                      ${app.status === 'APPLIED'    ? 'bg-blue-50 text-blue-600' :
-                        app.status === 'INTERVIEW'  ? 'bg-purple-50 text-purple-600' :
-                        app.status === 'OFFER'      ? 'bg-green-50 text-green-600' :
-                        'bg-slate-100 text-slate-500'}`}>
+                  <td className="py-4 px-6">
+                    <span className={`py-1 text-[10px] font-bold uppercase tracking-wider px-2.5 rounded-full border ${getStatusClass(app.status)}`}>
                       {app.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <button className="text-primary hover:underline text-sm font-bold">View Details</button>
+                  <td className="py-4 px-6">
+                    <button className="type-ui text-primary hover:underline font-bold min-h-[36px] px-3 flex items-center">
+                      View Details
+                    </button>
                   </td>
                 </tr>
               ))}
               {applications.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-24 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <span className="material-symbols-outlined text-5xl text-slate-200">fact_check</span>
-                      <p className="text-slate-400 font-medium">You haven&apos;t applied to any jobs yet.</p>
-                      <a href="/dashboard" className="text-primary font-bold hover:underline text-sm">Browse Jobs →</a>
+                  <td colSpan={5} className="text-center py-24 px-6">
+                    <div className="flex gap-4 items-center flex-col max-w-sm mx-auto">
+                      <ClipboardCheck size={48} className="text-muted" aria-hidden="true" />
+                      <div>
+                        <p className="text-text font-semibold type-ui">No applications yet</p>
+                        <p className="text-xs text-muted mt-1 leading-relaxed">You haven&apos;t applied to any job listings on our platform yet.</p>
+                      </div>
+                      <a href="/jobs" className="type-ui text-primary hover:underline font-bold mt-2">Browse Jobs →</a>
                     </div>
                   </td>
                 </tr>
@@ -91,6 +167,7 @@ export default function ApplicationsPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Certification } from "@/types/profile";
+import { Button, Input } from "@/shared/ui";
+import { Crown, Plus, ExternalLink, Pencil, Trash2 } from "lucide-react";
 
 interface CertificationsSectionProps {
   certifications: Certification[];
@@ -52,198 +54,190 @@ export default function CertificationsSection({ certifications = [], onChange }:
   };
 
   return (
-    <section className="bg-card rounded-2xl border border-border shadow-sm transition-all duration-350 overflow-hidden" id="certifications">
+    <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="certifications">
       {/* Card Header */}
-      <div className="w-full flex items-center justify-between p-5 text-left border-b border-border/60">
+      <div className="w-full border-b items-center border-border/60 flex p-5 text-left justify-between">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">workspace_premium</span>
+          <div className="justify-center h-10 w-10 text-primary shrink-0 items-center bg-primary/5 flex rounded-xl">
+            <Crown size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text leading-tight font-display">Certifications & Courses</h3>
-            <p className="text-xs text-muted mt-0.5 font-display">Prove your specialized knowledge</p>
+            <h3 className="text-text type-card-title leading-tight">Certifications & Courses</h3>
+            <p className="text-xs text-muted mt-0.5">Prove your specialized knowledge</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex gap-3 items-center">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={addCertification}
-            className="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 cursor-pointer py-1.5 px-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all border border-primary/10 mr-1 min-h-[40px] flex items-center justify-center"
+            className="text-primary hover:text-primary-dark border-primary/10 bg-primary/5 hover:bg-primary/10 gap-2"
           >
-            <span className="material-symbols-outlined text-sm font-bold">add</span>
+            <Plus size={16} aria-hidden="true" />
             Add
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Card Content */}
-      <div className="p-5 sm:p-6 bg-card space-y-6">
+      <div className="bg-card p-5 space-y-6 sm:p-6">
         <div className="space-y-6">
           {certifications.length === 0 ? (
-            <div className="text-center py-10 border border-dashed border-border rounded-xl bg-bg/50">
-              <span className="material-symbols-outlined text-3xl text-muted/60 mb-2 block">workspace_premium</span>
-              <span className="text-sm font-bold text-text block mb-0.5">No certifications added yet</span>
-              <span className="text-xs text-muted block mb-4 font-semibold">Prove your domain credentials by adding coursework certifications.</span>
-              <button
+            <div className="border-dashed bg-bg/50 border-border text-center py-10 rounded-xl border">
+              <Crown size={32} className="text-muted/60 block mx-auto mb-2" aria-hidden="true" />
+              <span className="text-text mb-0.5 block type-ui">No certifications added yet</span>
+              <span className="block mb-4 type-caption text-muted">Prove your domain credentials by adding coursework certifications.</span>
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={addCertification}
-                className="text-primary text-xs font-bold hover:underline cursor-pointer min-h-[44px] px-4"
+                className="text-primary mt-1.5 hover:underline"
               >
                 Add first certificate card
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="gap-4 grid grid-cols-1">
               {certifications.map((cert) => {
                 const isEditing = editingId === cert.id;
 
                 return (
                   <div
                     key={cert.id}
-                    className="relative bg-bg/40 border border-border/80 rounded-xl p-5 transition-all group"
+                    className="group relative border-border/80 transition-all bg-bg/40 p-5 rounded-xl border"
                   >
                     {isEditing ? (
                       /* Editing Form Mode */
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Certification Name</label>
-                            <input
-                              type="text"
-                              value={cert.name || ""}
-                              onChange={(e) => updateCertification(cert.id, "name", e.target.value)}
-                              placeholder="e.g. AWS Certified Solutions Architect"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Issuing Organization</label>
-                            <input
-                              type="text"
-                              value={cert.issuing_organization || ""}
-                              onChange={(e) => updateCertification(cert.id, "issuing_organization", e.target.value)}
-                              placeholder="e.g. Amazon Web Services (AWS)"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                      <div className="space-y-4 text-left">
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                          <Input
+                            label="Certification Name"
+                            type="text"
+                            value={cert.name || ""}
+                            onChange={(e) => updateCertification(cert.id, "name", e.target.value)}
+                            placeholder="e.g. AWS Certified Solutions Architect"
+                          />
+                          <Input
+                            label="Issuing Organization"
+                            type="text"
+                            value={cert.issuing_organization || ""}
+                            onChange={(e) => updateCertification(cert.id, "issuing_organization", e.target.value)}
+                            placeholder="e.g. Amazon Web Services (AWS)"
+                          />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Issue Date</label>
-                            <input
-                              type="date"
-                              value={cert.issue_date || ""}
-                              onChange={(e) => updateCertification(cert.id, "issue_date", e.target.value)}
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Expiration Date</label>
-                            <input
-                              type="date"
-                              value={cert.expiry_date || ""}
-                              onChange={(e) => updateCertification(cert.id, "expiry_date", e.target.value)}
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Credential ID</label>
-                            <input
-                              type="text"
-                              value={cert.credential_id || ""}
-                              onChange={(e) => updateCertification(cert.id, "credential_id", e.target.value)}
-                              placeholder="e.g. AWS-ASA-1234"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-muted mb-1">Credential URL</label>
-                            <input
-                              type="text"
-                              value={cert.credential_url || ""}
-                              onChange={(e) => updateCertification(cert.id, "credential_url", e.target.value)}
-                              placeholder="https://cred.ly/aws-cert"
-                              className="w-full px-3.5 py-2 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-medium text-text placeholder:text-muted/65"
-                            />
-                          </div>
+                        <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                          <Input
+                            label="Issue Date"
+                            type="date"
+                            value={cert.issue_date || ""}
+                            onChange={(e) => updateCertification(cert.id, "issue_date", e.target.value)}
+                          />
+                          <Input
+                            label="Expiration Date"
+                            type="date"
+                            value={cert.expiry_date || ""}
+                            onChange={(e) => updateCertification(cert.id, "expiry_date", e.target.value)}
+                          />
+                          <Input
+                            label="Credential ID"
+                            type="text"
+                            value={cert.credential_id || ""}
+                            onChange={(e) => updateCertification(cert.id, "credential_id", e.target.value)}
+                            placeholder="e.g. AWS-ASA-1234"
+                          />
+                          <Input
+                            label="Credential URL"
+                            type="text"
+                            value={cert.credential_url || ""}
+                            onChange={(e) => updateCertification(cert.id, "credential_url", e.target.value)}
+                            placeholder="https://cred.ly/aws-cert"
+                          />
                         </div>
 
-                        <div className="flex justify-end gap-2.5 pt-2">
-                          <button
+                        <div className="pt-2 flex justify-end gap-2.5">
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => removeCertification(cert.id)}
-                            className="px-4 py-2 bg-card text-red-500 hover:bg-red-500/10 text-xs font-bold rounded-lg border border-border transition-all min-h-[44px] cursor-pointer"
+                            className="text-red-500 hover:text-red-650 hover:bg-red-500/10 border-border"
                           >
                             Delete
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="primary"
                             onClick={() => setEditingId(null)}
-                            className="px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all min-h-[44px] cursor-pointer shadow-xs"
                           >
                             Done Editing
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       /* Read-only Mode */
-                      <div className="flex items-start gap-4">
+                      <div className="gap-4 flex items-start text-left">
                         {/* Cert icon circle */}
-                        <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary shrink-0 border border-primary/10">
-                          <span className="material-symbols-outlined text-2xl">workspace_premium</span>
+                        <div className="justify-center text-primary shrink-0 h-12 w-12 items-center bg-primary/5 border-primary/10 flex rounded-xl border">
+                          <Crown size={24} aria-hidden="true" />
                         </div>
 
                         {/* Text fields */}
-                        <div className="flex-1 min-w-0 pr-20 space-y-1">
-                          <h4 className="text-base font-bold text-text tracking-tight break-words font-display">
+                        <div className="min-w-0 flex-1 space-y-1 pr-20">
+                          <h4 className="text-text break-words tracking-tight type-card-title">
                             {cert.name || "Untitled Certificate"}
                           </h4>
-                          <p className="text-sm font-semibold text-text/80 break-words">
+                          <p className="break-words type-ui text-text/80">
                             {cert.issuing_organization || "Unknown Issuing Organization"}
                           </p>
                           {(cert.issue_date || cert.expiry_date) && (
-                            <p className="text-xs text-muted font-medium">
+                            <p className="type-caption text-muted">
                               {cert.issue_date ? `Issued ${formatDateLabel(cert.issue_date)}` : ""}
                               {cert.expiry_date ? ` • Expires ${formatDateLabel(cert.expiry_date)}` : " • No Expiration"}
                             </p>
                           )}
                           {cert.credential_id && (
-                            <p className="text-xs text-muted font-medium">
-                              <span className="font-semibold text-text/70">Credential ID:</span> {cert.credential_id}
+                            <p className="type-caption text-muted">
+                              <span className="text-text/70">Credential ID:</span> {cert.credential_id}
                             </p>
                           )}
                           {cert.credential_url && (
-                            <a
+                            <Button
+                              as="a"
                               href={cert.credential_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline mt-1 cursor-pointer min-h-[32px]"
+                              variant="ghost"
+                              size="sm"
+                              className="text-primary hover:underline gap-1 mt-1 px-0 min-h-0 h-auto"
                             >
                               View Credential
-                              <span className="material-symbols-outlined text-sm">open_in_new</span>
-                            </a>
+                              <ExternalLink size={14} aria-hidden="true" />
+                            </Button>
                           )}
                         </div>
 
                         {/* Action buttons (Absolute top-right inside block) */}
-                        <div className="absolute right-3 top-3 flex items-center gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                          <button
+                        <div className="right-3 gap-1.5 absolute opacity-100 items-center transition-opacity flex top-3 lg:opacity-0 lg:group-hover:opacity-100">
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => setEditingId(cert.id || null)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-muted hover:text-primary cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-muted border-border hover:text-primary"
                             title="Edit Certificate"
                           >
-                            <span className="material-symbols-outlined text-base">edit</span>
-                          </button>
-                          <button
+                            <Pencil size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
                             type="button"
+                            variant="outline"
                             onClick={() => removeCertification(cert.id)}
-                            className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-red-500 hover:bg-red-500/10 cursor-pointer shadow-xs hover:shadow-sm"
+                            className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-red-500 border-border hover:bg-red-500/10"
                             title="Delete Certificate"
                           >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
+                            <Trash2 size={16} aria-hidden="true" />
+                          </Button>
                         </div>
                       </div>
                     )}

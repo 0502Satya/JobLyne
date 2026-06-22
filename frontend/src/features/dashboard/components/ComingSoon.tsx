@@ -2,6 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
+import Icon from "@/shared/ui/Icon";
+import { ArrowLeft } from "lucide-react";
 
 interface ComingSoonProps {
   title?: string;
@@ -15,26 +17,26 @@ export default function ComingSoon({
   icon = "rocket_launch"
 }: ComingSoonProps) {
   return (
-    <div className="flex-1 flex items-center justify-center p-8 min-h-[60vh]">
+    <div className="justify-center flex-1 items-center flex p-8 min-h-[60vh]">
       <div className="text-center max-w-md">
         {/* Animated Icon */}
-        <div className="relative mx-auto w-32 h-32 mb-8">
-          <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping opacity-20"></div>
-          <div className="relative w-32 h-32 bg-gradient-to-br from-primary to-accent-gradient rounded-full flex items-center justify-center shadow-2xl shadow-primary/30">
-            <span className="material-symbols-outlined text-white text-5xl">{icon}</span>
+        <div className="mx-auto h-32 w-32 mb-8 relative">
+          <div className="opacity-20 animate-ping inset-0 absolute rounded-full bg-primary/10"></div>
+          <div className="justify-center w-32 h-32 to-accent-gradient relative items-center bg-gradient-to-br from-primary rounded-full shadow-2xl shadow-primary/30 flex">
+            <Icon name={icon} size={48} className="text-white" aria-hidden="true" />
           </div>
         </div>
 
         {/* Text */}
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-3">{title}</h2>
-        <p className="text-slate-400 font-bold text-sm leading-relaxed mb-8">{description}</p>
+        <h2 className="mb-3 type-h1 text-text">{title}</h2>
+        <p className="mb-8 text-muted leading-relaxed type-ui">{description}</p>
 
         {/* Back Button */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+          className="px-8 inline-flex rounded-2xl uppercase py-3.5 items-center gap-2 transition-all text-white tracking-widest shadow-xl shadow-primary/20 bg-primary type-badge hover:scale-[1.02] active:scale-95"
         >
-          <span className="material-symbols-outlined text-sm">arrow_back</span>
+          <ArrowLeft size={16} aria-hidden="true" />
           Back to Dashboard
         </Link>
       </div>

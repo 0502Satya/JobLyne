@@ -1,3 +1,5 @@
+import { Icon } from "@/shared/ui";
+
 /**
  * This section shows links for different types of people (like Candidates or Companies).
  * Each link has an icon and a name.
@@ -12,20 +14,20 @@ export default function StakeholderNav() {
     ];
 
     return (
-        <section className="py-12 bg-bg border-y border-border transition-colors">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <p className="text-center text-sm font-bold text-muted uppercase tracking-widest mb-10">Tailored for your journey</p>
+        <section className="border-y py-12 border-border bg-bg transition-colors">
+            <div className="mx-auto px-4 max-w-7xl sm:px-6 lg:px-8">
+                <p className="mb-10 type-label uppercase text-center tracking-widest">Tailored for your journey</p>
 
                 {/* We map (loop) through the list of people names and icons above */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8">
+                <div className="grid-cols-2 grid gap-6 sm:grid-cols-3 sm:gap-8 md:grid-cols-5">
                     {stakeholders.map((item) => (
-                        <a key={item.name} className="flex flex-col items-center group min-w-0 py-2" href="#">
+                        <a key={item.name} className="group items-center flex-col flex py-2 min-w-0" href="#">
                             {/* The box containing the icon */}
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-surface flex items-center justify-center text-muted group-hover:text-primary group-hover:shadow-lg transition-all duration-300 shadow-sm border border-border">
-                                <span className="material-symbols-outlined text-2xl sm:text-3xl">{item.icon}</span>
+                            <div className="justify-center h-12 border-border rounded-2xl w-12 items-center transition-all shadow-sm text-muted duration-300 flex bg-surface border sm:h-14 sm:w-14 group-hover:text-primary group-hover:shadow-lg">
+                                <Icon name={item.icon} size={28} className="transition-colors duration-300" aria-hidden="true" />
                             </div>
                             {/* The name under the icon */}
-                            <span className="mt-3 text-sm font-black text-text group-hover:text-primary transition-colors tracking-tight truncate w-full text-center">{item.name}</span>
+                            <span className="w-full text-text tracking-tight mt-3 text-center type-ui truncate transition-colors group-hover:text-primary">{item.name}</span>
                         </a>
                     ))}
                 </div>
