@@ -49,7 +49,7 @@ export default function SocialLogin() {
             }}
             theme="outline"
             size="large"
-            width="100%"
+            width="240"
           />
         </div>
         
