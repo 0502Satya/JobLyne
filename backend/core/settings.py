@@ -121,6 +121,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Caching configuration: Use LocMemCache during unit tests or if Redis is not reachable to avoid requiring Redis
 import socket
 from urllib.parse import urlparse

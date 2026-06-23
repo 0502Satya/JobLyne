@@ -257,4 +257,75 @@ export async function getPublicCompanyProfileAction(companyId: string) {
   }
 }
 
+export async function uploadCompanyDocAction(formData: FormData) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/company/upload/`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { error: data.error || "Failed to upload document" };
+    }
+    return { success: true, file_url: data.file_url };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function submitCompanyVerificationAction() {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/company/verify/submit/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { error: data.error || "Failed to submit verification request" };
+    }
+    return { success: true, ...data };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function getPendingVerificationsAction() {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/admin/companies/pending/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { error: data.error || "Failed to fetch pending verification list" };
+    }
+    return data;
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function verifyCompanyAction(companyId: string, action: "approve" | "reject", notes: string) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/admin/companies/${companyId}/verify/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action, notes }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { error: data.error || "Failed to process verification action" };
+    }
+    return { success: true, ...data };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
 

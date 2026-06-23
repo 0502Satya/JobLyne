@@ -139,9 +139,9 @@ export default function PublicCompanyProfilePage() {
               <div className="justify-center items-center flex-wrap gap-3 flex md:justify-start">
                 <h1 className="text-text type-h1">{profile.name}</h1>
                 {profile.verified_badge && (
-                  <span className="py-1 gap-1 uppercase text-xs text-emerald-500 items-center px-2.5 bg-emerald-500/10 tracking-widest rounded-full border-emerald-500/20 flex border">
-                    <BadgeCheck size={12} aria-hidden="true" />
-                    Vetted Employer
+                  <span className="py-1 gap-1 uppercase text-xs text-blue-500 items-center px-2.5 bg-blue-500/10 tracking-widest rounded-full border-blue-500/20 flex border font-semibold">
+                    <BadgeCheck size={14} className="fill-blue-500/10" aria-hidden="true" />
+                    Verified
                   </span>
                 )}
               </div>

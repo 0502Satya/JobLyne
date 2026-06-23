@@ -706,3 +706,194 @@ class RecruiterProfileView(APIView):
             return Response(response_data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+import os
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from rest_framework.parsers import MultiPartParser, FormParser
+
+class CompanyFileUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        if 'file' not in request.FILES:
+            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        uploaded_file = request.FILES['file']
+        
+        # Limit file size to 5MB
+        if uploaded_file.size > 5 * 1024 * 1024:
+            return Response({"error": "File size exceeds 5MB limit."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Limit file type to PDF, JPG, PNG
+        ext = os.path.splitext(uploaded_file.name)[1].lower()
+        if ext not in ['.pdf', '.jpg', '.jpeg', '.png']:
+            return Response({"error": "Invalid file type. Only PDF, JPG, and PNG are allowed."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Save to local media uploads
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        fs = FileSystemStorage(location=upload_dir, base_url=settings.MEDIA_URL + 'uploads/')
+        filename = fs.save(f"{uuid.uuid4().hex}{ext}", uploaded_file)
+        file_url = fs.url(filename)
+        
+        return Response({"file_url": file_url}, status=status.HTTP_201_CREATED)
+
+class CompanySubmitVerificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_company(self, user):
+        if getattr(user, 'company', None):
+            return user.company
+        try:
+            adv_account = AdvertiserAccounts.objects.get(user=user)
+            return adv_account.company
+        except AdvertiserAccounts.DoesNotExist:
+            return None
+
+    def post(self, request, *args, **kwargs):
+        if request.user.account_type != 'COMPANY':
+            raise PermissionDenied("Only company accounts can access this endpoint.")
+            
+        company = self.get_company(request.user)
+        if not company:
+            return Response({"error": "No company associated with this user."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check required fields
+        required_fields = [
+            'legal_name', 'registration_number', 'tax_id', 
+            'registered_address', 'official_email', 'phone_number', 
+            'authorized_contact_name', 'authorized_contact_designation',
+            'incorporation_doc_url', 'tax_doc_url'
+        ]
+        
+        missing = []
+        for field in required_fields:
+            val = getattr(company, field)
+            if not val or (isinstance(val, str) and not val.strip()):
+                missing.append(field)
+                
+        if missing:
+            return Response(
+                {"error": f"Missing required verification fields or document uploads: {', '.join(missing)}"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Update verification status to pending
+        company.verification_status = 'pending'
+        company.save()
+        
+        # Send confirmation email to official_email
+        try:
+            subject = f"Company Verification Submitted — {company.legal_name}"
+            message = f"Hi {company.authorized_contact_name},\n\nWe have received your company verification request for {company.legal_name}. Our admin team is currently reviewing your documents. We will notify you once the review is complete.\n\nBest regards,\nThe JobLyne Team"
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [company.official_email],
+                fail_silently=True
+            )
+        except Exception:
+            pass
+            
+        # Send notification to admin/backend team
+        try:
+            subject = f"[PENDING VERIFICATION] New Company Registration: {company.legal_name}"
+            message = f"A new company verification request for '{company.legal_name}' (ID: {company.id}) has been submitted. Please review the documents in the admin dashboard.\n\nBest regards,\nThe JobLyne Team"
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.DEFAULT_FROM_EMAIL],
+                fail_silently=True
+            )
+        except Exception:
+            pass
+            
+        return Response({
+            "message": "Company verification request submitted successfully.",
+            "verification_status": "pending"
+        }, status=status.HTTP_200_OK)
+
+class AdminPendingCompaniesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response({"error": "Admin access required."}, status=status.HTTP_403_FORBIDDEN)
+            
+        companies = Companies.objects.filter(verification_status='pending').order_by('-created_at')
+        serializer = CompanyProfileSerializer(companies, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AdminVerifyActionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, company_id, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response({"error": "Admin access required."}, status=status.HTTP_403_FORBIDDEN)
+            
+        try:
+            company = Companies.objects.get(id=company_id)
+        except Companies.DoesNotExist:
+            return Response({"error": "Company not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+        action = request.data.get('action') # 'approve' or 'reject'
+        notes = request.data.get('notes', '')
+        
+        if action not in ['approve', 'reject']:
+            return Response({"error": "Action must be 'approve' or 'reject'."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if action == 'approve':
+            company.verification_status = 'verified'
+            company.verified_badge = True
+            company.verification_notes = notes or "Approved by administrator."
+            company.save()
+            
+            # Send approval email
+            try:
+                subject = f"Company Verified! — {company.legal_name}"
+                message = f"Hi {company.authorized_contact_name},\n\nWe are pleased to inform you that your company profile for {company.legal_name} has been verified! You can now publish job posts on JobLyne.\n\nBest regards,\nThe JobLyne Team"
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [company.official_email],
+                    fail_silently=True
+                )
+            except Exception:
+                pass
+                
+        elif action == 'reject':
+            if not notes.strip():
+                return Response({"error": "Reason/Notes are required for rejection."}, status=status.HTTP_400_BAD_REQUEST)
+                
+            company.verification_status = 'rejected'
+            company.verified_badge = False
+            company.verification_notes = notes
+            company.save()
+            
+            # Send rejection email
+            try:
+                subject = f"Company Verification Rejected — {company.legal_name}"
+                message = f"Hi {company.authorized_contact_name},\n\nUnfortunately, your company verification request for {company.legal_name} was rejected.\n\nReason: {notes}\n\nYou can log in, correct the profile details, and resubmit for verification.\n\nBest regards,\nThe JobLyne Team"
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [company.official_email],
+                    fail_silently=True
+                )
+            except Exception:
+                pass
+                
+        return Response({
+            "message": f"Company registration {company.verification_status} successfully.",
+            "verification_status": company.verification_status,
+            "verified_badge": company.verified_badge
+        }, status=status.HTTP_200_OK)
+
