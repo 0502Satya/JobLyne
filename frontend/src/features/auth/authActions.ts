@@ -197,7 +197,14 @@ export async function loginAction(prevState: any, formData: FormData) {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await res.json();
+    let data: any;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      const text = await res.text();
+      console.error("[DIAGNOSTIC] loginAction failed to parse JSON. Status:", res.status, "Body preview:", text.substring(0, 1000));
+      return { error: `Server returned invalid response structure (Status ${res.status}).` };
+    }
 
     if (!res.ok) {
         return {
@@ -212,6 +219,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     }
 
   } catch (err: any) {
+    console.error("[DIAGNOSTIC] loginAction threw exception:", err);
     return {
       error: "Unable to connect to the server. Please try again later.",
     };
@@ -232,7 +240,14 @@ export async function socialLoginAction(provider: "google" | "linkedin", token: 
       body: JSON.stringify({ provider, token }),
     });
 
-    const data = await res.json();
+    let data: any;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      const text = await res.text();
+      console.error("[DIAGNOSTIC] socialLoginAction failed to parse JSON. Status:", res.status, "Body preview:", text.substring(0, 1000));
+      return { error: `Server returned invalid response structure (Status ${res.status}).` };
+    }
 
     if (!res.ok) {
       return { error: data.error || "Social authentication failed." };
@@ -244,6 +259,7 @@ export async function socialLoginAction(provider: "google" | "linkedin", token: 
 
     return { success: true };
   } catch (err: any) {
+    console.error("[DIAGNOSTIC] socialLoginAction threw exception:", err);
     return { error: "Unable to connect to the server." };
   }
 }
