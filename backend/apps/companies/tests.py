@@ -171,3 +171,109 @@ class JobLyneRecruiterProfileTests(TestCase):
         self.recruiter.refresh_from_db()
         self.assertEqual(self.recruiter.agency_name, "New Agency Name")
 
+
+class CompanyVerificationTests(TestCase):
+    def setUp(self):
+        from apps.companies.models import Companies
+        self.client = APIClient()
+        self.company = Companies.objects.create(
+            name="My Company",
+            industry="Technology",
+            website="https://mycompany.com"
+        )
+        self.company_user = CustomUser.objects.create_user(
+            email="employer@mycompany.com",
+            password="Password123",
+            account_type="COMPANY",
+            team_role="ADMIN",
+            company=self.company,
+            is_verified=True,
+            is_active=True
+        )
+        self.admin_user = CustomUser.objects.create_superuser(
+            email="admin@joblyne.com",
+            password="Password123",
+            is_staff=True,
+            is_active=True
+        )
+
+    def test_submit_verification_requires_fields(self):
+        self.client.force_authenticate(user=self.company_user)
+        url = reverse('company_submit_verification')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("error", response.data)
+
+    def test_submit_verification_success(self):
+        self.client.force_authenticate(user=self.company_user)
+        self.company.legal_name = "My Company LLC"
+        self.company.registration_number = "REG123456"
+        self.company.tax_id = "TAX789"
+        self.company.registered_address = "456 Corporate Ave"
+        self.company.official_email = "verify@mycompany.com"
+        self.company.phone_number = "+1555123456"
+        self.company.authorized_contact_name = "Jane Signatory"
+        self.company.authorized_contact_designation = "CEO"
+        self.company.incorporation_doc_url = "http://example.com/inc.pdf"
+        self.company.tax_doc_url = "http://example.com/tax.pdf"
+        self.company.save()
+
+        url = reverse('company_submit_verification')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["verification_status"], "pending")
+        
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.verification_status, "pending")
+
+    def test_admin_pending_companies_view_requires_staff(self):
+        self.client.force_authenticate(user=self.company_user)
+        url = reverse('admin_pending_companies')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_admin_pending_companies_view_success(self):
+        self.company.verification_status = 'pending'
+        self.company.save()
+
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('admin_pending_companies')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.data) > 0)
+        self.assertEqual(response.data[0]["id"], str(self.company.id))
+
+    def test_admin_verify_action_requires_staff(self):
+        self.client.force_authenticate(user=self.company_user)
+        url = reverse('admin_verify_action', kwargs={"company_id": self.company.id})
+        response = self.client.post(url, {"action": "approve"})
+        self.assertEqual(response.status_code, 403)
+
+    def test_admin_verify_action_approve(self):
+        self.company.verification_status = 'pending'
+        self.company.save()
+
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('admin_verify_action', kwargs={"company_id": self.company.id})
+        response = self.client.post(url, {"action": "approve", "notes": "Looks perfect!"})
+        self.assertEqual(response.status_code, 200)
+        
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.verification_status, "verified")
+        self.assertTrue(self.company.verified_badge)
+
+    def test_admin_verify_action_reject(self):
+        self.company.verification_status = 'pending'
+        self.company.save()
+
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('admin_verify_action', kwargs={"company_id": self.company.id})
+        response = self.client.post(url, {"action": "reject", "notes": "Tax doc invalid"})
+        self.assertEqual(response.status_code, 200)
+        
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.verification_status, "rejected")
+        self.assertFalse(self.company.verified_badge)
+        self.assertEqual(self.company.verification_notes, "Tax doc invalid")
+
+

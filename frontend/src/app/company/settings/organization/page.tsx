@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { getCompanyProfileAction, updateCompanyProfileAction, getUserProfileAction, updateUserProfileAction } from "@/features/auth/actions";
+import VerificationWizard from "@/features/company/components/VerificationWizard";
 import { Input } from "@/shared/ui";
 import { 
   AlertCircle, 
@@ -119,6 +120,53 @@ export default function OrganizationSettingsPage() {
         >
           Retry
         </button>
+      </div>
+    );
+  }
+  
+  if (profile?.verification_status !== "verified") {
+    return (
+      <div className="text-text bg-bg pb-20 transition-colors flex min-h-screen flex-col">
+        {/* Settings Header */}
+        <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+          <div className="flex gap-6 items-center">
+            <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
+              <Network size={30} aria-hidden="true" />
+              <span className="text-2xl tracking-tight font-bold">JobLyne</span>
+            </Link>
+            <div className="h-6 hidden w-px bg-border md:block"></div>
+            <span className="type-ui hidden text-muted md:inline-block">Profile Verification</span>
+          </div>
+          <Link 
+            href="/company" 
+            className="text-primary gap-1.5 min-h-[44px] items-center type-ui transition-colors flex px-4 rounded-xl hover:bg-primary/5 hover:text-primary-dark active:scale-[0.98]"
+          >
+            <ArrowLeft size={18} aria-hidden="true" />
+            Dashboard
+          </Link>
+        </header>
+
+        <main className="w-full mx-auto flex-1 max-w-5xl p-6 md:p-12">
+          {profile?.verification_status === "pending" && profile?.legal_name && (
+            <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 text-primary p-4 flex items-center gap-3">
+              <AlertCircle className="shrink-0" size={20} aria-hidden="true" />
+              <div>
+                <p className="font-semibold text-sm">Verification Pending Review</p>
+                <p className="text-xs opacity-90">You have already submitted a verification request. You can update your submission below.</p>
+              </div>
+            </div>
+          )}
+          {profile?.verification_status === "rejected" && (
+            <div className="mb-6 rounded-xl bg-error-bg border border-error/20 text-error p-4 flex items-center gap-3">
+              <AlertCircle className="shrink-0" size={20} aria-hidden="true" />
+              <div>
+                <p className="font-semibold text-sm">Verification Rejected</p>
+                <p className="text-xs opacity-90">Notes: {profile?.verification_notes || "No notes provided."}</p>
+              </div>
+            </div>
+          )}
+          <VerificationWizard initialProfile={profile} />
+        </main>
       </div>
     );
   }
