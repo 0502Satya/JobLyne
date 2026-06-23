@@ -2,6 +2,21 @@ import uuid
 from django.db import models
 
 class Companies(models.Model):
+    COMPANY_TYPE_CHOICES = (
+        ('private_ltd', 'Private Limited'),
+        ('llp', 'Limited Liability Partnership'),
+        ('proprietorship', 'Proprietorship'),
+        ('public_ltd', 'Public Limited'),
+        ('ngo', 'Non-Governmental Organization'),
+        ('government', 'Government'),
+        ('other', 'Other'),
+    )
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -19,6 +34,40 @@ class Companies(models.Model):
     gstin_number = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+    # Legal & Verification Fields
+    legal_name = models.CharField(max_length=255, null=True, blank=True)
+    registration_number = models.CharField(max_length=255, null=True, blank=True)
+    company_type = models.CharField(max_length=50, choices=COMPANY_TYPE_CHOICES, default='private_ltd')
+    year_established = models.IntegerField(null=True, blank=True)
+    registered_address = models.TextField(null=True, blank=True)
+    official_email = models.EmailField(null=True, blank=True)
+    phone_number = models.CharField(max_length=50, null=True, blank=True)
+    authorized_contact_name = models.CharField(max_length=255, null=True, blank=True)
+    authorized_contact_designation = models.CharField(max_length=255, null=True, blank=True)
+    id_proof_url = models.TextField(null=True, blank=True)
+    incorporation_doc_url = models.TextField(null=True, blank=True)
+    tax_doc_url = models.TextField(null=True, blank=True)
+    address_proof_url = models.TextField(null=True, blank=True)
+    verification_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    verification_notes = models.TextField(null=True, blank=True)
+
+    # Public Profile Extra Fields
+    company_size = models.CharField(max_length=50, null=True, blank=True)
+    headquarters_location = models.CharField(max_length=255, null=True, blank=True)
+    additional_locations = models.JSONField(default=list, blank=True)
+    tagline = models.CharField(max_length=120, null=True, blank=True)
+    social_links = models.JSONField(default=dict, blank=True)
+
+    # Hiring Info Extra Fields
+    hiring_departments = models.JSONField(default=list, blank=True)
+    hiring_contact_email = models.EmailField(null=True, blank=True)
+    perks_benefits = models.JSONField(default=list, blank=True)
+    culture_tags = models.JSONField(default=list, blank=True)
+
+    # Settings
+    profile_visibility = models.BooleanField(default=True)
+    allow_candidate_messages = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'companies'

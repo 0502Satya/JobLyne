@@ -31,7 +31,9 @@ import {
   CheckCircle, 
   Mail, 
   SearchX, 
-  X 
+  X,
+  ShieldCheck,
+  AlertTriangle
 } from "lucide-react";
 
 interface JobPost {
@@ -355,7 +357,18 @@ export default function CompanyDashboardPage() {
               {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "CO"}
             </div>
             <div className="hidden text-left lg:block">
-              <h4 className="type-ui tracking-tight">{profile?.name || "Company Portal"}</h4>
+              <h4 className="type-ui tracking-tight flex items-center gap-1.5">
+                {profile?.name || "Company Portal"}
+                {profile?.verification_status === "verified" && (
+                  <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full border border-emerald-500/20 font-medium">Verified</span>
+                )}
+                {profile?.verification_status === "pending" && (
+                  <span className="text-[10px] bg-warning/10 text-warning px-1.5 py-0.5 rounded-full border border-warning/20 font-medium">Pending</span>
+                )}
+                {profile?.verification_status === "rejected" && (
+                  <span className="text-[10px] bg-error-bg text-error px-1.5 py-0.5 rounded-full border border-error/20 font-medium">Rejected</span>
+                )}
+              </h4>
               <p className="text-xs uppercase tracking-widest text-muted">{profile?.industry || "Unverified"}</p>
             </div>
           </div>
@@ -441,16 +454,44 @@ export default function CompanyDashboardPage() {
                   <span className="animate-ping rounded-full size-2 bg-emerald-400"></span>
                   <span className="text-xs tracking-widest uppercase">System Operational</span>
                 </div>
-                <h1 className="type-h1">
-                  {getGreeting()}{profile?.name ? `, ${profile.name}` : ""}!
+                <h1 className="type-h1 flex items-center gap-3 flex-wrap">
+                  <span>{getGreeting()}{profile?.name ? `, ${profile.name}` : ""}!</span>
+                  {profile?.verification_status === "verified" ? (
+                    <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full border border-white/30 font-medium flex items-center gap-1">
+                      <ShieldCheck size={14} /> Verified Workspace
+                    </span>
+                  ) : profile?.verification_status === "pending" ? (
+                    <span className="text-xs bg-amber-500/20 text-amber-200 px-3 py-1 rounded-full border border-amber-500/30 font-medium flex items-center gap-1">
+                      <AlertTriangle size={14} /> Verification Pending
+                    </span>
+                  ) : profile?.verification_status === "rejected" ? (
+                    <span className="text-xs bg-red-500/20 text-red-200 px-3 py-1 rounded-full border border-red-500/30 font-medium flex items-center gap-1">
+                      <AlertTriangle size={14} /> Verification Rejected
+                    </span>
+                  ) : (
+                    <span className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full border border-white/15 font-medium flex items-center gap-1">
+                      <AlertTriangle size={14} /> Unverified Workspace
+                    </span>
+                  )}
                 </h1>
                 <p className="max-w-2xl leading-relaxed text-white/90 type-body md:text-lg">
                   Your workspace is synchronized. You currently have {jobs.filter(j => j.status === "Active").length} active engineer pipelines with new applications ready for review.
                 </p>
                 <div className="gap-4 flex flex-wrap pt-4">
                   <button 
-                    onClick={() => { setActiveTab("jobs"); setShowJobModal(true); }}
-                    className="text-primary min-h-[48px] px-6 py-4 rounded-2xl items-center transition-all gap-2 flex bg-surface hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98]"
+                    onClick={() => { 
+                      if (profile?.verification_status !== "verified") {
+                        toast.error("Your organization is not verified yet. Please complete verification in settings to unlock job posting.");
+                      } else {
+                        setActiveTab("jobs"); 
+                        setShowJobModal(true); 
+                      }
+                    }}
+                    className={`min-h-[48px] px-6 py-4 rounded-2xl items-center transition-all gap-2 flex ${
+                      profile?.verification_status === "verified"
+                        ? "text-primary bg-surface hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98]"
+                        : "text-muted bg-surface/50 cursor-not-allowed opacity-75"
+                    }`}
                   >
                     <PlusCircle size={18} aria-hidden="true" />
                     Post Live Position
@@ -622,8 +663,18 @@ export default function CompanyDashboardPage() {
                 <p className="type-label">Monitor applications, modify status flags, and post new open requisitions.</p>
               </div>
               <button 
-                onClick={() => setShowJobModal(true)}
-                className="justify-center min-h-[48px] px-6 rounded-2xl py-3.5 items-center transition-all gap-2 bg-primary flex text-white hover:scale-[1.03]"
+                onClick={() => {
+                  if (profile?.verification_status !== "verified") {
+                    toast.error("Your organization is not verified yet. Please complete verification in settings to unlock job posting.");
+                  } else {
+                    setShowJobModal(true);
+                  }
+                }}
+                className={`justify-center min-h-[48px] px-6 rounded-2xl py-3.5 items-center transition-all gap-2 flex text-white ${
+                  profile?.verification_status === "verified"
+                    ? "bg-primary hover:scale-[1.03]"
+                    : "bg-muted cursor-not-allowed opacity-75"
+                }`}
               >
                 <PlusCircle size={18} aria-hidden="true" />
                 New Requisition

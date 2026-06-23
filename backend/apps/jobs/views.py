@@ -160,6 +160,11 @@ class JobListView(APIView):
             try:
                 adv_account = AdvertiserAccounts.objects.get(user=request.user)
                 company = adv_account.company
+                if company.verification_status != 'verified':
+                    return Response(
+                        {"error": "Your company profile is not verified yet. Job posting is gated until admin review is complete."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
             except AdvertiserAccounts.DoesNotExist:
                 return Response(
                     {"error": "No advertiser account associated with this company user. Please complete company profile onboarding first."},
