@@ -63,14 +63,14 @@ export default function DashboardLayout({
   const isProfilePage = pathname === "/dashboard/profile";
 
   return (
-    <div className="w-full bg-bg overflow-x-hidden flex min-h-screen flex-col">
+    <div className="w-full bg-bg flex flex-col" style={{ height: "100dvh" }}>
       <DashboardHeader
         initials={initials}
         userName={profile?.full_name}
         profileImage={profile?.profile_image}
       />
 
-      <div className="w-full flex-1 mx-auto max-w-[1440px] flex relative">
+      <div className="w-full flex-1 mx-auto max-w-[1440px] flex relative overflow-hidden">
         {!isProfilePage && (
           <DashboardSidebar 
             profile={profile}
@@ -78,7 +78,7 @@ export default function DashboardLayout({
           />
         )}
 
-        <main className={`overflow-x-hidden flex-1 pb-20 md:pb-0 ${isProfilePage ? "p-0 pb-20 md:pb-0" : "p-6 md:p-10"}`}>
+        <main className={`overflow-x-hidden overflow-y-auto flex-1 pb-20 md:pb-0 ${isProfilePage ? "p-0 pb-20 md:pb-0" : "p-6 md:p-10"}`}>
           {children}
         </main>
       </div>

@@ -31,7 +31,7 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
 
   // Height offset by --height-header plus 1px to compensate for the bottom border on the header container.
   return (
-    <aside className="h-[calc(100vh-var(--height-header)-1px)] w-64 border-border overflow-y-auto hidden pt-6 sticky top-[calc(var(--height-header)+1px)] gap-6 pb-6 border-right px-4 bg-surface flex-col md:flex">
+    <aside className="w-64 border-border hidden pt-6 pb-6 border-right px-4 bg-surface flex-col md:flex flex-shrink-0 h-full">
       {/* User Summary */}
       <div className="border-b border-border items-center text-center pb-6 flex flex-col">
         {/* Avatar */}
@@ -78,8 +78,8 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="gap-1 flex flex-col">
+      {/* Navigation Links — scrollable if content overflows */}
+      <nav className="flex-1 overflow-y-auto gap-1 flex flex-col mt-6">
         {sidebarLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
