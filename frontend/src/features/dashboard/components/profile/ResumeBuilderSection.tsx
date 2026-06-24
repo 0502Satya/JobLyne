@@ -63,9 +63,9 @@ export default function ResumeBuilderSection({ profile, onChange }: ResumeBuilde
               <h4 className="mb-2.5 uppercase tracking-wider type-caption text-muted">Select Template</h4>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { id: "classic", label: "Classic", color: "bg-slate-700" },
+                  { id: "classic", label: "Classic", color: "bg-muted" },
                   { id: "modern", label: "Modern", color: "bg-primary" },
-                  { id: "minimal", label: "Minimalist", color: "bg-slate-500" },
+                  { id: "minimal", label: "Minimalist", color: "bg-border" },
                 ].map((tmpl) => (
                   <Button
                     key={tmpl.id}
@@ -91,19 +91,19 @@ export default function ResumeBuilderSection({ profile, onChange }: ResumeBuilde
               <h4 className="uppercase tracking-wider type-caption text-muted">Optimization Recommendations</h4>
               <div className="space-y-2">
                 {(!profile?.skills || profile.skills.length < 5) && (
-                  <div className="border-amber-500/10 text-amber-600 items-start p-3 gap-2 rounded-lg flex bg-amber-500/5 type-caption border dark:text-amber-400">
+                  <div className="border-warning/10 text-warning-dark items-start p-3 gap-2 rounded-lg flex bg-warning-bg type-caption border dark:text-warning">
                     <Info size={14} className="mt-0.5" aria-hidden="true" />
                     Add at least 5 skills to showcase your core competencies.
                   </div>
                 )}
                 {(!profile?.experience || profile.experience.length === 0) && (
-                  <div className="border-amber-500/10 text-amber-600 items-start p-3 gap-2 rounded-lg flex bg-amber-500/5 type-caption border dark:text-amber-400">
+                  <div className="border-warning/10 text-warning-dark items-start p-3 gap-2 rounded-lg flex bg-warning-bg type-caption border dark:text-warning">
                     <Info size={14} className="mt-0.5" aria-hidden="true" />
                     Add work experience records to highlight your career history.
                   </div>
                 )}
                 {profileStrength >= 80 && (
-                  <div className="bg-emerald-500/5 border-emerald-500/10 text-emerald-600 items-start p-3 gap-2 rounded-lg flex type-caption border dark:text-emerald-450">
+                  <div className="bg-success-bg border-success/10 text-success-dark items-start p-3 gap-2 rounded-lg flex type-caption border dark:text-success">
                     <Sparkles size={14} className="mt-0.5" aria-hidden="true" />
                     Looking good! Your profile has excellent detail and strength.
                   </div>

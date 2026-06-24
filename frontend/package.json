@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "clean": "node -e \"['.next', 'out', 'dist', 'node_modules'].forEach(d => { try { require('fs').rmSync(d, { recursive: true, force: true }); } catch (e) {} }); console.log('Cleaned build caches successfully!');\""
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.4",
+    "@tanstack/react-virtual": "^3.14.3",
     "jose": "^5.9.6",
     "lucide-react": "^1.21.0",
     "next": "^16.2.9",
@@ -23,12 +25,17 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^9",
     "eslint-config-next": "^15.1.6",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.9"
   }
 }

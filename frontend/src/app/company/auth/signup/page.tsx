@@ -146,8 +146,8 @@ export default function CompanySignupPage() {
                   <form onSubmit={submitRegistration} className="space-y-6">
                     
                     {error && (
-                      <div className="border border-red-200 text-sm items-start text-red-700 rounded-lg gap-3 flex p-4 bg-red-50 dark:bg-red-900/30 dark:border-red-800/50 dark:text-red-400">
-                        <AlertCircle className="shrink-0 text-red-500 mt-0.5" size={20} aria-hidden="true" />
+                      <div className="border border-error/20 text-sm items-start text-error rounded-lg gap-3 flex p-4 bg-error-bg dark:border-error/20">
+                        <AlertCircle className="shrink-0 text-error mt-0.5" size={20} aria-hidden="true" />
                         <span className="flex-1">{error}</span>
                       </div>
                     )}
@@ -242,7 +242,7 @@ export default function CompanySignupPage() {
                     </div>
                     
                     <p className="pt-2 text-center text-muted type-caption">
-                      By registering, you agree to our <Link href="#" className="text-primary hover:underline">Terms of Service</Link> and <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>.
+                      By registering, you agree to our <Link href="#" className="text-primary hover:underline">Terms of service</Link> and <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>.
                     </p>
                   </form>
                 </div>

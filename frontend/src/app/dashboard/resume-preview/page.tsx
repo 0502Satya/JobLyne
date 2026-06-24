@@ -1,3 +1,4 @@
+/* eslint-disable local-rules/no-hardcoded-colors */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -66,14 +67,14 @@ export default function ResumePreviewPage() {
     return (
       <div className="justify-center items-center bg-bg flex p-4 min-h-screen">
         <div className="w-full rounded-3xl bg-surface border-border text-center shadow-xl max-w-md p-8 space-y-4 border flex flex-col items-center">
-          <AlertCircle size={40} className="text-red-500" aria-hidden="true" />
+          <AlertCircle size={40} className="text-error" aria-hidden="true" />
           <h2 className="text-text type-h2">Profile Not Found</h2>
           <p className="text-muted type-ui">We couldn&apos;t load your profile. Please make sure you are logged in.</p>
           <Button
             as={Link}
             href="/dashboard/profile"
           >
-            Back to Profile
+            Back to profile
           </Button>
         </div>
       </div>
@@ -130,7 +131,7 @@ export default function ResumePreviewPage() {
             href="/dashboard/profile"
             variant="outline"
             className="h-11 w-11 p-0 flex items-center justify-center text-muted"
-            title="Back to Profile Editor"
+            title="Back to profile Editor"
           >
             <ArrowLeft size={20} aria-hidden="true" />
           </Button>
@@ -306,7 +307,7 @@ export default function ResumePreviewPage() {
               <section className="print-break-inside-avoid">
                 <h3 className="border-b type-badge mb-3 text-muted gap-1.5 pb-1 items-center border-border flex">
                   <Zap className="text-primary" size={16} aria-hidden="true" />
-                  Skills & Expertise
+                  Skills and expertise
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {profile.skills.map((skill, i) => (

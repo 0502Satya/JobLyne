@@ -221,7 +221,7 @@ export default function OrganizationSettingsPage() {
               {/* Profile Card Summary */}
               <div className="space-y-4">
                 <div className="flex gap-3 items-center">
-                  <div className="justify-center rounded-2xl bg-gradient-to-tr size-12 items-center from-primary text-white shadow-primary/10 shadow-lg to-[#4c33cf] flex font-semibold">
+                  <div className="justify-center rounded-2xl bg-gradient-primary size-12 items-center text-white shadow-primary/10 shadow-lg flex font-semibold">
                     {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "CO"}
                   </div>
                   <div className="min-w-0">
@@ -237,7 +237,7 @@ export default function OrganizationSettingsPage() {
                   </div>
                   <div className="w-full h-2 overflow-hidden bg-bg rounded-full">
                     <div 
-                      className="bg-gradient-to-r h-full transition-all from-primary rounded-full duration-500 to-[#4c33cf]"
+                      className="bg-gradient-primary h-full transition-all rounded-full duration-500"
                       style={{ width: `${completionPercent}%` }}
                     ></div>
                   </div>
@@ -252,7 +252,7 @@ export default function OrganizationSettingsPage() {
                   { id: "personal", label: "Personal Details", icon: User },
                   { id: "general", label: "General Information", icon: Info },
                   { id: "location", label: "HQ Coordinates", icon: MapPin },
-                  { id: "values", label: "Culture & Perks", icon: Palette },
+                  { id: "values", label: "Culture and perks", icon: Palette },
                 ].map((step) => {
                   const StepIcon = step.icon;
                   return (
@@ -364,7 +364,7 @@ export default function OrganizationSettingsPage() {
 
                   <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <Input 
-                      label="First Name"
+                      label="First name"
                       name="first_name"
                       required
                       value={userProfile?.first_name || ""}
@@ -372,7 +372,7 @@ export default function OrganizationSettingsPage() {
                       placeholder="e.g. John"
                     />
                     <Input 
-                      label="Last Name"
+                      label="Last name"
                       name="last_name"
                       required
                       value={userProfile?.last_name || ""}
@@ -383,14 +383,14 @@ export default function OrganizationSettingsPage() {
 
                   <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <Input 
-                      label="Email (Read Only)"
+                      label="Email (read only)"
                       name="email"
                       disabled
                       value={userProfile?.email || ""}
                       placeholder="john.doe@company.com"
                     />
                     <Input 
-                      label="Phone Number"
+                      label="Phone number"
                       name="phone"
                       required
                       value={userProfile?.phone || ""}
@@ -400,7 +400,7 @@ export default function OrganizationSettingsPage() {
                   </div>
 
                   <Input 
-                    label="Avatar / Photo URL"
+                    label="Avatar / photo URL"
                     name="profile_photo_url"
                     type="url"
                     value={userProfile?.profile_photo_url || ""}
@@ -430,7 +430,7 @@ export default function OrganizationSettingsPage() {
 
                   <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <Input 
-                      label="Company Name"
+                      label="Company name"
                       name="name"
                       required
                       value={profile?.name || ""}
@@ -438,7 +438,7 @@ export default function OrganizationSettingsPage() {
                       placeholder="e.g. Acme Corp"
                     />
                     <Input 
-                      label="Industry Sector"
+                      label="Industry sector"
                       name="industry"
                       required
                       value={profile?.industry || ""}
@@ -490,7 +490,7 @@ export default function OrganizationSettingsPage() {
                       onClick={() => setActiveStep("location")}
                       className="justify-center flex-1 min-h-[44px] gap-1 rounded-xl py-3 items-center transition-all type-ui shadow-lg shadow-primary/20 bg-primary flex text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer font-semibold"
                     >
-                      Continue to Headquarters <ArrowRight size={14} aria-hidden="true" />
+                      Continue to headquarters <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -536,7 +536,7 @@ export default function OrganizationSettingsPage() {
                       onClick={() => setActiveStep("values")}
                       className="justify-center flex-1 min-h-[44px] gap-1 rounded-xl py-3 items-center transition-all type-ui shadow-lg shadow-primary/20 bg-primary flex text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer font-semibold"
                     >
-                      Continue to Culture <ArrowRight size={14} aria-hidden="true" />
+                      Continue to culture <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -547,7 +547,7 @@ export default function OrganizationSettingsPage() {
                 <div className="fade-in animate-in space-y-6 duration-200">
                   <div className="gap-2 flex text-primary items-center">
                     <Palette className="text-primary" size={24} aria-hidden="true" />
-                    <h3 className="text-text type-h2">Culture & Perks</h3>
+                    <h3 className="text-text type-h2">Culture and perks</h3>
                   </div>
 
                   <div className="space-y-1.5 text-left">
@@ -571,7 +571,7 @@ export default function OrganizationSettingsPage() {
 
                   <div className="space-y-1.5 text-left">
                     <div className="flex items-center justify-between">
-                      <label className="text-text type-ui block font-medium" htmlFor="benefits">Perks & Compensation Perks</label>
+                      <label className="text-text type-ui block font-medium" htmlFor="benefits">Perks and compensation Perks</label>
                       <span className="text-xs text-muted">
                         {(profile?.benefits || "").length} / 500
                       </span>
@@ -600,7 +600,7 @@ export default function OrganizationSettingsPage() {
                     <button 
                       type="submit"
                       disabled={isPending}
-                      className="relative bg-gradient-to-r justify-center flex-1 min-h-[44px] rounded-xl py-3 text-base transition-all from-primary shadow-primary/20 items-center gap-2 shadow-xl to-[#4c33cf] flex text-white hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-semibold"
+                      className="relative bg-gradient-primary justify-center flex-1 min-h-[44px] rounded-xl py-3 text-base transition-all shadow-primary/20 items-center gap-2 shadow-xl flex text-white hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-semibold"
                     >
                       <span className="flex items-center gap-2">
                         <Save size={18} aria-hidden="true" />

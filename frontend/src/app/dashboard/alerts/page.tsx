@@ -234,7 +234,7 @@ export default function JobAlertsPage() {
               <button 
                 onClick={() => handleTogglePref("email_enabled", !!preferences?.email_enabled)}
                 className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.email_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle Email Alerts"
+                aria-label="Toggle email alerts"
               >
                 <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.email_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
               </button>
@@ -254,7 +254,7 @@ export default function JobAlertsPage() {
               <button 
                 onClick={() => handleTogglePref("push_enabled", !!preferences?.push_enabled)}
                 className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.push_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle Push Alerts"
+                aria-label="Toggle push alerts"
               >
                 <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.push_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
               </button>
@@ -274,7 +274,7 @@ export default function JobAlertsPage() {
               <button 
                 onClick={() => handleTogglePref("sms_enabled", !!preferences?.sms_enabled)}
                 className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.sms_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle SMS Alerts"
+                aria-label="Toggle SMS alerts"
               >
                 <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.sms_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
               </button>
@@ -338,7 +338,7 @@ export default function JobAlertsPage() {
                         {/* Toggle Alert Enabled */}
                         <button 
                           onClick={() => handleToggleAlertActive(alert)}
-                          className={`w-11 justify-center min-h-[44px] items-center transition-colors h-11 flex min-w-[44px] rounded-xl border ${alert.alert_enabled ? "text-green-700 bg-green-50/20 border-green-200/40 dark:text-green-400 hover:bg-green-100/10" : "bg-bg text-muted border-border/30 hover:text-text"}`}
+                          className={`w-11 justify-center min-h-[44px] items-center transition-colors h-11 flex min-w-[44px] rounded-xl border ${alert.alert_enabled ? "text-success bg-success-bg border-success/20 hover:bg-success-bg/80" : "bg-bg text-muted border-border/30 hover:text-text"}`}
                           aria-label={alert.alert_enabled ? "Pause alert" : "Activate alert"}
                         >
                           {alert.alert_enabled ? (
@@ -351,7 +351,7 @@ export default function JobAlertsPage() {
                         {/* Delete Alert */}
                         <button 
                           onClick={() => handleDeleteAlert(alert.id)}
-                          className="w-11 justify-center shrink-0 min-w-[44px] min-h-[44px] items-center text-red-500 transition-all bg-red-50/10 h-11 flex border-red-200/30 rounded-xl border dark:bg-red-900/10 hover:bg-red-500 hover:text-white hover:border-red-500"
+                          className="w-11 justify-center shrink-0 min-w-[44px] min-h-[44px] items-center text-error transition-all bg-error-bg h-11 flex border-error/20 rounded-xl border hover:bg-error hover:text-white hover:border-error"
                           aria-label="Delete alert"
                         >
                           <Trash2 size={20} aria-hidden="true" />
@@ -449,7 +449,7 @@ export default function JobAlertsPage() {
                   type="button"
                   onClick={() => setIsAlertEnabled(!isAlertEnabled)}
                   className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${isAlertEnabled ? "bg-primary" : "bg-border"}`}
-                  aria-label="Toggle Alert Enabled Status"
+                  aria-label="Toggle alert enabled status"
                 >
                   <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${isAlertEnabled ? "translate-x-6" : "translate-x-0"}`}></div>
                 </button>
@@ -468,7 +468,7 @@ export default function JobAlertsPage() {
                   disabled={creating}
                   className="relative justify-center type-badge flex-1 min-h-[48px] gap-1.5 py-3.5 items-center shadow bg-primary flex text-white rounded-xl transition-opacity hover:opacity-90"
                 >
-                  <span>Save & Subscribe</span>
+                  <span>Save and subscribe</span>
                   {creating && (
                     <span className="absolute right-4 flex items-center">
                       <span className="border-2 rounded-full h-4 border-t-transparent w-4 animate-spin border-white"></span>

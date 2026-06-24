@@ -78,7 +78,7 @@ export default function UserMenu({
                     <form action={logoutAction}>
                         <button
                             type="submit"
-                            className="w-full group type-label py-4 items-center transition-all gap-3 flex text-left px-5 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
+                            className="w-full group type-label py-4 items-center transition-all gap-3 flex text-left px-5 hover:text-error hover:bg-error-bg"
                         >
                             <LogOut size={18} className="transition-transform group-hover:rotate-12" aria-hidden="true" />
                             Logout

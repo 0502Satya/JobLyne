@@ -24,7 +24,7 @@ export default function ThemeToggle() {
       type="button"
       className="text-text justify-center cursor-pointer rounded-xl border-border items-center transition-all shadow-sm select-none flex size-10 bg-surface border hover:bg-bg hover:text-primary dark:hover:bg-card/50"
       title={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      aria-label="Toggle Theme"
+      aria-label="Toggle theme"
     >
       {dark ? (
         <Sun size={18} aria-hidden="true" />

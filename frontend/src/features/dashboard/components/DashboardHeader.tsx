@@ -17,9 +17,6 @@ interface DashboardHeaderProps {
 
 const headerNavLinks = [
   { name: "Jobs", href: "/jobs" },
-  { name: "Companies", href: "#", disabled: true },
-  { name: "Salaries", href: "#", disabled: true },
-  { name: "Community", href: "#", disabled: true },
   { name: "Upskill", href: "/courses" },
 ];
 
@@ -58,18 +55,6 @@ export default function DashboardHeader({
         {/* Navigation Links with Active States */}
         <nav className="gap-6 hidden items-center lg:flex h-full">
           {headerNavLinks.map((link) => {
-            if (link.disabled) {
-              return (
-                <span
-                  key={link.name}
-                  title={`${link.name} - Coming Soon`}
-                  className="type-label leading-normal text-muted/50 cursor-not-allowed py-1 border-b-2 border-transparent select-none"
-                  aria-disabled="true"
-                >
-                  {link.name}
-                </span>
-              );
-            }
             const isActive = pathname === link.href || (link.href !== "/jobs" && pathname.startsWith(link.href));
             return (
               <Link 

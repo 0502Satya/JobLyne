@@ -104,7 +104,7 @@ export default function CoursesPage() {
         <div>
           <h2 className="text-text items-center type-h1 gap-2 flex">
             <GraduationCap className="text-primary" size={30} aria-hidden="true" />
-            Bridge Your Skill Gap
+            Bridge your skill gap
           </h2>
           <p className="mt-1 text-muted">Learn new skills to qualify for the high-paying jobs listed on JobLyne.</p>
         </div>
@@ -175,7 +175,7 @@ export default function CoursesPage() {
                 <div>
                   <div className="gap-2 flex mb-3 items-center">
                     <span className="px-2 py-1 text-primary type-caption rounded bg-primary/10">{course.category}</span>
-                    <div className="flex text-yellow-500 items-center">
+                    <div className="flex text-warning items-center">
                       <Star className="fill-current" size={14} aria-hidden="true" />
                       <span className="ml-1 type-caption">{course.rating}</span>
                     </div>
@@ -190,7 +190,7 @@ export default function CoursesPage() {
                     onClick={(e) => { e.stopPropagation(); handleEnrollNow(course.title); }}
                     className="type-ui text-primary min-h-[44px] hover:underline"
                   >
-                    Enroll Now
+                    Enroll now
                   </button>
                 </div>
               </div>
@@ -241,7 +241,7 @@ export default function CoursesPage() {
               {/* Course Meta Info */}
               <div className="rounded-2xl border-primary/20 items-center bg-primary/5 flex-col p-6 justify-between flex gap-6 border sm:flex-row">
                 <div className="flex items-center gap-4">
-                  <div className="flex text-yellow-500 items-center bg-surface border border-border/40 p-3 rounded-xl">
+                  <div className="flex text-warning items-center bg-surface border border-border/40 p-3 rounded-xl">
                     <Star className="fill-current" size={24} aria-hidden="true" />
                     <span className="ml-1 text-lg font-bold">{selectedCourse.rating} Rating</span>
                   </div>
@@ -302,7 +302,7 @@ export default function CoursesPage() {
                 className="justify-center px-8 min-h-[48px] gap-1.5 items-center py-3 type-ui shadow bg-primary flex text-white rounded-xl transition-opacity hover:opacity-90"
               >
                 <ShoppingCart size={18} aria-hidden="true" />
-                Buy & Enroll Now
+                Buy & Enroll now
               </button>
             </div>
           </div>

@@ -84,7 +84,7 @@ export default function PublicCompanyProfilePage() {
   if (error || !profile) {
     return (
       <div className="text-text justify-center mx-auto items-center bg-bg text-center p-6 max-w-md flex min-h-screen flex-col">
-        <Building2 className="text-red-500 mb-4" size={60} aria-hidden="true" />
+        <Building2 className="text-error mb-4" size={60} aria-hidden="true" />
         <h2 className="mb-2 type-h2">Workspace Unresolved</h2>
         <p className="mb-6 type-label">{error || "The requested employer workspace does not exist or has been cancelled."}</p>
         <Link href="/" className="justify-center type-badge px-6 rounded-2xl min-h-[44px] items-center py-3 bg-primary flex text-white">
@@ -119,7 +119,7 @@ export default function PublicCompanyProfilePage() {
       <main className="w-full py-12 mx-auto space-y-12 px-6 max-w-5xl">
         
         {/* Banner Section */}
-        <section className="bg-gradient-to-r rounded-card gap-8 relative border-primary/20 from-primary/15 items-center to-[#4c33cf]/10 overflow-hidden shadow-sm flex-col flex justify-between p-8 border md:items-start md:p-12 md:flex-row">
+        <section className="bg-gradient-to-r rounded-card gap-8 relative border-primary/20 from-primary/15 items-center to-accent-gradient/10 overflow-hidden shadow-sm flex-col flex justify-between p-8 border md:items-start md:p-12 md:flex-row">
           
           <div className="z-10 relative items-center text-center flex gap-6 flex-col md:items-start md:flex-row md:text-left">
             {/* Logo */}
@@ -130,7 +130,7 @@ export default function PublicCompanyProfilePage() {
                 className="shrink-0 object-cover border-border shadow-md rounded-3xl border-2 bg-surface size-20" 
               />
             ) : (
-              <div className="justify-center shrink-0 type-h2 rounded-3xl bg-gradient-to-tr items-center from-primary text-white shadow-lg to-[#4c33cf] flex size-20">
+              <div className="justify-center shrink-0 type-h2 rounded-3xl bg-gradient-primary items-center text-white shadow-lg flex size-20">
                 {logoInitials}
               </div>
             )}
@@ -139,8 +139,8 @@ export default function PublicCompanyProfilePage() {
               <div className="justify-center items-center flex-wrap gap-3 flex md:justify-start">
                 <h1 className="text-text type-h1">{profile.name}</h1>
                 {profile.verified_badge && (
-                  <span className="py-1 gap-1 uppercase text-xs text-blue-500 items-center px-2.5 bg-blue-500/10 tracking-widest rounded-full border-blue-500/20 flex border font-semibold">
-                    <BadgeCheck size={14} className="fill-blue-500/10" aria-hidden="true" />
+                  <span className="py-1 gap-1 uppercase text-xs text-info items-center px-2.5 bg-info-bg tracking-widest rounded-full border-info/20 flex border font-semibold">
+                    <BadgeCheck size={14} className="fill-info/10" aria-hidden="true" />
                     Verified
                   </span>
                 )}
@@ -173,7 +173,7 @@ export default function PublicCompanyProfilePage() {
             <div className="rounded-card border-border shadow-sm p-8 space-y-4 bg-surface border">
               <h3 className="text-text type-h2 items-center gap-2 flex">
                 <Info className="text-primary" size={20} aria-hidden="true" />
-                About the Organization
+                About the organization
               </h3>
               <p className="break-word type-label leading-relaxed overflow-wrap">
                 {profile.description || "No company bio provided yet."}
@@ -196,7 +196,7 @@ export default function PublicCompanyProfilePage() {
               <div className="rounded-card border-border shadow-sm p-8 space-y-4 bg-surface border">
                 <h3 className="text-text type-h2 items-center gap-2 flex">
                   <Crown className="text-primary" size={20} aria-hidden="true" />
-                  Perks & Compensation
+                  Perks and compensation
                 </h3>
                 <p className="break-word type-label leading-relaxed overflow-wrap">
                   {profile.benefits}
@@ -220,7 +220,7 @@ export default function PublicCompanyProfilePage() {
                     <h4 className="text-text leading-tight text-base">{job.title}</h4>
                     <p className="tracking-tight type-caption text-muted">{job.location} &bull; {job.employment_type}</p>
                     {job.salary_min && (
-                      <p className="weight-display mt-1 text-xs text-emerald-500">
+                      <p className="weight-display mt-1 text-xs text-success">
                         Salary: {job.currency || "$"}{Number(job.salary_min).toLocaleString()}
                         {job.salary_max ? ` - ${Number(job.salary_max).toLocaleString()}` : "+"}
                       </p>

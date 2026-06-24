@@ -86,8 +86,8 @@ export default function LanguagesSection({ data = [], onChange }: LanguagesSecti
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveLanguage(idx)}
-                      className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
-                      title="Remove Language"
+                      className="hover:text-error min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                      title="Remove language"
                       aria-label={`Remove ${lang.name}`}
                     >
                       <X size={12} aria-hidden="true" />

@@ -347,23 +347,23 @@ export default function CompanyDashboardPage() {
           <Link 
             href="/company/settings/organization" 
             className="justify-center items-center size-11 text-muted transition-colors p-2.5 flex rounded-xl hover:bg-bg hover:text-primary"
-            title="Organization Settings"
+            title="Organization settings"
           >
             <Settings size={24} aria-hidden="true" />
           </Link>
           <div className="h-10 w-px bg-border"></div>
           <div className="flex gap-3 items-center">
-            <div className="justify-center cursor-pointer rounded-2xl bg-gradient-to-tr items-center size-11 from-primary text-white shadow-primary/20 shadow-lg to-[var(--color-accent-gradient)] flex">
+            <div className="justify-center cursor-pointer rounded-2xl bg-gradient-primary items-center size-11 text-white shadow-primary/20 shadow-lg flex">
               {profile?.name ? profile.name.substring(0, 2).toUpperCase() : "CO"}
             </div>
             <div className="hidden text-left lg:block">
               <h4 className="type-ui tracking-tight flex items-center gap-1.5">
                 {profile?.name || "Company Portal"}
                 {profile?.verification_status === "verified" && (
-                  <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full border border-emerald-500/20 font-medium">Verified</span>
+                  <span className="text-[10px] bg-success-bg text-success px-1.5 py-0.5 rounded-full border border-success/20 font-medium">Verified</span>
                 )}
                 {profile?.verification_status === "pending" && (
-                  <span className="text-[10px] bg-warning/10 text-warning px-1.5 py-0.5 rounded-full border border-warning/20 font-medium">Pending</span>
+                  <span className="text-[10px] bg-warning-bg text-warning px-1.5 py-0.5 rounded-full border border-warning/20 font-medium">Pending</span>
                 )}
                 {profile?.verification_status === "rejected" && (
                   <span className="text-[10px] bg-error-bg text-error px-1.5 py-0.5 rounded-full border border-error/20 font-medium">Rejected</span>
@@ -374,7 +374,7 @@ export default function CompanyDashboardPage() {
           </div>
           <button 
             onClick={() => logoutAction()} 
-            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-error hover:bg-error/5 active:scale-[0.98]"
           >
             Logout
           </button>
@@ -412,13 +412,13 @@ export default function CompanyDashboardPage() {
               {/* Circular Gauge */}
               <div className="justify-center shrink-0 relative items-center flex size-16">
                 <svg className="size-full -rotate-90">
-                  <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(245, 158, 11, 0.15)" strokeWidth="6" />
+                  <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--color-warning-bg)" strokeWidth="6" />
                   <circle 
                     cx="32" 
                     cy="32" 
                     r="28" 
                     fill="transparent" 
-                    stroke="rgb(245, 158, 11)" 
+                    stroke="var(--color-warning)" 
                     strokeWidth="6" 
                     strokeDasharray={2 * Math.PI * 28} 
                     strokeDashoffset={2 * Math.PI * 28 * (1 - completeness / 100)} 
@@ -448,10 +448,10 @@ export default function CompanyDashboardPage() {
         {activeTab === "overview" && (
           <div className="fade-in animate-in space-y-8 duration-300">
             {/* Welcome Banner */}
-            <section className="bg-gradient-to-r rounded-card max-w-full relative overflow-hidden from-primary shadow-primary/25 shadow-2xl to-[var(--color-accent-gradient)] p-8 text-white md:p-12">
+            <section className="bg-gradient-primary rounded-card max-w-full relative overflow-hidden shadow-primary/25 shadow-2xl p-8 text-white md:p-12">
               <div className="space-y-5 relative z-10">
                 <div className="bg-white/10 inline-flex items-center backdrop-blur-md gap-2 py-1.5 rounded-full border-white/15 px-4 border">
-                  <span className="animate-ping rounded-full size-2 bg-emerald-400"></span>
+                  <span className="animate-ping rounded-full size-2 bg-success animate-pulse"></span>
                   <span className="text-xs tracking-widest uppercase">System Operational</span>
                 </div>
                 <h1 className="type-h1 flex items-center gap-3 flex-wrap">
@@ -461,11 +461,11 @@ export default function CompanyDashboardPage() {
                       <ShieldCheck size={14} /> Verified Workspace
                     </span>
                   ) : profile?.verification_status === "pending" ? (
-                    <span className="text-xs bg-amber-500/20 text-amber-200 px-3 py-1 rounded-full border border-amber-500/30 font-medium flex items-center gap-1">
+                    <span className="text-xs bg-warning-bg text-warning px-3 py-1 rounded-full border border-warning/30 font-medium flex items-center gap-1">
                       <AlertTriangle size={14} /> Verification Pending
                     </span>
                   ) : profile?.verification_status === "rejected" ? (
-                    <span className="text-xs bg-red-500/20 text-red-200 px-3 py-1 rounded-full border border-red-500/30 font-medium flex items-center gap-1">
+                    <span className="text-xs bg-error-bg text-error px-3 py-1 rounded-full border border-error/30 font-medium flex items-center gap-1">
                       <AlertTriangle size={14} /> Verification Rejected
                     </span>
                   ) : (
@@ -512,9 +512,9 @@ export default function CompanyDashboardPage() {
             {/* Quick Summary Cards */}
             <section className="gap-6 grid grid-cols-1 md:grid-cols-3">
               {[
-                { title: "Active Positions", count: jobs.filter(j => j.status === "Active").length, icon: Briefcase, color: "text-info", bg: "bg-info/10", border: "border-info/20", trend: "Interactive" },
+                { title: "Active Positions", count: jobs.filter(j => j.status === "Active").length, icon: Briefcase, color: "text-info", bg: "bg-info-bg", border: "border-info/20", trend: "Interactive" },
                 { title: "Developer Pool", count: candidates.length, icon: Users, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20", trend: "Live database" },
-                { title: "Interviews Booked", count: candidates.filter(c => c.interviewStatus === "Invited").length, icon: Calendar, color: "text-warning", bg: "bg-warning/10", border: "border-warning/20", trend: "Active pipeline" },
+                { title: "Interviews Booked", count: candidates.filter(c => c.interviewStatus === "Invited").length, icon: Calendar, color: "text-warning", bg: "bg-warning-bg", border: "border-warning/20", trend: "Active pipeline" },
               ].map((stat, i) => {
                 const StatIcon = stat.icon;
                 return (
@@ -526,7 +526,7 @@ export default function CompanyDashboardPage() {
                       <span className="text-text tracking-tight type-h1">{stat.count}</span>
                     </div>
                     <h4 className="type-label uppercase tracking-wider mb-1">{stat.title}</h4>
-                    <div className="type-badge gap-1.5 items-center text-emerald-500 flex">
+                    <div className="type-badge gap-1.5 items-center text-success flex">
                       <TrendingUp size={14} aria-hidden="true" />
                       {stat.trend}
                     </div>
@@ -557,7 +557,7 @@ export default function CompanyDashboardPage() {
                         <div className="flex gap-2.5 flex-wrap items-center">
                           <h4 className="text-text text-base">{job.title}</h4>
                           <span className={`py-1 px-2.5 rounded-full type-badge ${
-                            job.status === "Active" ? "bg-emerald-500/10 text-emerald-500" : "bg-warning/10 text-warning"
+                            job.status === "Active" ? "bg-success-bg text-success" : "bg-warning-bg text-warning"
                           }`}>{job.status}</span>
                         </div>
                         <p className="tracking-tight type-caption text-muted">{job.department} &bull; {job.location} &bull; {job.salary}</p>
@@ -581,7 +581,7 @@ export default function CompanyDashboardPage() {
                       title="No active listings found"
                       description="Create a requisition to get started with recruitment."
                       icon="work_off"
-                      actionLabel="Create Requisition"
+                      actionLabel="Create requisition"
                       onAction={() => { setActiveTab("jobs"); setShowJobModal(true); }}
                       className="w-full max-w-lg mt-4"
                     />
@@ -688,7 +688,7 @@ export default function CompanyDashboardPage() {
                     <div className="flex gap-3 flex-wrap items-center">
                       <h3 className="text-text type-h2">{job.title}</h3>
                       <span className={`py-1 px-2.5 rounded-full type-badge ${
-                        job.status === "Active" ? "bg-emerald-500/10 text-emerald-500" : job.status === "Draft" ? "bg-warning/10 text-warning" : "text-red-500 bg-red-500/10"
+                        job.status === "Active" ? "bg-success-bg text-success" : job.status === "Draft" ? "bg-warning-bg text-warning" : "text-error bg-error-bg"
                       }`}>{job.status}</span>
                     </div>
                     <div className="type-label items-center flex-wrap gap-3 flex">
@@ -721,7 +721,7 @@ export default function CompanyDashboardPage() {
                   title="No live postings found"
                   description="Create a requisition to attract elite engineering candidates."
                   icon="work_off"
-                  actionLabel="New Requisition"
+                  actionLabel="New requisition"
                   onAction={() => setShowJobModal(true)}
                   className="w-full max-w-lg mt-6"
                 />
@@ -813,7 +813,7 @@ export default function CompanyDashboardPage() {
                       <div className="pb-2 text-left space-y-1 lg:text-right">
                         <span className="block type-badge text-muted">Status</span>
                         <span className={`type-badge uppercase ${
-                          c.interviewStatus === "Invited" ? "text-emerald-500" : "text-muted"
+                          c.interviewStatus === "Invited" ? "text-success" : "text-muted"
                         }`}>
                           {c.interviewStatus === "Invited" ? "Interview Requested" : "Open to Sourcing"}
                         </span>
@@ -824,7 +824,7 @@ export default function CompanyDashboardPage() {
                         disabled={c.interviewStatus === "Invited"}
                         className={`w-full justify-center min-h-[48px] rounded-2xl py-3.5 items-center gap-2 transition-all type-ui flex px-4 active:scale-[0.98] ${
                           c.interviewStatus === "Invited" 
-                            ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20 cursor-default border" 
+                            ? "text-success bg-success-bg border-success/20 cursor-default border" 
                             : "bg-primary shadow-lg text-white shadow-primary/10 hover:scale-[1.02]"
                         }`}
                       >

@@ -190,12 +190,12 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
 
   // Theme Helpers
   const accentGradient = theme === "company" 
-    ? "from-teal-500 via-teal-600 to-emerald-700 shadow-teal-500/10" 
-    : "from-amber-400 via-amber-500 to-yellow-600 shadow-amber-500/10";
+    ? "bg-gradient-company-card shadow-company-accent/10" 
+    : "bg-gradient-recruiter-card shadow-recruiter-accent/10";
   
   const textGradient = theme === "company"
-    ? "from-teal-400 to-emerald-500"
-    : "from-amber-400 to-yellow-500";
+    ? "bg-gradient-company-text"
+    : "bg-gradient-recruiter-text";
 
   const presetClass = (preset: string) => {
     const isSelected = depositAmount === preset;
@@ -224,8 +224,8 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
     : "text-recruiter-accent bg-recruiter-accent/10 border-recruiter-accent/20";
 
   const progressGradient = theme === "company"
-    ? "from-company-accent to-emerald-500"
-    : "from-recruiter-accent to-yellow-500";
+    ? "from-company-accent to-company-gradient-end"
+    : "from-recruiter-accent to-recruiter-gradient-end";
 
   const presets = role === "COMPANY" ? ["50", "100", "250", "500"] : ["25", "50", "100", "250"];
 
@@ -247,7 +247,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
           </Link>
           <button
             onClick={handleLogout}
-            className="min-h-[44px] px-3 text-red-400 items-center type-ui transition-colors flex py-2 hover:text-red-300"
+            className="min-h-[44px] px-3 text-error/80 items-center type-ui transition-colors flex py-2 hover:text-error"
           >
             Logout
           </button>
@@ -271,7 +271,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
               {/* Debit Card Panel */}
               <div className="lg:col-span-7 rounded-3xl bg-card/40 relative overflow-hidden flex-col p-6 backdrop-blur-sm justify-between shadow-2xl flex gap-6 border-border border sm:p-8">
                 <div className={`w-80 absolute blur-[100px] pointer-events-none rounded-full h-80 right-0 top-0 ${theme === "company" ? "bg-company-accent/5" : "bg-recruiter-accent/5"}`}></div>
-                <div className="w-80 h-80 absolute blur-[100px] pointer-events-none left-0 rounded-full bg-blue-500/5 bottom-0"></div>
+                <div className="w-80 h-80 absolute blur-[100px] pointer-events-none left-0 rounded-full bg-primary/5 bottom-0"></div>
 
                 <div className="flex gap-6 flex-col">
                   <h2 className="type-h3 items-center gap-2 text-muted flex font-semibold">
@@ -289,7 +289,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
 
                     <div className="flex items-start justify-between">
                       <div className="flex flex-col">
-                        <span className="opacity-80 text-xs uppercase tracking-widest text-teal-950">
+                        <span className={`opacity-80 text-xs uppercase tracking-widest ${theme === "company" ? "text-white" : "text-on-warning"}`}>
                           {role === "COMPANY" ? "Organization Pool" : "Corporate Wallet"}
                         </span>
                         <span className="type-card-title text-white mt-1 font-bold">
@@ -297,19 +297,19 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
                         </span>
                       </div>
                       <div className="bg-white/10 justify-center w-10 border-white/20 items-center backdrop-blur-md text-white h-8 flex rounded-md type-caption border font-semibold">
-                        VISA
+                        Visa
                       </div>
                     </div>
 
                     {/* Chip representation */}
-                    <div className="bg-gradient-to-r w-10 via-yellow-100 to-yellow-300 relative overflow-hidden from-yellow-300 border-black/10 h-8 rounded-md shadow-inner border">
+                    <div className="bg-card-chip w-10 relative overflow-hidden border-black/10 h-8 rounded-md shadow-inner border">
                       <div className="bg-black/10 left-1/3 inset-y-0 absolute w-px"></div>
                       <div className="bg-black/10 right-1/3 inset-y-0 absolute w-px"></div>
                       <div className="bg-black/10 absolute inset-x-0 top-1/2 h-px"></div>
                     </div>
 
                     <div className="flex flex-col">
-                      <span className="opacity-80 text-xs uppercase tracking-widest text-teal-950">
+                      <span className={`opacity-80 text-xs uppercase tracking-widest ${theme === "company" ? "text-white" : "text-on-warning"}`}>
                         {role === "COMPANY" ? "Available Balance" : "Available Funds"}
                       </span>
                       <span className="tracking-tight weight-display leading-none text-white mt-1 text-2xl sm:text-3xl font-extrabold">
@@ -319,7 +319,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
 
                     <div className="flex items-end justify-between">
                       <div className="flex flex-col">
-                        <span className="uppercase text-xs tracking-wider text-teal-950 opacity-60">
+                        <span className={`uppercase text-xs tracking-wider opacity-60 ${theme === "company" ? "text-white" : "text-on-warning"}`}>
                           Account Owner
                         </span>
                         <span className="text-white type-caption mt-0.5 font-medium">
@@ -327,7 +327,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="block uppercase text-xs tracking-wider text-teal-950 opacity-60">
+                        <span className={`block uppercase text-xs tracking-wider opacity-60 ${theme === "company" ? "text-white" : "text-on-warning"}`}>
                           Card Status
                         </span>
                         <span className="px-2 border-white/10 text-xs uppercase bg-white/20 text-white py-0.5 tracking-wider rounded border font-semibold">
@@ -532,19 +532,19 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
                         {/* Feature Checks */}
                         <ul className="border-t text-xs border-border/80 gap-3 pt-5 text-muted flex flex-col sm:text-sm">
                           <li className="gap-2 flex items-center">
-                            <span className="text-emerald-400">✓</span>
+                            <span className="text-success">✓</span>
                             <span>{p.features.cv_unlocks} {role === "COMPANY" ? "Recruiter CV Unlocks" : "Candidate Profile Unlocks"}</span>
                           </li>
                           <li className="gap-2 flex items-center">
-                            <span className="text-emerald-400">✓</span>
+                            <span className="text-success">✓</span>
                             <span>{p.features.job_postings} Premium Job Openings</span>
                           </li>
                           <li className="gap-2 flex items-center">
-                            <span className="text-emerald-400">✓</span>
+                            <span className="text-success">✓</span>
                             <span>{role === "COMPANY" ? "AI Candidate Rank & Sourcing Engine" : "Smart AI Talent Sourcing Sort"}</span>
                           </li>
                           <li className="gap-2 flex items-center">
-                            <span className="text-emerald-400">✓</span>
+                            <span className="text-success">✓</span>
                             <span>{role === "COMPANY" ? "Secure Team Chats & Inboxes" : "Direct Chat & Messaging Room"}</span>
                           </li>
                         </ul>
@@ -609,12 +609,12 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
                           <tr key={tx.id} className="hover:bg-card/20 text-muted">
                             <td className="truncate capitalize p-3">{tx.reference_type}</td>
                             <td className="p-3">
-                              <span className={tx.transaction_type === "deposit" ? "text-emerald-400" : "text-amber-500"}>
+                              <span className={tx.transaction_type === "deposit" ? "text-success" : "text-warning"}>
                                 {tx.transaction_type === "deposit" ? "+" : "-"}${parseFloat(tx.amount).toFixed(2)}
                               </span>
                             </td>
                             <td className="p-3">
-                              <span className="px-2 text-xs text-emerald-400 uppercase bg-emerald-500/10 py-0.5 border-emerald-500/20 tracking-wider rounded border font-semibold">
+                              <span className="px-2 text-xs text-success uppercase bg-success-bg py-0.5 border-success/20 tracking-wider rounded border font-semibold">
                                 {tx.status}
                               </span>
                             </td>
@@ -667,7 +667,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`justify-center uppercase min-h-[44px] items-center tracking-wide flex cursor-pointer type-caption hover:underline ${
-                                  theme === "company" ? "text-teal-400 hover:text-teal-350" : "text-amber-400 hover:text-amber-355"
+                                  theme === "company" ? "text-company-accent hover:text-company-accent/80" : "text-recruiter-accent hover:text-recruiter-accent/80"
                                 }`}
                               >
                                 PDF

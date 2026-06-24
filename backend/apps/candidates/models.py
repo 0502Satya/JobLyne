@@ -175,3 +175,16 @@ class CandidateShortlists(models.Model):
     class Meta:
         db_table = 'candidate_shortlists'
         unique_together = [['recruiter', 'job_seeker']]
+
+class CandidateProfileViews(models.Model):
+    """Records each time a recruiter/company user views a candidate's profile."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job_seeker = models.ForeignKey('JobSeekers', on_delete=models.CASCADE, null=False, blank=False, related_name='profile_views')
+    viewer = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='viewed_profiles')
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'candidate_profile_views'
+        indexes = [
+            models.Index(fields=['job_seeker', 'viewed_at']),
+        ]

@@ -3,55 +3,91 @@ import Button from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PaginationProps = {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  className?: string;
+  currentPage:     number;
+  totalPages:      number;
+  onPageChange:    (page: number) => void;
+  siblingsCount?:  number;
+  showEdgePages?:  boolean;
+  className?:      string;
 };
 
 export default function Pagination({
   currentPage,
   totalPages,
   onPageChange,
+  siblingsCount = 1,
+  showEdgePages = true,
   className = "",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Generate pagination items
+  const siblingRangeStart = Math.max(1, currentPage - siblingsCount);
+  const siblingRangeEnd = Math.min(totalPages, currentPage + siblingsCount);
 
-  // Show a window of page numbers
-  const maxVisiblePages = 5;
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  const pageItems: (number | "ellipsis-left" | "ellipsis-right")[] = [];
 
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  if (showEdgePages) {
+    // First page and left ellipsis
+    if (siblingRangeStart > 1) {
+      pageItems.push(1);
+      if (siblingRangeStart > 2) {
+        pageItems.push("ellipsis-left");
+      }
+    }
+
+    // Sibling range
+    for (let i = siblingRangeStart; i <= siblingRangeEnd; i++) {
+      if (!pageItems.includes(i)) {
+        pageItems.push(i);
+      }
+    }
+
+    // Right ellipsis and last page
+    if (siblingRangeEnd < totalPages) {
+      if (siblingRangeEnd < totalPages - 1) {
+        pageItems.push("ellipsis-right");
+      }
+      if (!pageItems.includes(totalPages)) {
+        pageItems.push(totalPages);
+      }
+    }
+  } else {
+    for (let i = siblingRangeStart; i <= siblingRangeEnd; i++) {
+      pageItems.push(i);
+    }
   }
 
-  const visiblePages = pages.slice(startPage - 1, endPage);
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === totalPages;
 
   return (
     <nav
       role="navigation"
-      aria-label="Pagination Navigation"
+      aria-label="Pagination navigation"
       className={`flex items-center justify-between gap-4 py-4 border-t border-border/40 w-full ${className}`}
     >
+      {/* Mobile View */}
       <div className="flex-1 flex justify-between sm:hidden">
         <Button
           variant="outline"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={isFirstPage}
+          aria-disabled={isFirstPage ? "true" : undefined}
         >
           Previous
         </Button>
         <Button
           variant="outline"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={isLastPage}
+          aria-disabled={isLastPage ? "true" : undefined}
         >
           Next
         </Button>
       </div>
+
+      {/* Desktop View */}
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted">
@@ -66,73 +102,49 @@ export default function Pagination({
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                disabled={isFirstPage}
+                aria-disabled={isFirstPage ? "true" : undefined}
                 aria-label="Go to previous page"
                 className="min-h-[32px] px-2.5 py-1"
               >
                 <ChevronLeft size={16} aria-hidden="true" />
               </Button>
             </li>
-            {startPage > 1 && (
-              <>
-                <li>
+
+            {pageItems.map((item, index) => {
+              if (item === "ellipsis-left" || item === "ellipsis-right") {
+                return (
+                  <li key={`ellipsis-${index}`}>
+                    <span className="px-2 text-muted text-sm" aria-hidden="true">...</span>
+                  </li>
+                );
+              }
+
+              const isCurrent = currentPage === item;
+              return (
+                <li key={item}>
                   <Button
-                    variant={currentPage === 1 ? "primary" : "outline"}
+                    variant="outline"
+                    selected={isCurrent}
                     size="sm"
-                    onClick={() => onPageChange(1)}
-                    aria-label="Go to page 1"
+                    onClick={() => onPageChange(item)}
+                    aria-label={`Go to page ${item}`}
+                    aria-current={isCurrent ? "page" : undefined}
                     className="min-h-[32px] px-3 py-1"
                   >
-                    1
+                    {item}
                   </Button>
                 </li>
-                {startPage > 2 && (
-                  <li>
-                    <span className="px-2 text-muted text-sm">...</span>
-                  </li>
-                )}
-              </>
-            )}
-            {visiblePages.map((page) => (
-              <li key={page}>
-                <Button
-                  variant={currentPage === page ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(page)}
-                  aria-label={`Go to page ${page}`}
-                  aria-current={currentPage === page ? "page" : undefined}
-                  className="min-h-[32px] px-3 py-1"
-                >
-                  {page}
-                </Button>
-              </li>
-            ))}
-            {endPage < totalPages && (
-              <>
-                {endPage < totalPages - 1 && (
-                  <li>
-                    <span className="px-2 text-muted text-sm">...</span>
-                  </li>
-                )}
-                <li>
-                  <Button
-                    variant={currentPage === totalPages ? "primary" : "outline"}
-                    size="sm"
-                    onClick={() => onPageChange(totalPages)}
-                    aria-label={`Go to page ${totalPages}`}
-                    className="min-h-[32px] px-3 py-1"
-                  >
-                    {totalPages}
-                  </Button>
-                </li>
-              </>
-            )}
+              );
+            })}
+
             <li>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                disabled={isLastPage}
+                aria-disabled={isLastPage ? "true" : undefined}
                 aria-label="Go to next page"
                 className="min-h-[32px] px-2.5 py-1"
               >

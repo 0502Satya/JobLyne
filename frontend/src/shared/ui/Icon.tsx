@@ -129,6 +129,7 @@ import {
   X,
   Zap,
   Inbox,
+  Table,
   type LucideIcon,
 } from "lucide-react";
 
@@ -276,6 +277,7 @@ const iconMap: Record<string, LucideIcon> = {
   work_off: Briefcase,
   workspace_premium: Crown,
   inbox: Inbox,
+  grid_on: Table,
 };
 
 

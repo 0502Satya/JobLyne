@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useId } from "react";
 
 type TooltipProps = {
   content: string;
   children: React.ReactNode;
   position?: "top" | "bottom" | "left" | "right";
   className?: string;
+  delay?:     number;
+  maxWidth?:  number;
 };
 
 export default function Tooltip({
@@ -14,8 +16,12 @@ export default function Tooltip({
   children,
   position = "top",
   className = "",
+  delay = 200,
+  maxWidth,
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tooltipId = `tooltip-${useId()}`;
 
   const positionStyles = {
     top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
@@ -24,24 +30,50 @@ export default function Tooltip({
     right: "left-full top-1/2 -translate-y-1/2 ml-2",
   };
 
+  const showTooltip = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(true);
+    }, delay);
+  };
+
+  const hideTooltip = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsVisible(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   return (
-    <div
+    <span
       className={`relative inline-block ${className}`}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onFocus={() => setIsVisible(true)}
-      onBlur={() => setIsVisible(false)}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onFocus={showTooltip}
+      onBlur={hideTooltip}
+      aria-describedby={isVisible ? tooltipId : undefined}
     >
       {children}
-      {isVisible && (
-        <div
-          role="tooltip"
-          className={`absolute whitespace-nowrap bg-text text-bg text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none transition-all duration-150 animate-in fade-in-50 zoom-in-95 ${positionStyles[position]}`}
-          style={{ zIndex: "var(--z-tooltip)" }}
-        >
-          {content}
-        </div>
-      )}
-    </div>
+      <div
+        id={tooltipId}
+        role="tooltip"
+        className={[
+          "absolute bg-text text-bg text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none transition-opacity duration-150 ease-out",
+          isVisible ? "opacity-100" : "opacity-0",
+          positionStyles[position],
+        ].join(" ")}
+        style={{
+          zIndex: "var(--z-tooltip)",
+          maxWidth: maxWidth ? `${maxWidth}px` : undefined,
+          whiteSpace: maxWidth ? "normal" : "nowrap",
+        }}
+      >
+        {content}
+      </div>
+    </span>
   );
 }

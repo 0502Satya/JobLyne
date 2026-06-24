@@ -134,13 +134,13 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
   const getCompanyColor = (companyName: string) => {
     const colors = [
       "bg-primary",
-      "bg-orange-500",
-      "bg-emerald-500",
+      "bg-experience",
+      "bg-success",
       "bg-primary",
-      "bg-purple-500",
-      "bg-rose-500",
-      "bg-cyan-500",
-      "bg-amber-500"
+      "bg-accent",
+      "bg-error",
+      "bg-company-accent",
+      "bg-warning"
     ];
     if (!companyName) return colors[0];
     let hash = 0;
@@ -242,7 +242,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
               return (
                 <div key={exp.id} className="min-w-0 relative group">
                   {/* Timeline Dot/Badge */}
-                  <div className={`-left-[43px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[51px] sm:w-10 ${companyColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
+                  <div className={`-left-[44px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[52px] sm:w-10 ${companyColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
                     {initials}
                   </div>
 
@@ -251,13 +251,13 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                     <div className="border-border bg-bg/40 p-5 shadow-inner space-y-4 rounded-xl border">
                       <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                         <Input
-                          label="Job Title"
+                          label="Job title"
                           value={exp.title || ""}
                           onChange={(e) => updateEntry(exp.id, "title", e.target.value)}
                           placeholder="e.g. Lead Frontend Developer"
                         />
                         <Input
-                          label="Company Name"
+                          label="Company name"
                           value={exp.company || ""}
                           onChange={(e) => updateEntry(exp.id, "company", e.target.value)}
                           placeholder="e.g. Google"
@@ -265,7 +265,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                       </div>
 
                       <div className="gap-4 grid grid-cols-1 md:grid-cols-4">
-                        <FormField label="Employment Type">
+                        <FormField label="Employment type">
                           <Select
                             value={exp.employment_type || "Full-time"}
                             onChange={(e) => updateEntry(exp.id, "employment_type", e.target.value)}
@@ -281,7 +281,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                         />
 
                         <Input
-                          label="Start Date"
+                          label="Start date"
                           type="date"
                           value={exp.start_date || ""}
                           onChange={(e) => updateEntry(exp.id, "start_date", e.target.value)}
@@ -289,7 +289,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                         />
 
                         <Input
-                          label="End Date"
+                          label="End date"
                           type="date"
                           value={exp.end_date || ""}
                           disabled={exp.current}
@@ -328,7 +328,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                       {/* Description & AI suggestor */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Responsibilities & Achievements</label>
+                          <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Responsibilities and achievements</label>
                           <Button
                             type="button"
                             variant="ghost"
@@ -364,7 +364,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleRemoveTech(exp.id, tech)}
-                                className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                                className="hover:text-error min-w-8 h-8 p-0 flex items-center justify-center text-muted"
                                 aria-label={`Remove ${tech}`}
                               >
                                  <X size={12} aria-hidden="true" />
@@ -414,8 +414,8 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                           disabled={idx === 0}
                           onClick={() => moveEntry(idx, "up")}
                           className="h-10 w-10 p-0 rounded-lg"
-                          title="Move Up"
-                          aria-label="Move Up"
+                          title="Move up"
+                          aria-label="Move up"
                         >
                            <ArrowUp size={16} aria-hidden="true" />
                         </Button>
@@ -425,8 +425,8 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                           disabled={idx === experience.length - 1}
                           onClick={() => moveEntry(idx, "down")}
                           className="h-10 w-10 p-0 rounded-lg"
-                          title="Move Down"
-                          aria-label="Move Down"
+                          title="Move down"
+                          aria-label="Move down"
                         >
                            <ArrowDown size={16} aria-hidden="true" />
                         </Button>
@@ -435,8 +435,8 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                           variant="outline"
                           onClick={() => setEditingId(exp.id || null)}
                           className="h-10 w-10 p-0 rounded-lg"
-                          title="Edit Experience"
-                          aria-label="Edit Experience"
+                          title="Edit experience"
+                          aria-label="Edit experience"
                         >
                            <Pencil size={16} aria-hidden="true" />
                         </Button>
@@ -444,9 +444,9 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                           type="button"
                           variant="outline"
                           onClick={() => removeEntry(exp.id)}
-                          className="h-10 w-10 p-0 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                          title="Delete Experience"
-                          aria-label="Delete Experience"
+                          className="h-10 w-10 p-0 rounded-lg text-error hover:text-error/90 hover:bg-error-bg"
+                          title="Delete experience"
+                          aria-label="Delete experience"
                         >
                            <Trash2 size={16} aria-hidden="true" />
                         </Button>

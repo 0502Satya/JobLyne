@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { getSavedJobsAction, unsaveJobAction, applyToJobAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
 import { Button } from "@/shared/ui";
@@ -114,7 +115,7 @@ export default function SavedJobsPage() {
                 variant="primary"
                 className="flex-1 py-2 min-h-0"
               >
-                {applying === job.id ? "Applying..." : "Apply Now"}
+                {applying === job.id ? "Applying..." : "Apply now"}
               </Button>
             </div>
           </div>
@@ -125,7 +126,7 @@ export default function SavedJobsPage() {
             <div className="flex gap-3 items-center flex-col">
               <Bookmark size={48} className="text-muted" aria-hidden="true" />
               <p className="text-muted">You haven&apos;t saved any jobs yet.</p>
-              <a href="/dashboard" className="type-ui text-primary hover:underline">Discover Jobs →</a>
+              <Link href="/jobs" className="type-ui text-primary hover:underline">Browse Jobs →</Link>
             </div>
           </div>
         )}

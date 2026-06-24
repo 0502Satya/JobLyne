@@ -95,7 +95,7 @@ export default function JobListItem({
         )}
 
         {job.salary_min && (
-          <span className="py-1 border-green-200/30 text-green-700 bg-green-50 rounded-lg px-2.5 ml-auto type-badge border text-xs font-semibold dark:bg-green-900/10 dark:text-green-400">
+          <span className="py-1 border-success/20 text-success bg-success-bg rounded-lg px-2.5 ml-auto type-badge border text-xs font-semibold">
             {job.currency}
             {job.salary_min.toLocaleString()} - {job.salary_max?.toLocaleString()}
           </span>
@@ -114,11 +114,11 @@ export default function JobListItem({
           <div
             className={`py-1 type-badge gap-1.5 uppercase px-3 items-center rounded-full tracking-wider flex font-semibold ${
               matchVal >= 80
-                ? "text-green-700 bg-green-50 border-green-200/40 border dark:bg-green-900/20 dark:text-green-400"
+                ? "text-success bg-success-bg border-success/20 border"
                 : "text-primary border border-primary/20 bg-primary/10"
             }`}
           >
-            <Sparkles size={14} className={matchVal >= 80 ? "fill-current text-green-750 dark:text-green-450" : "fill-current text-primary"} aria-hidden="true" />
+            <Sparkles size={14} className={matchVal >= 80 ? "fill-current text-success" : "fill-current text-primary"} aria-hidden="true" />
             {matchVal}% Match
           </div>
         </div>

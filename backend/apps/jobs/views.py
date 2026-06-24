@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from apps.jobs.models import Jobs, JobSkills, Applications
-from apps.candidates.models import JobSeekers, JobSeekerSkills, SavedJobs
+from apps.candidates.models import JobSeekers, JobSeekerSkills, SavedJobs, CandidateShortlists, CandidateProfileViews
 from apps.commerce.models import AdvertiserAccounts
 from apps.companies.models import Recruiters, Companies
 from apps.taxonomy.models import Skills
@@ -364,15 +364,50 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             return Response({"error": "Only candidates can access stats."}, status=status.HTTP_403_FORBIDDEN)
         
         try:
+            from datetime import timedelta
             job_seeker = JobSeekers.objects.get(user=request.user)
             total_applications = Applications.objects.filter(job_seeker=job_seeker).count()
-            profile_views = 0 
+            
+            # Real profile views from the candidate_profile_views table
+            now = timezone.now()
+            seven_days_ago = now - timedelta(days=7)
+            fourteen_days_ago = now - timedelta(days=14)
+            
+            profile_views = CandidateProfileViews.objects.filter(job_seeker=job_seeker).count()
+            views_this_week = CandidateProfileViews.objects.filter(job_seeker=job_seeker, viewed_at__gte=seven_days_ago).count()
+            views_last_week = CandidateProfileViews.objects.filter(job_seeker=job_seeker, viewed_at__range=(fourteen_days_ago, seven_days_ago)).count()
+            
+            # Calculate week-over-week growth percentage
+            if views_last_week == 0:
+                profile_views_change = 100 if views_this_week > 0 else 0
+            else:
+                profile_views_change = int(((views_this_week - views_last_week) / views_last_week) * 100)
+            
+            # Count of pending review applications
+            pending_applications = Applications.objects.filter(job_seeker=job_seeker, status='PENDING').count()
+            
+            # Number of interview phase applications
             interviews = Applications.objects.filter(job_seeker=job_seeker, status='INTERVIEW').count()
+            
+            # Next upcoming interview details
+            next_interview_app = Applications.objects.filter(
+                job_seeker=job_seeker, 
+                status='INTERVIEW', 
+                interview_schedule__isnull=False,
+                interview_schedule__gte=timezone.now()
+            ).order_by('interview_schedule').first()
+            
+            next_interview_time = None
+            if next_interview_app:
+                next_interview_time = next_interview_app.interview_schedule.isoformat()
             
             return Response({
                 "applications": total_applications,
+                "pending_applications": pending_applications,
                 "profile_views": profile_views,
-                "interviews": interviews
+                "profile_views_change": profile_views_change,
+                "interviews": interviews,
+                "next_interview_time": next_interview_time
             })
         except JobSeekers.DoesNotExist:
              return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)

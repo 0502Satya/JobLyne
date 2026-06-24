@@ -22,17 +22,17 @@ export default function Footer() {
                             <span className="text-text tracking-tight type-h3">JobLyne</span>
                         </div>
                         <p className="type-label leading-relaxed transition-colors max-w-xs mb-6">
-                            One Stop Solution For Your Career Intelligence.
+                            One stop solution for your career intelligence.
                         </p>
                         {/* Social media icons */}
                         <div className="gap-4 flex">
-                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="Official Website">
+                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="Official website">
                                 <Globe size={20} aria-hidden="true" />
                             </a>
-                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="Email Support">
+                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="Email support">
                                 <AtSign size={20} aria-hidden="true" />
                             </a>
-                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="RSS Feed">
+                            <a className="w-11 justify-center items-center bg-bg transition-all shadow-sm rounded-full h-11 flex text-muted hover:bg-primary hover:text-white" href="#" aria-label="RSS feed">
                                 <Rss size={20} aria-hidden="true" />
                             </a>
                         </div>
@@ -42,7 +42,7 @@ export default function Footer() {
                     <div>
                         <h5 className="text-text uppercase tracking-widest mb-6 type-caption">Platform</h5>
                         <ul className="text-sm space-y-4 text-muted">
-                            <li><Link className="hover:text-primary transition-colors" href="/jobs">Find Jobs</Link></li>
+                            <li><Link className="hover:text-primary transition-colors" href="/jobs">Find jobs</Link></li>
                             <li><Link className="hover:text-primary transition-colors" href="/courses">Courses</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Talent Search</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Pricing</Link></li>

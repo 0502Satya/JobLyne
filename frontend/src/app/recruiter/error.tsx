@@ -9,7 +9,7 @@ export default function RecruiterError({ error, reset }: {
 }) {
   return (
     <div className="justify-center min-h-[400px] mx-auto my-12 border border-border items-center text-center shadow-sm rounded-[24px] max-w-md flex gap-6 p-8 bg-surface flex-col">
-      <div className="justify-center h-16 w-16 items-center text-red-500 rounded-full flex bg-red-50 dark:bg-red-950/30">
+      <div className="justify-center h-16 w-16 items-center text-error rounded-full flex bg-error-bg">
         <AlertCircle size={30} aria-hidden="true" />
       </div>
       <div>
@@ -20,7 +20,7 @@ export default function RecruiterError({ error, reset }: {
       </div>
       <button 
         onClick={reset} 
-        className="text-xs px-6 shadow-md uppercase shadow-red-500/20 transition-all py-3 text-white tracking-widest bg-red-500 rounded-xl hover:bg-red-600 active:scale-95 cursor-pointer"
+        className="text-xs px-6 shadow-md uppercase shadow-error/20 transition-all py-3 text-white tracking-widest bg-error rounded-xl hover:bg-error/95 active:scale-95 cursor-pointer"
       >
         Try again
       </button>

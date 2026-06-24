@@ -105,7 +105,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
   const strengthColors = [
     "bg-border/20",
     "bg-error",
-    "bg-orange-500",
+    "bg-warning",
     "bg-warning",
     "bg-success"
   ];
@@ -129,7 +129,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
 
       {/* Single-column inputs: First Name */}
       <Input
-        label="First Name"
+        label="First name"
         id="first_name"
         name="first_name"
         placeholder="John"
@@ -142,7 +142,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
 
       {/* Last Name */}
       <Input
-        label="Last Name"
+        label="Last name"
         id="last_name"
         name="last_name"
         placeholder="Doe"
@@ -155,7 +155,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
 
       {/* Email Address */}
       <Input
-        label="Email Address"
+        label="Email address"
         id="email"
         name="email"
         placeholder="name@example.com"
@@ -194,7 +194,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
               <span className="text-muted">Password Strength:</span>
               <span className={`font-semibold ${
                 strength === 1 ? "text-error" :
-                strength === 2 ? "text-orange-500" :
+                strength === 2 ? "text-warning" :
                 strength === 3 ? "text-warning" :
                 strength === 4 ? "text-success" : "text-muted"
               }`}>
@@ -220,7 +220,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
 
       {/* Confirm Password */}
       <Input
-        label="Confirm Password"
+        label="Confirm password"
         id="password_confirm"
         name="password_confirm"
         placeholder="••••••••"
@@ -240,7 +240,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
         isLoading={isPending}
         className="w-full mt-6"
       >
-        Create {role} Account
+        Create {role} account
       </Button>
     </form>
   );

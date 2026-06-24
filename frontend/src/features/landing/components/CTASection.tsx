@@ -19,10 +19,10 @@ export default function CTASection() {
                 {/* Main action buttons */}
                 <div className="justify-center gap-4 flex items-stretch flex-col sm:flex-row sm:items-center">
                     <Button variant="primary" size="lg" className="rounded-2xl sm:min-h-[64px] sm:text-lg sm:py-5 sm:px-10 shadow-lg shadow-primary/25">
-                        Create Free Account
+                        Create free account
                     </Button>
                     <Button variant="outline" size="lg" className="rounded-2xl sm:min-h-[64px] sm:text-lg sm:py-5 sm:px-10">
-                        Talk to Sales
+                        Talk to sales
                     </Button>
                 </div>
             </Container>
