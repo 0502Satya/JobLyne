@@ -147,13 +147,13 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                       <div className="space-y-4">
                         <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                           <Input
-                            label="Project Title"
+                            label="Project title"
                             value={proj.title || ""}
                             onChange={(e) => updateProject(proj.id, "title", e.target.value)}
                             placeholder="e.g. E-Commerce Platform"
                           />
                           <Input
-                            label="Your Role"
+                            label="Your role"
                             value={proj.role || ""}
                             onChange={(e) => updateProject(proj.id, "role", e.target.value)}
                             placeholder="e.g. Lead Architect"
@@ -174,14 +174,14 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                             placeholder="https://myproject.com"
                           />
                           <Input
-                            label="GitHub Repo URL"
+                            label="GitHub repo URL"
                             value={proj.github_url || ""}
                             onChange={(e) => updateProject(proj.id, "github_url", e.target.value)}
                             placeholder="https://github.com/myrepo"
                           />
                         </div>
 
-                        <FormField label="Project Description">
+                        <FormField label="Project description">
                           <textarea
                             value={proj.description || ""}
                             onChange={(e) => updateProject(proj.id, "description", e.target.value)}
@@ -206,7 +206,7 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleRemoveTech(proj.id, tech)}
-                                  className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                                  className="hover:text-error min-w-8 h-8 p-0 flex items-center justify-center text-muted"
                                   aria-label={`Remove ${tech}`}
                                 >
                                   <X size={12} aria-hidden="true" />
@@ -255,8 +255,8 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                             variant="outline"
                             onClick={() => setEditingId(proj.id || null)}
                             className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-muted border-border hover:text-primary"
-                            title="Edit Project"
-                            aria-label="Edit Project"
+                            title="Edit project"
+                            aria-label="Edit project"
                           >
                             <Pencil size={16} aria-hidden="true" />
                           </Button>
@@ -264,9 +264,9 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                             type="button"
                             variant="outline"
                             onClick={() => removeProject(proj.id)}
-                            className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-red-500 border-border hover:bg-red-500/10"
-                            title="Delete Project"
-                            aria-label="Delete Project"
+                            className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-error border-border hover:bg-error-bg"
+                            title="Delete project"
+                            aria-label="Delete project"
                           >
                             <Trash2 size={16} aria-hidden="true" />
                           </Button>

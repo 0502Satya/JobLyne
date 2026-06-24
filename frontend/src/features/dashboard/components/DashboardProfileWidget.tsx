@@ -44,11 +44,11 @@ export default function DashboardProfileWidget({
   return (
     <div className="w-full shrink-0 flex gap-6 flex-col">
       {/* Profile Summary Card */}
-      <div className="p-10 rounded-[32px] items-center bg-surface text-center flex shadow-xl shadow-slate-200/50 flex-col">
+      <div className="p-10 rounded-[32px] items-center bg-surface text-center flex shadow-xl flex-col">
         {/* Progress Circle around Image */}
         <div className="h-36 relative mb-6 w-36">
           <svg className="w-full h-full -rotate-90">
-            <circle cx="72" cy="72" r="68" fill="transparent" stroke="#F1F5F9" strokeWidth="8" />
+            <circle cx="72" cy="72" r="68" fill="transparent" stroke="var(--color-chart-grid)" strokeWidth="8" />
             <circle
               cx="72" cy="72" r="68" fill="transparent"
               stroke="var(--color-primary)"
@@ -80,7 +80,7 @@ export default function DashboardProfileWidget({
             <div key={skill.label} className="flex-1 items-center gap-3 flex flex-col">
               <div className="h-16 relative w-16">
                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="32" cy="32" r="28" fill="transparent" stroke="#f1f5f9" strokeWidth="6" />
+                    <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--color-chart-grid)" strokeWidth="6" />
                     <circle 
                       cx="32" cy="32" r="28" fill="transparent" stroke={skill.color} strokeWidth="6" 
                       strokeDasharray={176} 
@@ -99,11 +99,11 @@ export default function DashboardProfileWidget({
       </div>
 
       {/* Recent Activities Card */}
-      <div className="p-10 rounded-[32px] bg-surface shadow-xl grow shadow-slate-200/50">
+      <div className="p-10 rounded-[32px] bg-surface shadow-xl grow">
         <h4 className="mb-8 type-card-title text-text">Recent Activities</h4>
         <div className="space-y-8 relative">
           {/* Vertical Line */}
-          <div className="left-[23px] top-2 absolute w-0.5 bg-bg bottom-6"></div>
+          <div className="left-[24px] top-2 absolute w-0.5 bg-bg bottom-6"></div>
 
           {activities.map((activity) => (
             <div key={activity.id} className="z-10 group relative transition-all flex gap-5 cursor-default hover:translate-x-1">

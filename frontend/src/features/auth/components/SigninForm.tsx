@@ -92,7 +92,7 @@ export default function SigninForm({ role = "Candidate" }: { role?: string }) {
       
       {/* Input for Email Address */}
       <Input
-        label="Email Address"
+        label="Email address"
         id="email"
         name="email"
         placeholder="name@example.com"
@@ -115,7 +115,7 @@ export default function SigninForm({ role = "Candidate" }: { role?: string }) {
             onClick={() => toast.info("Password recovery is coming soon. Please contact system support.")}
             className="type-ui text-primary transition-colors hover:text-primary/80 font-medium cursor-pointer"
           >
-            Forgot Password?
+            Forgot password?
           </button>
         </div>
         <Input
@@ -147,7 +147,7 @@ export default function SigninForm({ role = "Candidate" }: { role?: string }) {
         isLoading={isPending}
         className="w-full mt-4"
       >
-        Sign In as {role}
+        Sign in as {role}
       </Button>
     </form>
   );

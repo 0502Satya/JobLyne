@@ -60,7 +60,7 @@ export default function CandidateCard({
         </div>
       </div>
 
-      <button className="w-full bg-card py-4 rounded-2xl uppercase mt-8 transition-all text-white tracking-widest shadow-lg shadow-slate-900/20 type-badge hover:bg-black">
+      <button className="w-full bg-primary py-4 rounded-2xl uppercase mt-8 transition-all text-white tracking-widest shadow-lg shadow-primary/20 type-badge hover:opacity-90 active:scale-[0.98]">
         View Public Profile
       </button>
     </div>

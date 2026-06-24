@@ -205,7 +205,7 @@ export default function CompanyTeamPage() {
           </Link>
           <button 
             onClick={() => logoutAction()} 
-            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-error hover:bg-error/5 active:scale-[0.98]"
           >
             Logout
           </button>
@@ -231,13 +231,13 @@ export default function CompanyTeamPage() {
 
         {/* Alerts */}
         {error && (
-          <div className="slide-in-from-top-2 rounded-2xl text-red-500 animate-in gap-3 border-red-500/20 type-ui flex p-4 bg-red-500/10 border">
+          <div className="slide-in-from-top-2 rounded-2xl text-error animate-in gap-3 border-error/20 type-ui flex p-4 bg-error-bg border">
             <AlertCircle size={20} aria-hidden="true" />
             {error}
           </div>
         )}
         {success && (
-          <div className="slide-in-from-top-2 rounded-2xl text-emerald-500 animate-in gap-3 bg-emerald-500/10 type-ui border-emerald-500/20 flex p-4 border">
+          <div className="slide-in-from-top-2 rounded-2xl text-success animate-in gap-3 bg-success-bg type-ui border-success/20 flex p-4 border">
             <CheckCircle size={20} aria-hidden="true" />
             {success}
           </div>
@@ -269,7 +269,7 @@ export default function CompanyTeamPage() {
             
             <div className="rounded-card border-border overflow-hidden shadow-sm bg-surface border">
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left min-w-[550px]">
+                <table className="w-full border-collapse text-left min-w-[552px]">
                   <thead>
                     <tr className="border-b bg-bg/50 border-border">
                       <th scope="col" className="type-badge p-4">Teammate</th>
@@ -286,7 +286,7 @@ export default function CompanyTeamPage() {
                         <tr key={member.id} className="border-b transition-colors border-border last:border-0 hover:bg-bg/10">
                           <td className="p-4">
                             <div className="flex gap-3 items-center">
-                              <div className="justify-center shrink-0 shadow-md bg-gradient-to-tr items-center from-primary text-white type-ui to-[#4c33cf] flex size-10 rounded-xl">
+                              <div className="justify-center shrink-0 shadow-md bg-gradient-primary items-center text-white type-ui flex size-10 rounded-xl">
                                 {initials}
                               </div>
                               <div className="min-w-0">
@@ -434,7 +434,7 @@ export default function CompanyTeamPage() {
       <Dialog
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
-        title="Confirm Member Dissociation"
+        title="Confirm member dissociation"
       >
         <div className="space-y-4">
           <p className="text-text">

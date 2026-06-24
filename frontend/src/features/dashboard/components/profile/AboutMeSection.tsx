@@ -135,7 +135,7 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
                       size="sm"
                       onClick={() => handleToolbarClick("list")}
                       className="h-8 w-8 p-0 min-w-8 text-text hover:bg-border/60"
-                      title="Bullet List"
+                      title="Bullet list"
                       aria-label="Bullet list"
                     >
                       <List size={16} aria-hidden="true" />
@@ -163,7 +163,7 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
                       className="w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted resize-none leading-relaxed px-4"
                     />
                     <span className={`bottom-3 absolute right-4 type-caption ${
-                      bioLength >= characterLimit ? "text-red-500" : "text-muted"
+                      bioLength >= characterLimit ? "text-error" : "text-muted"
                     }`}>
                       {bioLength} / {characterLimit} Chars
                     </span>
@@ -197,7 +197,7 @@ export default function AboutMeSection({ data, onChange }: AboutMeSectionProps) 
                 </div>
               ) : (
                 /* Preview Area */
-                <div className="text-text bg-bg/50 border-border min-h-[150px] leading-relaxed type-ui whitespace-pre-line p-4 rounded-xl border">
+                <div className="text-text bg-bg/50 border-border min-h-[152px] leading-relaxed type-ui whitespace-pre-line p-4 rounded-xl border">
                   {data.bio || <span className="italic text-muted">No summary written yet. Click edit to write one.</span>}
                 </div>
               )}

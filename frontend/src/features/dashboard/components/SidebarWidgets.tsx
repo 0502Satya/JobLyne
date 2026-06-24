@@ -50,7 +50,7 @@ export default function SidebarWidgets() {
                   href={action.link} 
                   className="text-primary gap-1 inline-flex items-center type-caption hover:underline font-bold"
                 >
-                  Get Started
+                  Get started
                   <ArrowRight size={12} className="font-bold" aria-hidden="true" />
                 </Link>
               </div>

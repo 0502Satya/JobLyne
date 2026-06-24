@@ -11,6 +11,7 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   error?: string;
   helper?: string;
+  isValid?: boolean;
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -24,6 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       label,
       error,
       helper,
+      isValid,
       required,
       ...props
     },
@@ -52,11 +54,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             required={required}
             className={className}
+            error={error}
+            isValid={isValid}
             {...props}
           />
         </FormField>
       );
     }
+
+    const stateBorderClass = error
+      ? "border-error! focus:ring-error! focus:border-error!"
+      : isValid
+      ? "border-success! focus:ring-success! focus:border-success!"
+      : "border-input-border focus:ring-primary focus:border-primary";
 
     return (
       <div className="relative w-full text-text">
@@ -73,7 +83,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           type={resolvedType}
           required={required}
-          className={`w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg border-input-border focus:ring-2 focus:border-primary focus:ring-primary placeholder:text-muted disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`w-full text-text outline-none transition-all rounded-md py-3 border bg-input-bg focus:ring-2 placeholder:text-muted disabled:opacity-50 disabled:cursor-not-allowed read-only:bg-surface-2/60 read-only:text-muted read-only:border-border/40 read-only:cursor-default read-only:focus:ring-0 read-only:focus:border-border/40 ${stateBorderClass} ${
             icon ? "pl-10" : "pl-4"
           } ${
             type === "password" && showVisibilityToggle ? "pr-10" : "pr-4"

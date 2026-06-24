@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Button, Container, ThemeToggle } from "@/shared/ui";
 import { Search, Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 
-export default function Navbar() {
+interface NavbarProps {
+    isLoggedIn?: boolean;
+}
+
+export default function Navbar({ isLoggedIn = false }: NavbarProps) {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [recruiterUrl, setRecruiterUrl] = React.useState("/recruiter");
     const [companyUrl, setCompanyUrl] = React.useState("/company");
@@ -33,7 +37,7 @@ export default function Navbar() {
 
     return (
         <header className="w-full border-b border-border bg-surface/80 backdrop-blur-md sticky transition-colors z-50 overflow-visible top-0">
-            <Container size="xl" className="h-16 sm:h-20 items-center flex justify-between">
+            <Container size="xl" className="h-[var(--height-header)] items-center flex justify-between">
                 {/* Left side: Logo and main links */}
                 <div className="gap-4 flex items-center sm:gap-8">
                     <Link href="/" className="shrink-0 group items-center gap-2 flex">
@@ -72,12 +76,12 @@ export default function Navbar() {
 
                     {/* Compact Mobile Auth Actions (always visible on mobile) */}
                     <div className="flex sm:hidden items-center ml-1">
-                        <MobileCompactAuthActions />
+                        <MobileCompactAuthActions isLoggedIn={isLoggedIn} />
                     </div>
 
                     {/* Desktop Auth Actions */}
                     <div className="border-l border-border hidden items-center gap-2 pl-4 ml-2 sm:flex">
-                        <AuthActions isMobile={false} />
+                        <AuthActions isLoggedIn={isLoggedIn} isMobile={false} />
                         <div className="hidden h-6 mx-2 w-px bg-border lg:block"></div>
                         <EmployerDropdown recruiterUrl={recruiterUrl} companyUrl={companyUrl} />
                     </div>
@@ -86,7 +90,7 @@ export default function Navbar() {
                     <button 
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className="sm:hidden w-11 justify-center items-center transition-colors h-11 flex text-muted hover:text-primary cursor-pointer select-none"
-                        aria-label="Toggle Menu"
+                        aria-label="Toggle menu"
                     >
                         {isMenuOpen ? (
                             <X size={24} aria-hidden="true" />
@@ -108,7 +112,7 @@ export default function Navbar() {
                     </nav>
 
                     <div className="border-t flex-col gap-3 border-border flex pt-4 dark:border-border">
-                        <AuthActions isMobile={true} />
+                        <AuthActions isLoggedIn={isLoggedIn} isMobile={true} />
                         <div className="mt-2 grid-cols-2 grid gap-3">
                            <Link 
                                 href={`${recruiterUrl}/auth/signin`}
@@ -133,14 +137,7 @@ export default function Navbar() {
 /**
  * Compact action button for guest mobile layout context.
  */
-function MobileCompactAuthActions() {
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-
-    React.useEffect(() => {
-        const hasSession = document.cookie.includes('joblyne_session=true');
-        setIsLoggedIn(hasSession);
-    }, []);
-
+function MobileCompactAuthActions({ isLoggedIn }: { isLoggedIn: boolean }) {
     if (isLoggedIn) {
         return (
             <Button 
@@ -162,7 +159,7 @@ function MobileCompactAuthActions() {
             variant="primary"
             size="sm"
         >
-            Get Started
+            Get started
         </Button>
     );
 }
@@ -170,14 +167,7 @@ function MobileCompactAuthActions() {
 /**
  * Split Login/Register or Dashboard button.
  */
-function AuthActions({ isMobile }: { isMobile?: boolean }) {
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-
-    React.useEffect(() => {
-        const hasSession = document.cookie.includes('joblyne_session=true');
-        setIsLoggedIn(hasSession);
-    }, []);
-
+function AuthActions({ isLoggedIn, isMobile }: { isLoggedIn: boolean; isMobile?: boolean }) {
     if (isLoggedIn) {
         return (
             <div className={`flex items-center ${isMobile ? 'w-full gap-3 flex-col' : 'gap-4'}`}>
@@ -199,7 +189,7 @@ function AuthActions({ isMobile }: { isMobile?: boolean }) {
                     <Button 
                         type="submit" 
                         variant="ghost" 
-                        className={`text-muted hover:text-red-500 ${isMobile ? 'w-full py-3 bg-surface-2 rounded-xl' : ''}`}
+                        className={`text-muted hover:text-error ${isMobile ? 'w-full py-3 bg-surface-2 rounded-xl' : ''}`}
                     >
                         <LogOut size={18} aria-hidden="true" />
                         Logout
@@ -293,7 +283,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                         href={`${recruiterUrl}/auth/signin`}
                         className="group p-3 gap-0.5 transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card"
                     >
-                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Recruiter Portal</span>
+                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Recruiter portal</span>
                         <span className="text-muted text-xs">Find and vet top talent quickly.</span>
                     </Link>
                     <Link 
@@ -302,7 +292,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                         href={`${companyUrl}/auth/signin`}
                         className="border-t group p-3 gap-0.5 border-border transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card dark:border-border/50"
                     >
-                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Company Login</span>
+                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Company login</span>
                         <span className="text-muted text-xs">Manage your organization's hiring.</span>
                     </Link>
                 </div>

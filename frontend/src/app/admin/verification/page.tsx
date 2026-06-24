@@ -250,7 +250,7 @@ export default function AdminVerificationPage() {
                       {/* Company Header Card */}
                       <div className="border-b border-border bg-gradient-to-r from-bg to-surface p-6 md:p-8 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
                         <div className="flex gap-4 items-center">
-                          <div className="size-16 rounded-2xl bg-gradient-to-tr from-primary to-[#4c33cf] text-white flex items-center justify-center font-bold text-2xl shadow-lg">
+                          <div className="size-16 rounded-2xl bg-gradient-primary text-white flex items-center justify-center font-bold text-2xl shadow-lg">
                             {selectedCompany.name ? selectedCompany.name.substring(0, 2).toUpperCase() : "CO"}
                           </div>
                           <div>
@@ -297,7 +297,7 @@ export default function AdminVerificationPage() {
                               <span className="text-text font-semibold">{selectedCompany.legal_name || "N/A"}</span>
                             </div>
                             <div className="space-y-1">
-                              <span className="text-muted block text-xs">Country of Incorporation</span>
+                              <span className="text-muted block text-xs">Country of incorporation</span>
                               <span className="text-text font-semibold">{selectedCompany.country || "N/A"}</span>
                             </div>
                             <div className="space-y-1">
@@ -369,11 +369,11 @@ export default function AdminVerificationPage() {
                             {/* Incorporation doc */}
                             <div className="border border-border rounded-xl p-4 bg-bg flex justify-between items-center hover:border-primary/45 transition-colors">
                               <div className="flex gap-3 items-center min-w-0">
-                                <div className="p-2.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444] shrink-0">
+                                <div className="p-2.5 rounded-lg bg-error-bg text-error shrink-0">
                                   <FileText size={20} />
                                 </div>
                                 <div className="min-w-0">
-                                  <span className="text-xs text-muted block">Certificate of Incorporation</span>
+                                  <span className="text-xs text-muted block">Certificate of incorporation</span>
                                   <span className="text-xs text-text font-semibold block truncate">incorporation_doc.pdf</span>
                                 </div>
                               </div>
@@ -394,7 +394,7 @@ export default function AdminVerificationPage() {
                             {/* Tax Registration doc */}
                             <div className="border border-border rounded-xl p-4 bg-bg flex justify-between items-center hover:border-primary/45 transition-colors">
                               <div className="flex gap-3 items-center min-w-0">
-                                <div className="p-2.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444] shrink-0">
+                                <div className="p-2.5 rounded-lg bg-error-bg text-error shrink-0">
                                   <FileText size={20} />
                                 </div>
                                 <div className="min-w-0">
@@ -419,7 +419,7 @@ export default function AdminVerificationPage() {
                             {/* Signatory ID Proof */}
                             <div className="border border-border rounded-xl p-4 bg-bg flex justify-between items-center hover:border-primary/45 transition-colors">
                               <div className="flex gap-3 items-center min-w-0">
-                                <div className="p-2.5 rounded-lg bg-[#3b82f6]/10 text-[#3b82f6] shrink-0">
+                                <div className="p-2.5 rounded-lg bg-info-bg text-info shrink-0">
                                   <FileText size={20} />
                                 </div>
                                 <div className="min-w-0">
@@ -444,7 +444,7 @@ export default function AdminVerificationPage() {
                             {/* HQ Address Proof */}
                             <div className="border border-border rounded-xl p-4 bg-bg flex justify-between items-center hover:border-primary/45 transition-colors">
                               <div className="flex gap-3 items-center min-w-0">
-                                <div className="p-2.5 rounded-lg bg-[#3b82f6]/10 text-[#3b82f6] shrink-0">
+                                <div className="p-2.5 rounded-lg bg-info-bg text-info shrink-0">
                                   <FileText size={20} />
                                 </div>
                                 <div className="min-w-0">
@@ -571,7 +571,7 @@ export default function AdminVerificationPage() {
             <div className="space-y-2">
               <label className="type-ui text-text font-medium block">Reason for Rejection *</label>
               <textarea
-                placeholder="e.g. Uploaded Certificate of Incorporation has expired or is illegible. Please upload a clear tax document."
+                placeholder="e.g. Uploaded Certificate of incorporation has expired or is illegible. Please upload a clear tax document."
                 value={actionNotes}
                 required
                 onChange={(e) => setActionNotes(e.target.value)}

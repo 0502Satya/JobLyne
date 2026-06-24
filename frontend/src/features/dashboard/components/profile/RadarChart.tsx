@@ -49,8 +49,8 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
           <path 
             key={i} 
             d={path} 
-            fill={i % 2 === 0 ? "rgba(241, 245, 249, 0.2)" : "none"} 
-            stroke="#f1f5f9" 
+            fill={i % 2 === 0 ? "var(--color-chart-surface)" : "none"} 
+            stroke="var(--color-chart-grid)" 
             strokeWidth="1.5" 
           />
         ))}
@@ -65,7 +65,7 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
               key={i} 
               x1={center} y1={center} 
               x2={x} y2={y} 
-              stroke="#f1f5f9" 
+              stroke="var(--color-chart-grid)" 
               strokeWidth="1.5" 
             />
           );
@@ -74,8 +74,8 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
         {/* Data Polygon */}
         <path 
           d={dataPath} 
-          fill="rgba(76, 51, 207, 0.15)" 
-          stroke="#4c33cf" 
+          fill="var(--color-chart-fill)" 
+          stroke="var(--color-accent-gradient)" 
           strokeWidth="2.5" 
           strokeLinejoin="round"
           className="fade-in duration-1000 animate-in zoom-in"
@@ -89,9 +89,9 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
                <circle 
                   cx={x} cy={y} 
                   r="4.5" 
-                  fill="#fff" 
+                  fill="var(--color-surface)" 
                   className="shadow-sm"
-                  stroke="#4c33cf"
+                  stroke="var(--color-accent-gradient)"
                   strokeWidth="2"
                />
             </g>
@@ -110,7 +110,7 @@ export default function RadarChart({ data, size = 280 }: RadarChartProps) {
               key={i} 
               x={x} y={y} 
               textAnchor="middle" 
-              className="uppercase text-xs fill-slate-500 tracking-widest"
+              className="uppercase text-xs fill-muted tracking-widest"
               dominantBaseline="middle"
             >
               {skill.name}

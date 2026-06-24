@@ -12,7 +12,7 @@ interface ComingSoonProps {
 }
 
 export default function ComingSoon({
-  title = "Coming Soon",
+  title = "Coming soon",
   description = "We're working hard to bring you this feature. Stay tuned!",
   icon = "rocket_launch"
 }: ComingSoonProps) {
@@ -34,10 +34,10 @@ export default function ComingSoon({
         {/* Back Button */}
         <Link
           href="/dashboard"
-          className="px-8 inline-flex rounded-2xl uppercase py-3.5 items-center gap-2 transition-all text-white tracking-widest shadow-xl shadow-primary/20 bg-primary type-badge hover:scale-[1.02] active:scale-95"
+          className="px-8 inline-flex rounded-2xl py-3.5 items-center gap-2 transition-all text-white tracking-widest shadow-xl shadow-primary/20 bg-primary type-badge hover:scale-[1.02] active:scale-95"
         >
           <ArrowLeft size={16} aria-hidden="true" />
-          Back to Dashboard
+          Back to dashboard
         </Link>
       </div>
     </div>

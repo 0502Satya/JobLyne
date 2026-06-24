@@ -45,10 +45,10 @@ export default function RecommendedJobs() {
                 {/* Title and 'View All' button */}
                 <div className="mb-10 flex-col flex gap-6 justify-between sm:flex-row sm:items-end">
                     <div className="min-w-0">
-                        <h2 className="text-text type-h2 truncate mb-2">Recommended for You</h2>
+                        <h2 className="text-text type-h2 truncate mb-2">Recommended for you</h2>
                         <p className="text-sm text-muted sm:text-base">Jobs that match your profile and search history.</p>
                     </div>
-                    <Link href="/jobs" className="text-primary shrink-0 min-h-[44px] type-ui text-left hover:underline flex items-center">View All Jobs</Link>
+                    <Link href="/jobs" className="text-primary shrink-0 min-h-[44px] type-ui text-left hover:underline flex items-center">View all jobs</Link>
                 </div>
 
                 <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -61,7 +61,7 @@ export default function RecommendedJobs() {
                                     {job.logo}
                                 </div>
                                 {/* A small green tag showing the match percentage */}
-                                <span className="px-2 py-1 shrink-0 text-green-700 uppercase text-xs rounded-full bg-green-100">
+                                <span className="px-2 py-1 shrink-0 text-success uppercase text-xs rounded-full bg-success-bg border border-success/15">
                                     {job.match} Match
                                 </span>
                             </div>
@@ -82,7 +82,7 @@ export default function RecommendedJobs() {
                             </div>
 
                             <Link href="/auth/signup" className="w-full text-text min-h-[44px] py-3.5 bg-bg transition-all rounded-xl hover:text-white hover:bg-btn-primary flex items-center justify-center type-ui">
-                                Apply Now
+                                Apply now
                             </Link>
                         </div>
                     ))}

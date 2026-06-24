@@ -20,7 +20,7 @@ export default function CareerProfileSection({ profile, onEdit }: CareerProfileS
   ];
 
   return (
-    <div className="mb-8 rounded-[32px] bg-surface border-border shadow-xl p-6 shadow-slate-200/50 border sm:p-8">
+    <div className="mb-8 rounded-[32px] bg-surface border-border shadow-xl p-6 border sm:p-8">
       <div className="mb-10 flex-col flex gap-6 justify-between sm:flex-row sm:items-center">
         <div className="gap-4 flex items-center">
           <div className="justify-center shrink-0 h-12 rounded-2xl w-12 items-center flex bg-primary-light text-primary">
@@ -74,7 +74,7 @@ export default function CareerProfileSection({ profile, onEdit }: CareerProfileS
          <div className="flex items-center">
             <div className="border inline-flex items-center gap-2 border-primary/20 type-badge bg-primary-light/50 py-2 px-4 rounded-xl text-primary-dark">
                <CheckCircle2 size={12} aria-hidden="true" />
-               Open to Relocate
+               Open to relocate
             </div>
          </div>
       </div>

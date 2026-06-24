@@ -5,7 +5,7 @@ import SocialLogin from "@/features/auth/components/SocialLogin";
 import { Network } from "lucide-react";
 
 /**
- * Candidate Sign Up Page.
+ * Candidate Sign up Page.
  * Featured on the main domain. Includes role selection.
  */
 export default function SignupPage() {

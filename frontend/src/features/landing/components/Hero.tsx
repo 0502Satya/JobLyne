@@ -16,12 +16,12 @@ export default function Hero() {
                             <span className="w-full h-full animate-ping inline-flex opacity-75 absolute rounded-full bg-primary"></span>
                             <span className="h-2 inline-flex relative w-2 rounded-full bg-primary"></span>
                         </span>
-                        AI-Powered Job Matching
+                        AI-powered job matching
                     </Badge>
 
                     {/* The main big title of the website */}
                     <h1 className="text-text mb-8 type-display">
-                        Your Dream Job is a <span className="text-primary">Search Away</span>
+                        Your dream job is a <span className="text-primary">search away</span>
                     </h1>
 
                     {/* The search box for jobs and locations */}
@@ -52,7 +52,7 @@ export default function Hero() {
                         </div>
                         {/* The blue button to start the search */}
                         <Button type="submit" variant="primary" size="lg" className="rounded-xl shrink-0 px-8 py-4">
-                            Find Jobs
+                            Find jobs
                         </Button>
                     </form>
 

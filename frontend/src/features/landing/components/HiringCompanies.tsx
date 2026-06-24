@@ -18,7 +18,7 @@ export default function HiringCompanies() {
                 {/* A simple horizontal list of company names */}
                 <div className="justify-center gap-4 opacity-75 items-center transition-all flex-wrap duration-300 flex sm:gap-8 md:gap-16 hover:opacity-100">
                     <span className="w-full text-xs uppercase text-center tracking-decorative mb-2 text-muted md:w-auto md:mb-0 md:text-left">
-                        Top Hiring Companies:
+                        Top hiring companies:
                     </span>
                     {companies.map((company) => (
                         <div key={company.name} className="cursor-pointer duration-200 items-center gap-2 transition-transform flex hover:scale-105">

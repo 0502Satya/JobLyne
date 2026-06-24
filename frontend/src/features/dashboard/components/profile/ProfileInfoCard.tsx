@@ -26,7 +26,7 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
   return (
     <div className="border-border rounded-2xl relative overflow-hidden shadow-sm bg-card mb-6 border">
       <div className="w-full border-b border-border relative overflow-hidden bg-primary h-28 sm:h-32">
-        <div className="inset-0 absolute bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_35%),linear-gradient(135deg,rgb(var(--color-primary)),#084b51)]" />
+        <div className="inset-0 absolute bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_35%),linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))]" />
         <div className="bg-white/10 text-xs backdrop-blur text-white/95 uppercase absolute hidden items-center px-3 gap-2 rounded-lg tracking-wide right-6 py-1.5 top-5 sm:flex dark:bg-black/20">
           <BadgeCheck size={14} aria-hidden="true" />
           Candidate profile
@@ -51,7 +51,7 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
             <div className="pt-2 min-w-0 md:pt-12">
               <div className="justify-center gap-1.5 items-center flex-wrap flex mb-1 md:justify-start">
                 <h1 className="text-text break-words type-h2">{profile?.full_name || "Alex Thompson"}</h1>
-                <span title="Verified Profile">
+                <span title="Verified profile">
                   <BadgeCheck size={18} className="text-primary" aria-hidden="true" />
                 </span>
               </div>
@@ -71,7 +71,7 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
                   <span>{profile?.experience_years ? `${profile.experience_years} yrs experience` : "Fresher"}</span>
                 </div>
                 <div className="flex gap-1.5 items-center">
-                  <span className="h-2 shrink-0 w-2 rounded-full bg-emerald-500"></span>
+                  <span className="h-2 shrink-0 w-2 rounded-full bg-success"></span>
                   <span>
                     {profile?.work_mode && Array.isArray(profile.work_mode) && profile.work_mode.length > 0
                       ? `Open to ${profile.work_mode.join(" & ").toLowerCase()}`
@@ -89,7 +89,7 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
                   </span>
                 ))}
                 {profile?.resume_file_url && (
-                  <span className="h-7 gap-1 inline-flex text-emerald-600 px-3 items-center rounded-lg bg-emerald-500/10 type-caption dark:text-emerald-400 dark:bg-emerald-500/20">
+                  <span className="h-7 gap-1 inline-flex text-success px-3 items-center rounded-lg bg-success-bg type-caption">
                     <FileText size={14} aria-hidden="true" />
                     Resume ready
                   </span>

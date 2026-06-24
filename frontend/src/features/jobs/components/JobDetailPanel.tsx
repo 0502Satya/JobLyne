@@ -135,7 +135,7 @@ export default function JobDetailPanel({
 
             <div className="flex text-right items-end flex-col sm:items-end">
               <span className="type-badge text-muted text-xs uppercase tracking-wider font-bold">Salary Range</span>
-              <span className="text-green-700 mt-1 type-card-title font-semibold dark:text-green-400">
+              <span className="text-success mt-1 type-card-title font-semibold">
                 {selectedJob.salary_min
                   ? `${selectedJob.currency}${selectedJob.salary_min.toLocaleString()} - ${selectedJob.salary_max?.toLocaleString()}`
                   : "Not Disclosed"}
@@ -169,8 +169,8 @@ export default function JobDetailPanel({
             <div className="gap-4 flex flex-col">
               {/* Matching section */}
               {skillAnalysis.matching.length > 0 && (
-                <div className="border-green-200/30 gap-2 flex-col flex bg-green-50/20 p-4 rounded-xl border dark:bg-green-900/5">
-                  <div className="type-badge text-green-700 uppercase items-center gap-2 tracking-wider flex font-semibold text-xs dark:text-green-400">
+                <div className="border-success/20 gap-2 flex-col flex bg-success-bg p-4 rounded-xl border">
+                  <div className="type-badge text-success uppercase items-center gap-2 tracking-wider flex font-semibold text-xs">
                     <CheckCircle2 size={16} aria-hidden="true" className="mr-1 inline-block" />
                     Your matching qualifications
                   </div>
@@ -178,7 +178,7 @@ export default function JobDetailPanel({
                     {skillAnalysis.matching.map((skill: string) => (
                       <span
                         key={skill}
-                        className="py-1 gap-1.5 text-green-700 border-green-200/40 items-center rounded-lg px-2.5 bg-green-100 flex type-caption border text-xs dark:bg-green-900/30 dark:text-green-400"
+                        className="py-1 gap-1.5 text-success border-success/20 items-center rounded-lg px-2.5 bg-success-bg flex type-caption border text-xs"
                       >
                         ✓ {skill}
                       </span>
@@ -189,8 +189,8 @@ export default function JobDetailPanel({
 
               {/* Missing section */}
               {skillAnalysis.missing.length > 0 ? (
-                <div className="gap-2 flex-col border-amber-200/30 flex p-4 bg-amber-50/20 rounded-xl border dark:bg-amber-900/5">
-                  <div className="type-badge uppercase text-amber-700 items-center gap-2 tracking-wider flex font-semibold text-xs dark:text-amber-400">
+                <div className="gap-2 flex-col border-warning/20 flex p-4 bg-warning-bg rounded-xl border">
+                  <div className="type-badge uppercase text-warning items-center gap-2 tracking-wider flex font-semibold text-xs">
                     <Zap size={16} aria-hidden="true" className="mr-1 inline-block" />
                     Recommended skills to add
                   </div>
@@ -204,10 +204,10 @@ export default function JobDetailPanel({
                         key={skill}
                         onClick={() => onAddSkill(skill)}
                         disabled={updatingSkill !== null}
-                        className="py-1 cursor-pointer gap-1.5 border-amber-300/40 text-amber-700 items-center transition-all rounded-lg px-2.5 bg-amber-50 min-h-[36px] flex type-caption border text-xs dark:bg-amber-900/10 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                        className="py-1 cursor-pointer gap-1.5 border-warning/30 text-warning items-center transition-all rounded-lg px-2.5 bg-warning-bg min-h-[36px] flex type-caption border text-xs hover:opacity-90"
                       >
                         {updatingSkill === skill ? (
-                          <span className="h-3 mr-1 border-2 inline-block w-3 border-amber-500 rounded-full border-t-transparent animate-spin"></span>
+                          <span className="h-3 mr-1 border-2 inline-block w-3 border-warning rounded-full border-t-transparent animate-spin"></span>
                         ) : (
                           <PlusCircle size={14} aria-hidden="true" />
                         )}
@@ -217,7 +217,7 @@ export default function JobDetailPanel({
                   </div>
                 </div>
               ) : (
-                <div className="justify-center border-green-200/30 text-green-700 items-center gap-2 text-center flex bg-green-100/20 p-4 type-caption rounded-xl border text-xs dark:text-green-400">
+                <div className="justify-center border-success/20 text-success items-center gap-2 text-center flex bg-success-bg p-4 type-caption rounded-xl border text-xs">
                   <BadgeCheck size={16} aria-hidden="true" />
                   <span>Verified: You satisfy 100% of the requested skill criteria.</span>
                 </div>
@@ -230,7 +230,7 @@ export default function JobDetailPanel({
             <div className="border-border/40 border-t gap-2.5 pt-6 flex flex-col">
               <h4 className="uppercase text-base items-center gap-2 tracking-wider flex text-muted font-bold text-sm">
                 <ClipboardCheck className="text-muted" size={18} aria-hidden="true" />
-                Prerequisites & Expectations
+                Prerequisites and expectations
               </h4>
               <p className="bg-bg/20 text-text/80 text-sm border-border/30 leading-relaxed whitespace-pre-line p-4 rounded-xl border">
                 {selectedJob.requirements}
@@ -261,7 +261,7 @@ export default function JobDetailPanel({
           {selectedJob.has_applied ? (
             <button
               disabled
-              className="border-green-500/30 px-8 min-h-[48px] gap-1.5 text-green-700 items-center bg-green-500/25 py-3 type-ui flex rounded-xl border dark:text-green-400 font-semibold"
+              className="border-success/30 px-8 min-h-[48px] gap-1.5 text-success items-center bg-success-bg py-3 type-ui flex rounded-xl border font-semibold"
             >
               <CheckCircle2 size={16} aria-hidden="true" />
               Applied
@@ -277,7 +277,7 @@ export default function JobDetailPanel({
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 border-2 rounded-full h-4 border-t-transparent w-4 animate-spin border-white"></span>
               )}
               <Rocket size={16} aria-hidden="true" />
-              Apply to Opportunity
+              Apply to opportunity
             </Button>
           )}
         </div>

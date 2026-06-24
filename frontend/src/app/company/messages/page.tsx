@@ -195,13 +195,13 @@ function CompanyMessagesContent() {
 
   const getAvatarStyle = (email: string) => {
     const gradients = [
-      "from-[#10b981] to-[#059669]",
-      "from-[#3b82f6] to-[#06b6d4]",
-      "from-[#8b5cf6] to-[#ec4899]",
-      "from-[#f59e0b] to-[#ef4444]"
+      "bg-gradient-success",
+      "bg-gradient-info",
+      "bg-gradient-accent",
+      "bg-gradient-warning"
     ];
     const index = email.length % gradients.length;
-    return `bg-gradient-to-tr ${gradients[index]}`;
+    return gradients[index];
   };
 
   return (
@@ -215,7 +215,7 @@ function CompanyMessagesContent() {
             <span className="text-2xl tracking-tight">JobLyne</span>
           </Link>
           <div className="h-6 hidden w-px bg-border md:block"></div>
-          <span className="px-3 text-emerald-500 hidden py-1.5 bg-emerald-500/10 rounded-full type-badge md:inline-block">Corporate Workspace</span>
+          <span className="px-3 text-success hidden py-1.5 bg-success-bg rounded-full type-badge md:inline-block">Corporate Workspace</span>
         </div>
         <div className="gap-4 flex items-center">
           <Link href="/company" className="type-badge rounded-xl min-h-[44px] items-center gap-2 py-3 transition-colors flex px-4 hover:bg-primary/5 hover:text-primary active:scale-[0.98]">
@@ -224,12 +224,12 @@ function CompanyMessagesContent() {
           </Link>
           <div className="h-6 hidden w-px bg-border md:block"></div>
           <div className="flex gap-3 items-center">
-            <div className="justify-center rounded-2xl bg-gradient-to-tr items-center size-11 text-white shadow-emerald-500/20 shadow-lg to-[#059669] flex from-emerald-500">
+            <div className="justify-center rounded-2xl bg-gradient-success items-center size-11 text-white shadow-success/20 shadow-lg flex">
               HQ
             </div>
             <button 
               onClick={() => logoutAction()} 
-              className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
+              className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-error hover:bg-error/5 active:scale-[0.98]"
             >
               Logout
             </button>
@@ -249,7 +249,7 @@ function CompanyMessagesContent() {
         <div className="w-full max-w-full border-border rounded-3xl relative overflow-hidden shadow-sm h-[600px] flex bg-surface border">
           
           {/* Left Panel */}
-          <div className={`w-full h-full border-border transition-all duration-300 flex border-r bg-surface flex-col md:w-[350px] lg:w-[400px] ${
+          <div className={`w-full h-full border-border transition-all duration-300 flex border-r bg-surface flex-col md:w-[352px] lg:w-[400px] ${
             viewMode === "chat" ? "hidden md:flex" : "flex"
           }`}>
             <div className="border-b p-4 border-border">
@@ -301,7 +301,7 @@ function CompanyMessagesContent() {
                         <div className={`justify-center rounded-2xl size-12 items-center text-white shadow-sm flex ${getAvatarStyle(otherPart.email)}`}>
                           {otherPart.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="absolute border-2 rounded-full size-3 bg-emerald-500 bottom-0 border-surface right-0"></span>
+                        <span className="absolute border-2 rounded-full size-3 bg-success bottom-0 border-surface right-0"></span>
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -381,7 +381,7 @@ function CompanyMessagesContent() {
                   </div>
 
                   <div className="gap-2 flex items-center">
-                    <span className="py-1 text-emerald-500 px-2.5 bg-emerald-500/10 rounded-full type-badge">
+                    <span className="py-1 text-success px-2.5 bg-success-bg rounded-full type-badge">
                       Online
                     </span>
                   </div>

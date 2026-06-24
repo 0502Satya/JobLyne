@@ -24,7 +24,7 @@ export default function Toast({ message, type = "success", onClose }: ToastProps
   }, [message, onClose]);
 
   const icon = type === "success" ? "check_circle" : type === "error" ? "error" : "info";
-  const iconColor = type === "success" ? "text-green-400" : type === "error" ? "text-red-400" : "text-blue-400";
+  const iconColor = type === "success" ? "text-success" : type === "error" ? "text-error" : "text-info";
 
   return (
     <div className={`-translate-x-1/2 transition-all left-1/2 duration-300 bottom-6 z-[200] fixed ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-4 pointer-events-none'}`}>

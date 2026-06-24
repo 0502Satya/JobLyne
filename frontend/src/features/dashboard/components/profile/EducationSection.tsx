@@ -84,12 +84,12 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
   const getSchoolColor = (schoolName: string) => {
     const colors = [
       "bg-primary",
-      "bg-teal-600",
-      "bg-sky-600",
+      "bg-company-accent",
+      "bg-experience",
       "bg-primary",
-      "bg-purple-600",
-      "bg-emerald-600",
-      "bg-blue-600",
+      "bg-accent",
+      "bg-success",
+      "bg-primary",
     ];
     if (!schoolName) return colors[0];
     let hash = 0;
@@ -173,7 +173,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                 return (
                   <div key={edu.id} className="min-w-0 relative group">
                     {/* Timeline Dot/Badge */}
-                    <div className={`-left-[43px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[51px] sm:w-10 ${schoolColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
+                    <div className={`-left-[44px] absolute top-1.5 rounded-full h-8 w-8 sm:h-10 sm:-left-[52px] sm:w-10 ${schoolColor} justify-center shrink-0 border-card type-badge items-center text-white select-none shadow-xs border-4 flex`}>
                       {initials}
                     </div>
 
@@ -183,7 +183,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                         <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                           <div className="relative">
                             <Input
-                              label="School / University"
+                              label="School / university"
                               value={edu.school || ""}
                               onChange={(e) => {
                                 updateEntry(edu.id, "school", e.target.value);
@@ -222,21 +222,21 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                         <div className="gap-4 grid grid-cols-1 md:grid-cols-4">
                           <div className="md:col-span-2">
                             <Input
-                              label="Field of Study"
+                              label="Field of study"
                               value={edu.field || ""}
                               onChange={(e) => updateEntry(edu.id, "field", e.target.value)}
                               placeholder="e.g. Computer Science"
                             />
                           </div>
                           <Input
-                            label="Start Year"
+                            label="Start year"
                             type="number"
                             value={edu.start_year || ""}
                             onChange={(e) => updateEntry(edu.id, "start_year", e.target.value)}
                             placeholder="2018"
                           />
                           <Input
-                            label="End Year (or Expected)"
+                            label="End year (or expected)"
                             type="number"
                             value={edu.end_year || ""}
                             onChange={(e) => updateEntry(edu.id, "end_year", e.target.value)}
@@ -246,14 +246,14 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
 
                         <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
                           <Input
-                            label="Grade / GPA / Percentage"
+                            label="Grade / GPA / percentage"
                             value={edu.grade || ""}
                             onChange={(e) => updateEntry(edu.id, "grade", e.target.value)}
                             placeholder="e.g. 3.8/4.0 or 85%"
                           />
                           <div className="md:col-span-2">
                             <Input
-                              label="Courses & Activities"
+                              label="Courses and activities"
                               value={edu.certifications || ""}
                               onChange={(e) => updateEntry(edu.id, "certifications", e.target.value)}
                               placeholder="e.g. Algorithms, Data Structures, Varsity Football"
@@ -261,7 +261,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                           </div>
                         </div>
 
-                        <FormField label="Degree Description">
+                        <FormField label="Degree description">
                           <textarea
                             value={edu.description || ""}
                             onChange={(e) => updateEntry(edu.id, "description", e.target.value)}
@@ -299,8 +299,8 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                             disabled={idx === 0}
                             onClick={() => moveEntry(idx, "up")}
                             className="h-10 w-10 p-0 rounded-lg"
-                            title="Move Up"
-                            aria-label="Move Up"
+                            title="Move up"
+                            aria-label="Move up"
                           >
                              <ArrowUp size={16} aria-hidden="true" />
                           </Button>
@@ -310,8 +310,8 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                             disabled={idx === education.length - 1}
                             onClick={() => moveEntry(idx, "down")}
                             className="h-10 w-10 p-0 rounded-lg"
-                            title="Move Down"
-                            aria-label="Move Down"
+                            title="Move down"
+                            aria-label="Move down"
                           >
                              <ArrowDown size={16} aria-hidden="true" />
                           </Button>
@@ -320,8 +320,8 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                             variant="outline"
                             onClick={() => setEditingId(edu.id || null)}
                             className="h-10 w-10 p-0 rounded-lg"
-                            title="Edit Education"
-                            aria-label="Edit Education"
+                            title="Edit education"
+                            aria-label="Edit education"
                           >
                              <Pencil size={16} aria-hidden="true" />
                           </Button>
@@ -329,9 +329,9 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                             type="button"
                             variant="outline"
                             onClick={() => removeEntry(edu.id)}
-                            className="h-10 w-10 p-0 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                            title="Delete Education"
-                            aria-label="Delete Education"
+                            className="h-10 w-10 p-0 rounded-lg text-error hover:text-error/90 hover:bg-error-bg"
+                            title="Delete education"
+                            aria-label="Delete education"
                           >
                              <Trash2 size={16} aria-hidden="true" />
                           </Button>

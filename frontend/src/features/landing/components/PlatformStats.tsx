@@ -6,9 +6,9 @@ import { PageSection, Container } from "@/shared/ui";
  */
 export default function PlatformStats() {
     const stats = [
-        { value: "500k+", label: "Active Candidates" },
-        { value: "10k+", label: "Global Companies" },
-        { value: "2k+", label: "Premium Courses" },
+        { value: "500k+", label: "Active candidates" },
+        { value: "10k+", label: "Global companies" },
+        { value: "2k+", label: "Premium courses" },
     ];
 
     return (

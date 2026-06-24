@@ -28,14 +28,14 @@ export default function DashboardRightSidebar() {
           </div>
           {/* Course 2 */}
           <div className="border-t border-border items-start gap-3 flex pt-4">
-            <div className="flex-shrink-0 justify-center h-10 w-10 items-center bg-purple-100/50 flex text-purple-600 rounded dark:bg-purple-900/30">
+            <div className="flex-shrink-0 justify-center h-10 w-10 items-center bg-accent/10 flex text-accent rounded">
               <Brain size={20} aria-hidden="true" />
             </div>
             <div className="flex-1">
               <h4 className="text-text type-ui leading-tight">System Design Interview</h4>
               <p className="mb-2 text-xs text-muted">Module 8 of 10</p>
               <div className="w-full bg-border/20 h-1.5 rounded-full">
-                <div className="bg-purple-600 h-1.5 rounded-full" style={{ width: "80%" }}></div>
+                <div className="bg-accent h-1.5 rounded-full" style={{ width: "80%" }}></div>
               </div>
             </div>
           </div>
@@ -46,7 +46,7 @@ export default function DashboardRightSidebar() {
       </div>
 
       {/* Upcoming Interview Promo */}
-      <div className="to-blue-700 shadow-md relative overflow-hidden bg-gradient-to-br from-primary text-white p-6 rounded-xl">
+      <div className="bg-gradient-primary shadow-md relative overflow-hidden text-white p-6 rounded-xl">
         <div className="bg-white/10 -mr-4 w-24 absolute blur-xl rounded-full h-24 -mt-4 right-0 top-0"></div>
         <div className="-mb-4 h-20 absolute blur-xl left-0 bg-black/10 -ml-4 rounded-full w-20 bottom-0"></div>
         <div className="relative z-10">
@@ -54,7 +54,7 @@ export default function DashboardRightSidebar() {
             <Video size={20} aria-hidden="true" />
           </div>
           <h3 className="mb-1 type-card-title">Interview Prep</h3>
-          <p className="mb-4 text-sm text-blue-100">Practice with our AI interviewer to boost your confidence.</p>
+          <p className="mb-4 text-sm text-white/80">Practice with our AI interviewer to boost your confidence.</p>
           <button className="w-full text-primary bg-surface rounded-lg type-ui transition-colors py-2 hover:bg-primary/10">
             Start Session
           </button>
