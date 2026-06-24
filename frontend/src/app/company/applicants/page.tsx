@@ -208,7 +208,7 @@ export default function CompanyApplicantsPage() {
           </Link>
           <button 
             onClick={() => logoutAction()} 
-            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-red-500 hover:bg-red-500/5 active:scale-[0.98]"
+            className="rounded-xl min-h-[44px] py-3 transition-colors type-badge px-4 hover:text-error hover:bg-error/5 active:scale-[0.98]"
           >
             Logout
           </button>
@@ -298,7 +298,7 @@ export default function CompanyApplicantsPage() {
 
         {/* Bulk action drawer */}
         {selectedIds.length > 0 && viewMode === "list" && (
-          <div className="bg-gradient-to-r gap-4 rounded-3xl items-center from-primary flex-wrap animate-in slide-in-from-bottom-6 to-[#4c33cf] duration-300 flex p-4 text-white justify-between">
+          <div className="bg-gradient-primary gap-4 rounded-3xl items-center flex-wrap animate-in slide-in-from-bottom-6 duration-300 flex p-4 text-white justify-between">
             <span className="pl-2 uppercase tracking-wider type-badge">{selectedIds.length} Applicants Selected</span>
             <div className="flex gap-2.5">
               <Button 
@@ -383,13 +383,13 @@ export default function CompanyApplicantsPage() {
                       <td className="type-ui p-4">{app.candidate_experience ?? 3} Years</td>
                       <td className="p-4">
                         <span className={`py-1 px-2.5 rounded-full type-badge ${
-                          app.status === "PENDING" ? "text-blue-500 bg-blue-500/10" :
-                          app.status === "INTERVIEW" ? "bg-warning/10 text-warning" :
-                          app.status === "OFFER" ? "text-purple-500 bg-purple-500/10" :
-                          app.status === "PLACED" ? "bg-emerald-500/10 text-emerald-500" : "text-red-500 bg-red-500/10"
+                          app.status === "PENDING" ? "text-info bg-info-bg" :
+                          app.status === "INTERVIEW" ? "bg-warning-bg text-warning" :
+                          app.status === "OFFER" ? "text-featured bg-featured-bg" :
+                          app.status === "PLACED" ? "bg-success-bg text-success" : "text-error bg-error-bg"
                         }`}>{app.status}</span>
                         {app.interview_schedule && app.status === "INTERVIEW" && (
-                          <div className="mt-1 text-amber-500 text-xs">
+                          <div className="mt-1 text-warning text-xs">
                             Slot: {new Date(app.interview_schedule).toLocaleDateString()}
                           </div>
                         )}
@@ -462,7 +462,7 @@ export default function CompanyApplicantsPage() {
                     </h4>
                     <span className="bg-bg px-2.5 rounded-full py-0.5 type-badge text-muted">{stageApps.length}</span>
                   </div>
-                  <div className="space-y-3 min-h-[250px]">
+                  <div className="space-y-3 min-h-[248px]">
                     {stageApps.map(app => (
                       <div key={app.id} className="group rounded-2xl relative border-border/80 bg-bg transition-all shadow-sm space-y-3 p-4 border hover:border-primary/40">
                         <div className="space-y-1">
@@ -504,7 +504,7 @@ export default function CompanyApplicantsPage() {
                       </div>
                     ))}
                     {stageApps.length === 0 && (
-                      <div className="type-caption justify-center border-dashed rounded-2xl min-h-[150px] items-center border-border/60 text-center flex-col flex p-8 text-muted border">
+                      <div className="type-caption justify-center border-dashed rounded-2xl min-h-[152px] items-center border-border/60 text-center flex-col flex p-8 text-muted border">
                         <GripVertical className="mb-2 text-border" size={24} aria-hidden="true" />
                         No candidates
                       </div>
@@ -538,7 +538,7 @@ export default function CompanyApplicantsPage() {
               {compareData.map((cand) => (
                 <div key={cand.id} className="border-border rounded-3xl bg-bg shadow-sm p-6 space-y-5 border">
                   <div className="border-b space-y-2 border-border/80 text-center pb-4">
-                    <div className="justify-center mx-auto type-h2 shadow-md bg-gradient-to-tr items-center from-primary text-white rounded-full flex to-[#4c33cf] size-16">
+                    <div className="justify-center mx-auto type-h2 shadow-md bg-gradient-primary items-center text-white rounded-full flex size-16">
                       {cand.full_name?.substring(0, 2).toUpperCase() || "CN"}
                     </div>
                     <div>
@@ -577,7 +577,7 @@ export default function CompanyApplicantsPage() {
                     <div className="space-y-2">
                       <span className="block type-badge text-muted">Education</span>
                       {cand.education && cand.education.slice(0, 1).map((edu: any, i: number) => (
-                        <div key={i} className="space-y-0.5 border-l-2 pl-2 border-amber-500/20">
+                        <div key={i} className="space-y-0.5 border-l-2 pl-2 border-warning/20">
                           <p className="text-text">{edu.degree} in {edu.field_of_study}</p>
                           <p className="text-xs text-muted">{edu.institution} &bull; {edu.end_year}</p>
                         </div>
@@ -609,7 +609,7 @@ export default function CompanyApplicantsPage() {
             
             <form onSubmit={handleScheduleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="type-badge">Date & Time</label>
+                <label className="type-badge">Date and time</label>
                 <input 
                   type="datetime-local" 
                   required

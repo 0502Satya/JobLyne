@@ -121,7 +121,7 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
       <div className="border-t border-border space-y-4 pt-4 dark:border-border">
         <div className="justify-center text-sm items-center gap-2 flex">
           <Timer size={14} className="text-muted" aria-hidden="true" />
-          <span className={`${timer < 60 ? "text-red-500" : "text-muted"}`}>
+          <span className={`${timer < 60 ? "text-error" : "text-muted"}`}>
             Expires in {formatTime(timer)}
           </span>
         </div>

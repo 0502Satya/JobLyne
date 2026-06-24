@@ -25,8 +25,9 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
   const pathname = usePathname();
   const completeness = profile?.completeness || 75;
 
+  // Height offset by --height-header plus 1px to compensate for the bottom border on the header container.
   return (
-    <aside className="h-[calc(100vh-65px)] w-64 border-border overflow-y-auto hidden pt-6 sticky top-[65px] gap-6 pb-6 border-right px-4 bg-surface flex-col md:flex">
+    <aside className="h-[calc(100vh-var(--height-header)-1px)] w-64 border-border overflow-y-auto hidden pt-6 sticky top-[calc(var(--height-header)+1px)] gap-6 pb-6 border-right px-4 bg-surface flex-col md:flex">
       {/* User Summary */}
       <div className="border-b border-border items-center text-center pb-6 flex flex-col">
         <div 
@@ -93,7 +94,7 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
         <form action={logoutAction}>
           <button 
             type="submit"
-            className="w-full px-3 items-center rounded-lg gap-3 py-2.5 transition-colors flex text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
+            className="w-full px-3 items-center rounded-lg gap-3 py-2.5 transition-colors flex text-muted hover:text-error hover:bg-error-bg"
           >
             <LogOut size={20} aria-hidden="true" />
             <span className="type-ui">Logout</span>

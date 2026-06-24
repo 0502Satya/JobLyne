@@ -52,24 +52,24 @@ export default function GeneralsSection({ data, onChange }: GeneralsSectionProps
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Input 
           type="text" 
-          label="First Name"
+          label="First name"
           value={data.first_name || ""} 
           onChange={(e) => onChange("first_name", e.target.value)}
-          placeholder="First Name"
+          placeholder="First name"
         />
         <Input 
           type="text" 
-          label="Middle Name"
+          label="Middle name"
           value={data.middle_name || ""} 
           onChange={(e) => onChange("middle_name", e.target.value)}
           placeholder="Type here"
         />
         <Input 
           type="text" 
-          label="Last Name"
+          label="Last name"
           value={data.last_name || ""} 
           onChange={(e) => onChange("last_name", e.target.value)}
-          placeholder="Last Name"
+          placeholder="Last name"
         />
 
         <div className="md:col-span-1">
@@ -94,7 +94,7 @@ export default function GeneralsSection({ data, onChange }: GeneralsSectionProps
         <div className="md:col-span-1">
           <Input 
             type="password" 
-            label="Re-Type Password"
+            label="Re-type password"
             defaultValue=".........."
             showVisibilityToggle
           />

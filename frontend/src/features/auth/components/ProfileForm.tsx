@@ -116,7 +116,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         {/* Identity Section */}
         <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
           <Input 
-            label="Full Name"
+            label="Full name"
             name="full_name"
             id="full_name"
             defaultValue={initialData?.full_name}
@@ -128,7 +128,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           />
 
           <Input 
-            label="Phone Number"
+            label="Phone number"
             name="phone"
             id="phone"
             defaultValue={initialData?.phone}
@@ -188,7 +188,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         {/* Narrative Section */}
         <div className="space-y-6">
           <Input 
-            label="Professional Headline"
+            label="Professional headline"
             name="headline"
             id="headline"
             defaultValue={initialData?.headline}

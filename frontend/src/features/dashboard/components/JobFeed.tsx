@@ -148,9 +148,9 @@ export default function JobFeed() {
                 <button 
                   onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
                   disabled={applying === job.id}
-                  className="bg-text rounded-lg type-ui py-2 px-4 text-white transition-opacity dark:text-text dark:bg-surface hover:opacity-90 disabled:opacity-50 font-bold cursor-pointer min-h-[38px] flex items-center"
+                  className="bg-text rounded-lg type-ui py-2 px-4 text-white transition-opacity dark:text-text dark:bg-surface hover:opacity-90 disabled:opacity-50 font-bold cursor-pointer min-h-[40px] flex items-center"
                 >
-                  {applying === job.id ? "Applying..." : "Apply Now"}
+                  {applying === job.id ? "Applying..." : "Apply now"}
                 </button>
               </div>
             </div>

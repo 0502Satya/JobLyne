@@ -1,52 +1,195 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useId } from "react";
 import Icon from "./Icon";
 
-type TabItem = {
-  id: string;
-  label: string;
-  content: React.ReactNode;
-  icon?: string;
+/* ─── Specification ────────────────────────────────────────────────────────
+ * Variants:
+ *   underline  →  current border-b-2 style (default)
+ *   pill       →  active tab gets rounded background fill
+ *
+ * Keyboard navigation — MANUAL ACTIVATION pattern (WAI-ARIA recommended
+ * for content that is expensive to switch, e.g. data-heavy panels):
+ *   ArrowLeft / ArrowRight  →  moves FOCUS only; does NOT switch active tab
+ *   Home                    →  focus first enabled tab
+ *   End                     →  focus last enabled tab
+ *   Enter / Space           →  activates the focused (but not yet selected) tab
+ *
+ * This is distinct from "automatic activation" (arrow key immediately switches
+ * content). Manual activation is intentional — documented here for future
+ * maintainers. To switch to automatic, call handleTabActivate() from ArrowLeft/Right.
+ *
+ * Accessibility (§16):
+ *   - role="tablist" on the container
+ *   - role="tab" + aria-selected + aria-controls on each button
+ *   - role="tabpanel" + aria-labelledby on each panel
+ *   - Roving tabIndex: active=0, rest=-1 (focus managed via ref array)
+ *   - Disabled tabs: aria-disabled + pointer-events-none
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+type TabVariant = "underline" | "pill";
+
+export type TabItem = {
+  id:        string;
+  label:     string;
+  content:   React.ReactNode;
+  icon?:     string;
+  /** When true the tab button is visible but not activatable */
+  disabled?: boolean;
 };
 
 type TabsProps = {
-  items: TabItem[];
+  items:         TabItem[];
   defaultTabId?: string;
-  onChange?: (id: string) => void;
-  className?: string;
+  onChange?:     (id: string) => void;
+  variant?:      TabVariant;
+  className?:    string;
 };
 
-export default function Tabs({ items, defaultTabId, onChange, className = "" }: TabsProps) {
-  const [activeTabId, setActiveTabId] = useState(defaultTabId || items[0]?.id);
+export default function Tabs({
+  items,
+  defaultTabId,
+  onChange,
+  variant = "underline",
+  className = "",
+}: TabsProps) {
+  const [activeTabId,  setActiveTabId]  = useState(defaultTabId || items[0]?.id);
+  // Separate "focused but not yet activated" tab for manual-activation pattern
+  const [focusedTabId, setFocusedTabId] = useState<string | null>(null);
 
-  const handleTabClick = (id: string) => {
+  const baseId    = useId();
+  const tabRefs   = useRef<(HTMLButtonElement | null)[]>([]);
+  const enabledItems = items.filter((t) => !t.disabled);
+
+  // ── Activate tab ──────────────────────────────────────────────────────
+  const handleTabActivate = (id: string) => {
     setActiveTabId(id);
+    setFocusedTabId(null);
     if (onChange) onChange(id);
   };
 
+  // ── Keyboard navigation ───────────────────────────────────────────────
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number
+  ) => {
+    const allIndices = items.map((_, i) => i);
+    const enabledIndices = allIndices.filter((i) => !items[i].disabled);
+
+    const currentEnabledPos = enabledIndices.indexOf(currentIndex);
+
+    let nextEnabledIndex: number | null = null;
+
+    switch (e.key) {
+      case "ArrowRight": {
+        e.preventDefault();
+        const next = (currentEnabledPos + 1) % enabledIndices.length;
+        nextEnabledIndex = enabledIndices[next];
+        break;
+      }
+      case "ArrowLeft": {
+        e.preventDefault();
+        const prev =
+          (currentEnabledPos - 1 + enabledIndices.length) % enabledIndices.length;
+        nextEnabledIndex = enabledIndices[prev];
+        break;
+      }
+      case "Home": {
+        e.preventDefault();
+        nextEnabledIndex = enabledIndices[0];
+        break;
+      }
+      case "End": {
+        e.preventDefault();
+        nextEnabledIndex = enabledIndices[enabledIndices.length - 1];
+        break;
+      }
+      case "Enter":
+      case " ": {
+        e.preventDefault();
+        // Activate the currently focused tab (manual-activation pattern)
+        const focused = focusedTabId ?? activeTabId;
+        if (focused) handleTabActivate(focused);
+        return;
+      }
+      default:
+        return;
+    }
+
+    if (nextEnabledIndex !== null) {
+      const nextId = items[nextEnabledIndex].id;
+      setFocusedTabId(nextId);
+      tabRefs.current[nextEnabledIndex]?.focus();
+    }
+  };
+
+  // ── Style helpers ─────────────────────────────────────────────────────
+  const getTabClasses = (item: TabItem): string => {
+    const isActive   = item.id === activeTabId;
+    const isFocused  = item.id === focusedTabId;
+    const isDisabled = !!item.disabled;
+
+    const base = [
+      "flex items-center gap-2 text-sm font-medium outline-none whitespace-nowrap cursor-pointer",
+      "transition-all duration-150",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:rounded",
+    ].join(" ");
+
+    if (isDisabled) {
+      return `${base} opacity-40 cursor-not-allowed pointer-events-none`;
+    }
+
+    if (variant === "underline") {
+      return [
+        base,
+        "py-3 px-4 border-b-2 -mb-[1px]",
+        isActive
+          ? "border-primary text-primary"
+          : isFocused
+          ? "border-border text-text"
+          : "border-transparent text-muted hover:text-text hover:border-border/60",
+      ].join(" ");
+    }
+
+    // pill variant
+    return [
+      base,
+      "py-2 px-4 rounded-lg",
+      isActive
+        ? "bg-primary text-white shadow-sm"
+        : isFocused
+        ? "bg-surface-2 text-text"
+        : "text-muted hover:text-text hover:bg-surface-2/60",
+    ].join(" ");
+  };
+
+  const listClasses =
+    variant === "underline"
+      ? "flex border-b border-border/60 overflow-x-auto no-scrollbar scroll-smooth"
+      : "flex gap-1 p-1 rounded-xl bg-surface-2/40 overflow-x-auto no-scrollbar scroll-smooth";
+
   return (
     <div className={`w-full flex flex-col gap-4 ${className}`}>
-      <div 
-        role="tablist" 
-        className="flex border-b border-border/60 overflow-x-auto no-scrollbar scroll-smooth"
-      >
-        {items.map((item) => {
+      {/* Tab list */}
+      <div role="tablist" className={listClasses}>
+        {items.map((item, index) => {
           const isActive = item.id === activeTabId;
           return (
             <button
               key={item.id}
-              id={`tab-${item.id}`}
+              id={`${baseId}-tab-${item.id}`}
+              ref={(el) => { tabRefs.current[index] = el; }}
               role="tab"
               aria-selected={isActive}
-              aria-controls={`tabpanel-${item.id}`}
+              aria-controls={`${baseId}-panel-${item.id}`}
+              aria-disabled={item.disabled || undefined}
+              // Roving tabIndex: only the active tab is in the natural tab order
               tabIndex={isActive ? 0 : -1}
-              onClick={() => handleTabClick(item.id)}
-              className={`flex items-center gap-2 py-3 px-4 text-sm font-medium border-b-2 -mb-[1px] transition-all duration-150 outline-none whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted hover:text-text hover:border-border/60"
-              }`}
+              onClick={() => !item.disabled && handleTabActivate(item.id)}
+              onKeyDown={(e) => !item.disabled && handleKeyDown(e, index)}
+              onFocus={() => !isActive && setFocusedTabId(item.id)}
+              onBlur={() => setFocusedTabId(null)}
+              className={getTabClasses(item)}
             >
               {item.icon && (
                 <Icon name={item.icon} size={18} aria-hidden="true" />
@@ -56,13 +199,21 @@ export default function Tabs({ items, defaultTabId, onChange, className = "" }: 
           );
         })}
       </div>
+
+      {/* Tab panels */}
       {items.map((item) => (
         <div
           key={item.id}
-          id={`tabpanel-${item.id}`}
+          id={`${baseId}-panel-${item.id}`}
           role="tabpanel"
-          aria-labelledby={`tab-${item.id}`}
-          className={item.id === activeTabId ? "block animate-in fade-in-50 duration-200" : "hidden"}
+          aria-labelledby={`${baseId}-tab-${item.id}`}
+          // Hidden panels are removed from accessibility tree
+          hidden={item.id !== activeTabId}
+          className={
+            item.id === activeTabId
+              ? "motion-safe:animate-in motion-safe:fade-in-50 motion-safe:duration-200"
+              : ""
+          }
         >
           {item.content}
         </div>

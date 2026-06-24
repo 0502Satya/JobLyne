@@ -42,7 +42,7 @@ export default function RecruiterDashboardPage() {
             <span className="text-2xl tracking-tight font-bold">JobLyne</span>
           </Link>
           <div className="h-6 hidden w-px bg-border md:block"></div>
-          <span className="px-2 text-primary py-1 type-badge rounded bg-primary/10">Recruiter Portal</span>
+          <span className="px-2 text-primary py-1 type-badge rounded bg-primary/10">Recruiter portal</span>
         </div>
         <div className="gap-4 flex items-center">
           <button className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary cursor-pointer">
@@ -51,7 +51,7 @@ export default function RecruiterDashboardPage() {
           <Link 
             href="/recruiter/billing" 
             className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary"
-            title="Billing & Wallet"
+            title="Billing and wallet"
           >
             <CreditCard size={20} aria-hidden="true" />
           </Link>
@@ -76,7 +76,7 @@ export default function RecruiterDashboardPage() {
              )}
              <button 
                onClick={() => logoutAction()} 
-               className="px-2 uppercase min-h-[44px] items-center transition-colors tracking-wider flex type-caption text-muted hover:text-red-500 cursor-pointer"
+               className="px-2 uppercase min-h-[44px] items-center transition-colors tracking-wider flex type-caption text-muted hover:text-error cursor-pointer"
              >
                Logout
              </button>
@@ -98,10 +98,10 @@ export default function RecruiterDashboardPage() {
 
         <section className="gap-6 grid grid-cols-1 md:grid-cols-4">
           {[
-            { label: "Total Candidates", value: "1,284", icon: "person", color: "text-blue-500" },
+            { label: "Total Candidates", value: "1,284", icon: "person", color: "text-info" },
             { label: "Active Pipelines", value: "12", icon: "reorder", color: "text-primary" },
-            { label: "Interviewed", value: "45", icon: "event", color: "text-green-500" },
-            { label: "Placements", value: "8", icon: "verified", color: "text-orange-500" },
+            { label: "Interviewed", value: "45", icon: "event", color: "text-success" },
+            { label: "Placements", value: "8", icon: "verified", color: "text-warning" },
           ].map((stat, i) => (
             <div key={i} className="border-border rounded-2xl shadow-sm p-6 bg-surface border">
               <Icon name={stat.icon} className={`mb-2 ${stat.color}`} size={24} aria-hidden="true" />

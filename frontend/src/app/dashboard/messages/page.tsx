@@ -211,13 +211,13 @@ function CandidateMessagesContent() {
   // Get stable background color or gradient for user avatars based on email length
   const getAvatarStyle = (email: string) => {
     const gradients = [
-      "from-[#3b82f6] to-[#06b6d4]",
-      "from-[#8b5cf6] to-[#ec4899]",
-      "from-[#f59e0b] to-[#ef4444]",
-      "from-[#10b981] to-[#059669]"
+      "bg-gradient-info",
+      "bg-gradient-accent",
+      "bg-gradient-warning",
+      "bg-gradient-success"
     ];
     const index = email.length % gradients.length;
-    return `bg-gradient-to-tr ${gradients[index]}`;
+    return gradients[index];
   };
 
   return (
@@ -232,10 +232,10 @@ function CandidateMessagesContent() {
       </div>
 
       {/* Main Glassmorphic Inbox Container */}
-      <div className="w-full max-w-full border-border rounded-3xl relative overflow-hidden h-[calc(100vh-220px)] shadow-sm flex bg-surface border md:h-[650px]">
+      <div className="w-full max-w-full border-border rounded-3xl relative overflow-hidden h-[calc(100vh-224px)] shadow-sm flex bg-surface border md:h-[648px]">
         
         {/* Left Pane: Conversation List */}
-        <div className={`w-full h-full border-border transition-all duration-300 flex border-r bg-surface flex-col md:w-[350px] lg:w-[400px] ${
+        <div className={`w-full h-full border-border transition-all duration-300 flex border-r bg-surface flex-col md:w-[352px] lg:w-[400px] ${
           viewMode === "chat" ? "hidden md:flex" : "flex"
         }`}>
           {/* Search Box */}
@@ -292,7 +292,7 @@ function CandidateMessagesContent() {
                         {otherPart.name.charAt(0).toUpperCase()}
                       </div>
                       {/* Active status bubble */}
-                      <span className="absolute border-2 rounded-full size-3 bg-emerald-500 bottom-0 border-surface right-0"></span>
+                      <span className="absolute border-2 rounded-full size-3 bg-success bottom-0 border-surface right-0"></span>
                     </div>
 
                     {/* Details */}
@@ -377,7 +377,7 @@ function CandidateMessagesContent() {
                 </div>
 
                 <div className="gap-2 flex items-center">
-                  <span className="py-1 text-emerald-500 px-2.5 bg-emerald-500/10 rounded-full type-badge">
+                  <span className="py-1 text-success px-2.5 bg-success-bg rounded-full type-badge">
                     Online
                   </span>
                 </div>

@@ -360,7 +360,7 @@ function SearchJobPageContent() {
           handleKeywordSearch={handleKeywordSearch}
           handleResetFilters={handleResetFilters}
           isPending={isPending}
-          className="hidden lg:flex lg:flex-col sticky top-[85px]"
+          className="hidden lg:flex lg:flex-col sticky top-[84px]"
         />
 
         {/* Results Feed Panel */}

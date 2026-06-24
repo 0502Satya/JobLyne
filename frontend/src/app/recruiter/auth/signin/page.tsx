@@ -10,7 +10,7 @@ import SigninForm from "@/features/auth/components/SigninForm";
 export default function RecruiterSigninPage() {
   return (
     <PortalAuthLayout
-      title="Portal Sign In"
+      title="Portal sign in"
       subtitle="Access your recruiter workspace"
       registerUrl="/recruiter/auth/signup"
     >

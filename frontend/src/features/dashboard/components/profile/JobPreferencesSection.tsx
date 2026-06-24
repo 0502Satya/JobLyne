@@ -122,7 +122,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
             {/* Desired Titles */}
             <div className="text-left">
               <Input
-                label="Desired Job Roles"
+                label="Desired job roles"
                 type="text"
                 value={data.desired_titles || ""}
                 onChange={(e) => onChange("desired_titles", e.target.value)}
@@ -134,7 +134,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
             {/* Expected & Current Salaries */}
             <div className="gap-5 grid grid-cols-1 md:grid-cols-3">
               <div>
-                <FormField label="Expected Salary (Annual)">
+                <FormField label="Expected salary (annual)">
                   <div className="relative w-full text-text">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted select-none type-label z-10">
                       {data.currency || "$"}
@@ -150,7 +150,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
                 </FormField>
               </div>
               <div>
-                <FormField label="Current CTC / Salary">
+                <FormField label="Current CTC / salary">
                   <div className="relative w-full text-text">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted select-none type-label z-10">
                       {data.currency || "$"}
@@ -166,7 +166,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
                 </FormField>
               </div>
               <div>
-                <FormField label="Notice Period">
+                <FormField label="Notice period">
                   <Select
                     value={data.notice_period || ""}
                     onChange={(e) => onChange("notice_period", e.target.value)}
@@ -206,7 +206,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
               </div>
 
               <div>
-                <FormField label="Preferred Company Size">
+                <FormField label="Preferred company size">
                   <Select
                     value={data.preferred_company_size || ""}
                     onChange={(e) => onChange("preferred_company_size", e.target.value)}
@@ -219,11 +219,11 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
               </div>
             </div>
 
-            {/* Relocation & International Opportunities Toggles */}
+            {/* Relocation and international Opportunities Toggles */}
             <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
               <div className="border border-border items-center bg-bg/40 flex p-4 rounded-xl justify-between">
                 <div>
-                  <p className="text-text type-caption font-medium">Open to Relocation</p>
+                  <p className="text-text type-caption font-medium">Open to relocation</p>
                   <p className="text-xs mt-0.5 text-muted">Willing to move for correct opportunities</p>
                 </div>
                 <button
@@ -282,8 +282,8 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveLocation(loc)}
-                      className="hover:text-red-500 min-w-8 h-8 p-0 flex items-center justify-center text-muted"
-                      title="Remove Location"
+                      className="hover:text-error min-w-8 h-8 p-0 flex items-center justify-center text-muted"
+                      title="Remove location"
                       aria-label={`Remove ${loc}`}
                     >
                       <X size={12} aria-hidden="true" />
@@ -360,20 +360,20 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
             </div>
 
             <div>
-              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Relocation & International</span>
+              <span className="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Relocation and international</span>
               <div className="gap-2 flex flex-wrap mt-0.5">
                 <span className={`px-2 gap-1 inline-flex text-xs items-center rounded-full py-0.5 border ${
                   data.open_to_relocation
-                    ? "text-emerald-600 border-emerald-500/20 bg-emerald-500/10 dark:text-emerald-400"
-                    : "border-red-500/20 bg-red-500/10 text-red-650 dark:text-red-400"
+                    ? "text-success border-success/20 bg-success-bg"
+                    : "border-error/20 bg-error-bg text-error"
                 }`}>
                   <span className="h-1.5 shrink-0 bg-current rounded-full w-1.5"></span>
                   Relocation: {data.open_to_relocation ? "YES" : "NO"}
                 </span>
                 <span className={`px-2 gap-1 inline-flex text-xs items-center rounded-full py-0.5 border ${
                   data.open_to_international
-                    ? "text-emerald-600 border-emerald-500/20 bg-emerald-500/10 dark:text-emerald-400"
-                    : "border-red-500/20 bg-red-500/10 text-red-650 dark:text-red-450"
+                    ? "text-success border-success/20 bg-success-bg"
+                    : "border-error/20 bg-error-bg text-error"
                 }`}>
                   <span className="h-1.5 shrink-0 bg-current rounded-full w-1.5"></span>
                   International: {data.open_to_international ? "YES" : "NO"}

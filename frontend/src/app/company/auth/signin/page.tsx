@@ -10,7 +10,7 @@ import SigninForm from "@/features/auth/components/SigninForm";
 export default function CompanySigninPage() {
   return (
     <PortalAuthLayout
-      title="Portal Sign In"
+      title="Portal sign in"
       subtitle="Access your company workspace"
       registerUrl="/auth/signup"
     >

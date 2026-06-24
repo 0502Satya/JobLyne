@@ -61,7 +61,7 @@ export default function RecruiterSettingsPage() {
   if (loading) {
     return (
       <div className="justify-center gap-4 items-center text-muted flex bg-surface min-h-screen flex-col">
-        <div className="border-amber-500/20 border-t-amber-500 size-12 rounded-full border-4 animate-spin"></div>
+        <div className="border-primary/20 border-t-primary size-12 rounded-full border-4 animate-spin"></div>
         <p className="text-muted uppercase type-ui tracking-widest">Fetching Recruiter Profile...</p>
       </div>
     );
@@ -86,16 +86,16 @@ export default function RecruiterSettingsPage() {
       {/* Settings Header */}
       <header className="border-b px-6 py-4 items-center backdrop-blur-md bg-card/60 sticky z-50 flex top-0 border-border justify-between">
         <div className="flex gap-3 items-center">
-          <Link href="/recruiter/dashboard" className="bg-gradient-to-r from-amber-400 to-yellow-500 type-h3 text-transparent bg-clip-text">
+          <Link href="/recruiter/dashboard" className="bg-gradient-primary type-h3 text-transparent bg-clip-text">
             JobLyne Recruiter
           </Link>
-          <span className="px-2 bg-amber-500/10 border-amber-500/20 text-amber-400 rounded-full py-0.5 type-caption border">
+          <span className="px-2 bg-primary/10 border-primary/20 text-primary rounded-full py-0.5 type-caption border">
             Profile Settings
           </span>
         </div>
         <Link 
           href="/recruiter/dashboard" 
-          className="gap-1.5 min-h-[44px] text-amber-400 items-center type-ui transition-colors flex px-4 rounded-xl hover:bg-amber-500/5 hover:text-amber-300 active:scale-[0.98]"
+          className="gap-1.5 min-h-[44px] text-primary items-center type-ui transition-colors flex px-4 rounded-xl hover:bg-primary/5 hover:text-primary active:scale-[0.98]"
         >
           <ArrowLeft size={18} aria-hidden="true" />
           Dashboard
@@ -119,7 +119,7 @@ export default function RecruiterSettingsPage() {
                       className="object-cover rounded-2xl size-12 border-border border"
                     />
                   ) : (
-                    <div className="to-yellow-600 from-amber-400 justify-center shrink-0 rounded-2xl bg-gradient-to-tr shadow-amber-500/10 size-12 items-center text-white shadow-lg flex">
+                    <div className="justify-center shrink-0 rounded-2xl bg-gradient-primary shadow-primary/10 size-12 items-center text-white shadow-lg flex">
                       {profile?.first_name ? profile.first_name.substring(0, 2).toUpperCase() : "RC"}
                     </div>
                   )}
@@ -134,11 +134,11 @@ export default function RecruiterSettingsPage() {
                 <div className="space-y-1.5">
                   <div className="text-muted uppercase items-center flex type-caption justify-between">
                     <span>Completeness</span>
-                    <span className="text-amber-400">{completionPercent}%</span>
+                    <span className="text-primary">{completionPercent}%</span>
                   </div>
                   <div className="w-full h-2 overflow-hidden border-border rounded-full bg-surface border">
                     <div 
-                      className="bg-gradient-to-r from-amber-400 h-full to-yellow-500 transition-all rounded-full duration-500"
+                      className="bg-gradient-primary h-full transition-all rounded-full duration-500"
                       style={{ width: `${completionPercent}%` }}
                     ></div>
                   </div>
@@ -159,7 +159,7 @@ export default function RecruiterSettingsPage() {
                     onClick={() => setActiveStep(step.id as FormStep)}
                     className={`w-full min-h-[48px] rounded-2xl py-3.5 items-center transition-all type-ui gap-3 flex px-4 text-left active:scale-[0.98] ${
                       activeStep === step.id 
-                        ? "bg-amber-500 text-text shadow-lg shadow-amber-500/15" 
+                        ? "bg-primary text-white shadow-lg shadow-primary/15" 
                         : "text-muted hover:bg-card/40 hover:text-muted"
                     }`}
                   >
@@ -185,7 +185,7 @@ export default function RecruiterSettingsPage() {
               
               {/* Error Alert */}
               {error && (
-                <div className="slide-in-from-top-2 rounded-2xl text-red-400 animate-in gap-3 border-red-500/20 type-ui flex p-4 bg-red-500/10 border">
+                <div className="slide-in-from-top-2 rounded-2xl text-error animate-in gap-3 border-error/20 type-ui flex p-4 bg-error-bg border">
                   <AlertCircle size={20} aria-hidden="true" />
                   {error}
                 </div>
@@ -193,7 +193,7 @@ export default function RecruiterSettingsPage() {
 
               {/* Success Alert */}
               {success && (
-                <div className="slide-in-from-top-2 rounded-2xl text-emerald-400 animate-in gap-3 bg-emerald-500/10 type-ui border-emerald-500/20 flex p-4 border">
+                <div className="slide-in-from-top-2 rounded-2xl text-success animate-in gap-3 bg-success-bg type-ui border-success/20 flex p-4 border">
                   <CheckCircle2 size={20} aria-hidden="true" />
                   Recruiter details updated successfully!
                 </div>
@@ -202,31 +202,31 @@ export default function RecruiterSettingsPage() {
               {/* Step 1: Personal Details */}
               {activeStep === "personal" && (
                 <div className="fade-in animate-in space-y-6 duration-200">
-                  <div className="gap-2 flex text-amber-400 items-center">
+                  <div className="gap-2 flex text-primary items-center">
                     <User size={24} aria-hidden="true" />
                     <h3 className="text-muted tracking-tight type-h3">Personal Profile</h3>
                   </div>
 
                   <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <label className="text-muted uppercase tracking-wider type-caption">First Name</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">First name</label>
                       <input 
                         name="first_name"
                         required
                         value={profile?.first_name || ""}
                         onChange={handleChange}
-                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-primary focus:ring-2"
                         placeholder="e.g. Surya"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-muted uppercase tracking-wider type-caption">Last Name</label>
+                      <label className="text-muted uppercase tracking-wider type-caption">Last name</label>
                       <input 
                         name="last_name"
                         required
                         value={profile?.last_name || ""}
                         onChange={handleChange}
-                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-primary focus:ring-2"
                         placeholder="e.g. Shukla"
                       />
                     </div>
@@ -250,7 +250,7 @@ export default function RecruiterSettingsPage() {
                         required
                         value={profile?.phone || ""}
                         onChange={handleChange}
-                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
+                        className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-primary focus:ring-2"
                         placeholder="e.g. +1 (555) 123-4567"
                       />
                     </div>
@@ -263,7 +263,7 @@ export default function RecruiterSettingsPage() {
                       type="url"
                       value={profile?.profile_photo_url || ""}
                       onChange={handleChange}
-                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
+                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-primary focus:ring-2"
                       placeholder="https://example.com/photo.jpg"
                     />
                   </div>
@@ -272,7 +272,7 @@ export default function RecruiterSettingsPage() {
                     <button
                       type="button"
                       onClick={() => setActiveStep("agency")}
-                      className="w-full bg-amber-500 justify-center text-text shadow-amber-500/20 min-h-[48px] gap-1 rounded-2xl py-3.5 items-center transition-all type-ui flex shadow-lg hover:scale-[1.02] hover:bg-amber-400 active:scale-[0.98]"
+                      className="w-full bg-primary justify-center text-white shadow-primary/20 min-h-[48px] gap-1 rounded-2xl py-3.5 items-center transition-all type-ui flex shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                     >
                       Continue to Agency Details <ArrowRight size={14} aria-hidden="true" />
                     </button>
@@ -283,7 +283,7 @@ export default function RecruiterSettingsPage() {
               {/* Step 2: Agency Details */}
               {activeStep === "agency" && (
                 <div className="fade-in animate-in space-y-6 duration-200">
-                  <div className="gap-2 flex text-amber-400 items-center">
+                  <div className="gap-2 flex text-primary items-center">
                     <Building2 size={24} aria-hidden="true" />
                     <h3 className="text-muted tracking-tight type-h3">Agency Details</h3>
                   </div>
@@ -295,7 +295,7 @@ export default function RecruiterSettingsPage() {
                       required
                       value={profile?.agency_name || ""}
                       onChange={handleChange}
-                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-amber-400 focus:ring-2"
+                      className="w-full outline-none min-h-[48px] rounded-2xl py-3.5 transition-all type-ui bg-surface px-4 border-border border focus:ring-primary focus:ring-2"
                       placeholder="e.g. Dataminerz Sourcing"
                     />
                   </div>
@@ -312,7 +312,7 @@ export default function RecruiterSettingsPage() {
                     <button 
                       type="submit"
                       disabled={isPending}
-                      className="bg-gradient-to-r to-yellow-600 from-amber-400 text-text flex-1 shadow-amber-500/20 min-h-[48px] justify-center rounded-2xl type-card-title py-3.5 transition-all items-center gap-2 shadow-xl flex hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="bg-gradient-primary text-white flex-1 shadow-primary/20 min-h-[48px] justify-center rounded-2xl type-card-title py-3.5 transition-all items-center gap-2 shadow-xl flex hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isPending ? (
                         <>

@@ -100,7 +100,7 @@ export default function JobsFilterSidebar({
         {/* City/Location Input */}
         <div className="flex gap-1.5 flex-col">
           <label htmlFor="filter-location" className="uppercase tracking-wider type-caption text-muted font-bold">
-            City or Location
+            City or location
           </label>
           <div className="relative">
             <input

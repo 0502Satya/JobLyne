@@ -71,7 +71,7 @@ export default function RecruiterSignupPage() {
                       <ShieldCheck className="text-primary" size={16} aria-hidden="true" />
                       One-Click Verification
                     </h3>
-                    <button className="w-full justify-center rounded-xl px-6 gap-4 py-4 group items-center transition-all text-white flex shadow-lg shadow-blue-500/20 bg-[#0A66C2] hover:bg-[#0954a1] active:scale-[0.98]">
+                    <button className="w-full justify-center rounded-xl px-6 gap-4 py-4 group items-center transition-all text-white flex shadow-lg shadow-linkedin/20 bg-linkedin hover:bg-linkedin-hover active:scale-[0.98]">
                       <svg className="size-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                       </svg>
@@ -91,7 +91,7 @@ export default function RecruiterSignupPage() {
                   </div>
 
                   {state?.error && (
-                    <div className="bg-red-50 border-red-200 items-center rounded-lg gap-3 flex p-4 text-red-600 border dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+                    <div className="bg-error-bg border-error/20 items-center rounded-lg gap-3 flex p-4 text-error border">
                       <AlertCircle size={20} aria-hidden="true" />
                       <p className="type-ui">{state.error}</p>
                     </div>
@@ -113,7 +113,7 @@ export default function RecruiterSignupPage() {
                       </div>
                       <div className="gap-2 flex flex-col">
                         <label className="text-text type-ui">Designation</label>
-                        <input name="designation" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="Technical Recruiter" type="text" required />
+                        <input name="designation" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="Technical recruiter" type="text" required />
                       </div>
                       <div className="gap-2 flex flex-col">
                         <label className="text-text type-ui">Password</label>
@@ -127,7 +127,7 @@ export default function RecruiterSignupPage() {
                     <div className="items-center bg-bg rounded-lg gap-3 flex p-4 dark:bg-card">
                       <input type="checkbox" name="terms" className="text-primary h-5 w-5 cursor-pointer rounded focus:ring-primary" required />
                       <p className="text-muted text-xs">
-                        I agree to the <Link href="#" className="text-primary hover:underline">Recruiter Terms of Service</Link> and <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>.
+                        I agree to the <Link href="#" className="text-primary hover:underline">Recruiter Terms of service</Link> and <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>.
                       </p>
                     </div>
                     <button disabled={isPending} className="w-full px-8 bg-card py-4 transition-all text-white shadow-lg rounded-xl dark:text-text dark:bg-bg hover:opacity-90 disabled:opacity-50 active:scale-[0.98]" type="submit">
@@ -139,7 +139,7 @@ export default function RecruiterSignupPage() {
 
               {/* Right Side: Perks Sidebar */}
               <div className="lg:col-span-2 fade-in animate-in duration-500 flex gap-6 slide-in-from-right-4 flex-col">
-                <div className="bg-card gap-8 rounded-2xl relative overflow-hidden text-white shadow-xl flex p-8 shadow-slate-900/10 flex-col">
+                <div className="bg-card gap-8 rounded-2xl relative overflow-hidden text-white shadow-xl flex p-8 flex-col">
                   <div className="space-y-4">
                     <span className="py-1 text-primary text-xs px-3 uppercase rounded-full tracking-wider bg-primary/20">Recruiter Benefits</span>
                     <h3 className="type-h2">Elevate your hiring game</h3>
@@ -218,7 +218,7 @@ export default function RecruiterSignupPage() {
           <footer className="border-t text-xs px-6 mt-auto gap-4 items-center border-border py-8 flex transition-colors text-muted justify-between flex-col md:px-20 md:flex-row dark:border-border">
             <div className="flex gap-8">
               <Link className="hover:text-primary transition-colors" href="#">Privacy Policy</Link>
-              <Link className="hover:text-primary transition-colors" href="#">Terms of Service</Link>
+              <Link className="hover:text-primary transition-colors" href="#">Terms of service</Link>
               <Link className="hover:text-primary transition-colors" href="#">Cookie Policy</Link>
             </div>
             <p>© 2026 JobLyne Inc. All rights reserved.</p>

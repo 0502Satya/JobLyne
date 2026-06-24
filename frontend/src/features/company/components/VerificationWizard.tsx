@@ -278,7 +278,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
     if (!formData.official_email || !formData.website_url) return null;
     try {
       const emailDomain = formData.official_email.split("@")[1]?.toLowerCase().trim();
-      let webDomain = formData.website_url
+      const webDomain = formData.website_url
         .replace(/https?:\/\//, "")
         .replace(/^www\./, "")
         .split("/")[0]
@@ -522,7 +522,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
             <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
               {/* Country Select */}
               <div className="space-y-2">
-                <label className="type-ui text-text font-medium block">Country of Incorporation *</label>
+                <label className="type-ui text-text font-medium block">Country of incorporation *</label>
                 <select 
                   name="country" 
                   value={formData.country} 
@@ -726,7 +726,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                 <div className="border rounded-2xl p-6 bg-surface border-border flex flex-col justify-between h-[180px]">
                   <div className="space-y-1">
                     <h4 className="text-text type-ui font-semibold flex gap-2 items-center">
-                      Certificate of Incorporation * 
+                      Certificate of incorporation * 
                       {formData.incorporation_doc_url && <CheckCircle2 className="text-success h-5 w-5" aria-hidden="true" />}
                     </h4>
                     <p className="text-xs text-muted">Upload copy of incorporation act registration papers.</p>
@@ -737,7 +737,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                         <span className="text-xs text-success font-medium truncate max-w-[200px]">Doc Uploaded</span>
                         <button 
                           onClick={() => setFormData(prev => ({ ...prev, incorporation_doc_url: "" }))}
-                          className="text-error hover:text-red-600 font-semibold text-xs"
+                          className="text-error hover:text-error/80 font-semibold text-xs"
                         >
                           Remove
                         </button>
@@ -776,7 +776,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                         <span className="text-xs text-success font-medium truncate max-w-[200px]">Doc Uploaded</span>
                         <button 
                           onClick={() => setFormData(prev => ({ ...prev, tax_doc_url: "" }))}
-                          className="text-error hover:text-red-600 font-semibold text-xs"
+                          className="text-error hover:text-error/80 font-semibold text-xs"
                         >
                           Remove
                         </button>
@@ -815,7 +815,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                         <span className="text-xs text-success font-medium truncate max-w-[200px]">Doc Uploaded</span>
                         <button 
                           onClick={() => setFormData(prev => ({ ...prev, id_proof_url: "" }))}
-                          className="text-error hover:text-red-600 font-semibold text-xs"
+                          className="text-error hover:text-error/80 font-semibold text-xs"
                         >
                           Remove
                         </button>
@@ -853,7 +853,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                         <span className="text-xs text-success font-medium truncate max-w-[200px]">Doc Uploaded</span>
                         <button 
                           onClick={() => setFormData(prev => ({ ...prev, address_proof_url: "" }))}
-                          className="text-error hover:text-red-600 font-semibold text-xs"
+                          className="text-error hover:text-error/80 font-semibold text-xs"
                         >
                           Remove
                         </button>
@@ -1011,7 +1011,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                       <img src={formData.logo_url} alt="Logo" className="object-cover size-full" />
                       <button 
                         onClick={() => setFormData(prev => ({ ...prev, logo_url: "" }))}
-                        className="absolute -top-1 -right-1 bg-error text-white rounded-full p-0.5 hover:bg-red-600 shadow-md"
+                        className="absolute -top-1 -right-1 bg-error text-white rounded-full p-0.5 hover:bg-error/90 shadow-md"
                       >
                         <X size={12} />
                       </button>
@@ -1045,7 +1045,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                       <img src={formData.banner_url} alt="Banner" className="object-cover size-full" />
                       <button 
                         onClick={() => setFormData(prev => ({ ...prev, banner_url: "" }))}
-                        className="absolute -top-1 -right-1 bg-error text-white rounded-full p-0.5 hover:bg-red-600 shadow-md"
+                        className="absolute -top-1 -right-1 bg-error text-white rounded-full p-0.5 hover:bg-error/90 shadow-md"
                       >
                         <X size={12} />
                       </button>
@@ -1191,9 +1191,9 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
               </div>
             </div>
 
-            {/* Perks & Benefits Tag Input */}
+            {/* Perks and benefits Tag Input */}
             <div className="space-y-2">
-              <label className="type-ui text-text font-medium block">Perks & Benefits Offered</label>
+              <label className="type-ui text-text font-medium block">Perks and benefits Offered</label>
               <div className="flex gap-2">
                 <input 
                   type="text" 
@@ -1213,9 +1213,9 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
               </div>
               <div className="gap-2 flex flex-wrap pt-2">
                 {perksBenefits.map((tag, idx) => (
-                  <span key={idx} className="flex items-center gap-1.5 bg-company-accent/10 border border-company-accent/20 text-teal-600 px-3 py-1 rounded-full text-xs font-semibold">
+                  <span key={idx} className="flex items-center gap-1.5 bg-company-accent/10 border border-company-accent/20 text-company-accent px-3 py-1 rounded-full text-xs font-semibold">
                     {tag}
-                    <button type="button" onClick={() => removeTag("perk", idx)} className="text-teal-600 hover:text-teal-800">
+                    <button type="button" onClick={() => removeTag("perk", idx)} className="text-company-accent hover:text-company-accent">
                       <X size={12} />
                     </button>
                   </span>
@@ -1245,9 +1245,9 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
               </div>
               <div className="gap-2 flex flex-wrap pt-2">
                 {cultureTags.map((tag, idx) => (
-                  <span key={idx} className="flex items-center gap-1.5 bg-accent/10 border border-accent/20 text-purple-600 px-3 py-1 rounded-full text-xs font-semibold">
+                  <span key={idx} className="flex items-center gap-1.5 bg-accent/10 border border-accent/20 text-accent px-3 py-1 rounded-full text-xs font-semibold">
                     {tag}
-                    <button type="button" onClick={() => removeTag("culture", idx)} className="text-purple-600 hover:text-purple-800">
+                    <button type="button" onClick={() => removeTag("culture", idx)} className="text-accent hover:text-accent">
                       <X size={12} />
                     </button>
                   </span>
@@ -1293,7 +1293,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                 {inviteEmails.map((email, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-bg rounded-xl px-4 py-2 border border-border">
                     <span className="text-xs text-text font-semibold">{email}</span>
-                    <button type="button" onClick={() => removeInvite(idx)} className="text-error hover:text-red-700">
+                    <button type="button" onClick={() => removeInvite(idx)} className="text-error hover:text-error/85">
                       <X size={16} />
                     </button>
                   </div>
@@ -1374,7 +1374,7 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
               {/* Category 2: Public profile details */}
               <div className="border border-border rounded-2xl p-6 bg-bg space-y-4">
                 <h4 className="text-text type-ui font-bold border-b pb-2 border-border flex gap-2 items-center">
-                  <Building2 className="text-teal-600 h-5 w-5" />
+                  <Building2 className="text-company-accent h-5 w-5" />
                   Public Profile details
                 </h4>
                 <div className="flex gap-4 items-center mb-4">
@@ -1403,8 +1403,8 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
               {/* Category 3: Hiring Info */}
               <div className="border border-border rounded-2xl p-6 bg-bg space-y-4">
                 <h4 className="text-text type-ui font-bold border-b pb-2 border-border flex gap-2 items-center">
-                  <FileText className="text-purple-600 h-5 w-5" />
-                  Hiring & Settings
+                  <FileText className="text-accent h-5 w-5" />
+                  Hiring and settings
                 </h4>
                 <div className="space-y-3">
                   <div>
@@ -1417,10 +1417,10 @@ export default function VerificationWizard({ initialProfile }: VerificationWizar
                     </div>
                   </div>
                   <div>
-                    <span className="text-muted block text-xs uppercase font-semibold mb-1">Perks & Benefits</span>
+                    <span className="text-muted block text-xs uppercase font-semibold mb-1">Perks and benefits</span>
                     <div className="gap-1.5 flex flex-wrap">
                       {perksBenefits.map((tag, idx) => (
-                        <span key={idx} className="bg-teal-600/10 border border-teal-600/20 text-teal-600 px-2.5 py-0.5 rounded-full text-xs font-semibold">{tag}</span>
+                        <span key={idx} className="bg-company-accent/10 border border-company-accent/20 text-company-accent px-2.5 py-0.5 rounded-full text-xs font-semibold">{tag}</span>
                       ))}
                       {perksBenefits.length === 0 && <span className="text-xs text-muted font-medium">None added</span>}
                     </div>

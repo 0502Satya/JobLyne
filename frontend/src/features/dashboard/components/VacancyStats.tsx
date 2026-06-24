@@ -21,7 +21,7 @@ export default function VacancyStats() {
   const dayLabels = getLast30DaysLabels();
 
   return (
-    <div className="w-full p-10 overflow-hidden rounded-[32px] bg-surface flex shadow-xl shadow-slate-200/50 flex-col">
+    <div className="w-full p-10 overflow-hidden rounded-[32px] bg-surface flex shadow-xl flex-col">
       {/* Header */}
       <div className="items-center flex-wrap mb-12 flex gap-6 justify-between">
         <h4 className="text-text type-h2">Vacancy Stats</h4>
@@ -147,7 +147,7 @@ export default function VacancyStats() {
             <span className="text-muted type-badge">Interviews</span>
          </div>
          <div className="flex gap-3 items-center">
-            <div className="bg-red-400 w-3 rounded-full h-3"></div>
+            <div className="bg-error w-3 rounded-full h-3"></div>
             <span className="text-muted type-badge">Rejected</span>
          </div>
       </div>

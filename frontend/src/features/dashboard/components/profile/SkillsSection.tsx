@@ -94,7 +94,7 @@ export default function SkillsSection({ data = [], onChange }: SkillsSectionProp
             <Zap size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-text type-card-title leading-tight">Skills & Expertise</h3>
+            <h3 className="text-text type-card-title leading-tight">Skills and expertise</h3>
             <p className="text-xs text-muted mt-0.5">Showcase your technical & soft skills</p>
           </div>
         </div>
@@ -166,8 +166,8 @@ export default function SkillsSection({ data = [], onChange }: SkillsSectionProp
                             disabled={idx === 0}
                             onClick={() => moveSkill(idx, "left")}
                             className="h-8 w-8 p-0 min-w-8"
-                            title="Move Left"
-                            aria-label="Move Left"
+                            title="Move left"
+                            aria-label="Move left"
                           >
                              <ChevronLeft size={14} aria-hidden="true" />
                           </Button>
@@ -178,8 +178,8 @@ export default function SkillsSection({ data = [], onChange }: SkillsSectionProp
                             disabled={idx === skills.length - 1}
                             onClick={() => moveSkill(idx, "right")}
                             className="h-8 w-8 p-0 min-w-8"
-                            title="Move Right"
-                            aria-label="Move Right"
+                            title="Move right"
+                            aria-label="Move right"
                           >
                              <ChevronRight size={14} aria-hidden="true" />
                           </Button>
@@ -188,8 +188,8 @@ export default function SkillsSection({ data = [], onChange }: SkillsSectionProp
                             variant="ghost"
                             size="sm"
                             onClick={() => removeSkill(skill)}
-                            className="h-8 w-8 p-0 min-w-8 hover:text-red-500"
-                            title="Remove Skill"
+                            className="h-8 w-8 p-0 min-w-8 hover:text-error"
+                            title="Remove skill"
                             aria-label={`Remove ${skill}`}
                           >
                              <X size={14} aria-hidden="true" />
@@ -251,7 +251,7 @@ export default function SkillsSection({ data = [], onChange }: SkillsSectionProp
                   let progressColor = "bg-border";
                   if (currentLevel === "Beginner") {
                     progressWidth = "30%";
-                    progressColor = "bg-amber-500/80";
+                    progressColor = "bg-warning/80";
                   } else if (currentLevel === "Intermediate") {
                     progressWidth = "60%";
                     progressColor = "bg-primary/75";

@@ -376,28 +376,29 @@ export default function ProfilePage() {
       label: "Skills",
       value: `${profile?.skills?.length || 0}`,
       icon: "bolt",
-      color: "text-[#9333ea]",
-      bg: "bg-[#faf0ff]",
+      color: "text-featured",
+      bg: "bg-featured-bg",
     },
     {
       label: "Experience",
       value: profile?.experience_years ? `${profile.experience_years} yrs` : profile?.experience?.length ? `${profile.experience.length} roles` : "Fresher",
       icon: "work_history",
-      color: "text-[#ea580c]",
-      bg: "bg-[#fff2e9]",
+      color: "text-experience",
+      bg: "bg-experience-bg",
     },
     {
       label: "Visibility",
       value: activeVisibility === "everyone" ? "Public" : activeVisibility === "recruiters" ? "Recruiters" : "Hidden",
       icon: "visibility",
-      color: "text-[#16a34a]",
-      bg: "bg-[#e9f9ef]",
+      color: "text-success",
+      bg: "bg-success-bg",
     },
   ], [activeVisibility, completenessScore, profile?.experience, profile?.experience_years, profile?.skills]);
 
   if (fetchError) {
+    // Height offset by --height-header plus 1px for the bottom header border
     return (
-      <main className="justify-center flex-1 overflow-y-auto items-center py-8 bg-bg/50 flex h-[calc(100vh-73px)] px-4 md:py-12 md:px-10">
+      <main className="justify-center flex-1 overflow-y-auto items-center py-8 bg-bg/50 flex h-[calc(100vh-var(--height-header)-1px)] px-4 md:py-12 md:px-10">
         <ErrorState
           title="Failed to load profile"
           description="There was a problem retrieving your candidate profile. Please check your network connection and try again."
@@ -408,8 +409,9 @@ export default function ProfilePage() {
   }
 
   if (loading && !profile) {
+    // Height offset by --height-header plus 1px for the bottom header border
     return (
-      <main className="flex-1 overflow-y-auto animate-pulse py-8 bg-bg/50 h-[calc(100vh-73px)] px-4 md:py-12 md:px-10">
+      <main className="flex-1 overflow-y-auto animate-pulse py-8 bg-bg/50 h-[calc(100vh-var(--height-header)-1px)] px-4 md:py-12 md:px-10">
         <div className="mx-auto max-w-7xl space-y-12">
           <div className="rounded-2xl w-48 h-10 bg-border"></div>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr_320px]">
@@ -432,13 +434,9 @@ export default function ProfilePage() {
         onSave={handleSave} 
         onDiscard={handleDiscard} 
       />
+      {/* Height offset by --height-header plus 1px for the bottom header border */}
       <main
-        className="custom-scrollbar flex-1 overflow-y-auto pb-32 pt-6 bg-bg h-[calc(100vh-73px)] candidate-profile-reference px-4 md:px-8 md:py-8"
-        style={{
-          "--color-primary": "#0e7c86",
-          "--color-primary-dark": "#0a575e",
-          "--color-primary-light": "#e7f4f5",
-        } as React.CSSProperties}
+        className="custom-scrollbar flex-1 overflow-y-auto pb-32 pt-6 bg-bg h-[calc(100vh-var(--height-header)-1px)] candidate-profile-reference px-4 md:px-8 md:py-8"
       >
         <div className="max-w-[1440px] mx-auto animate-fade-in">
           <div className="items-center flex-wrap flex gap-5 mb-6 justify-between">
@@ -548,11 +546,11 @@ export default function ProfilePage() {
                       
                       <div className="gap-1 flex items-center">
                         {status.status === "complete" ? (
-                          <CheckCircle2 size={16} className="text-emerald-500" aria-hidden="true" />
+                          <CheckCircle2 size={16} className="text-success" aria-hidden="true" />
                         ) : status.status === "partial" ? (
-                          <span className="h-2.5 w-2.5 shadow-sm rounded-full bg-amber-400" title="Partially Complete"></span>
+                          <span className="h-2.5 w-2.5 shadow-sm rounded-full bg-warning" title="Partially complete"></span>
                         ) : status.error ? (
-                          <span className="bg-red-400 h-2.5 w-2.5 rounded-full" title="Required Fields Missing"></span>
+                          <span className="bg-error h-2.5 w-2.5 rounded-full" title="Required fields missing"></span>
                         ) : null}
                       </div>
                     </button>
@@ -579,11 +577,11 @@ export default function ProfilePage() {
                     <div className="relative">
                       <Icon name={sect.icon} size={18} aria-hidden="true" />
                       {status.status === "complete" ? (
-                        <span className="-top-1 border h-2.5 w-2.5 absolute rounded-full border-white bg-emerald-500 -right-1"></span>
+                        <span className="-top-1 border h-2.5 w-2.5 absolute rounded-full border-white bg-success -right-1"></span>
                       ) : status.status === "partial" ? (
-                        <span className="-top-1 border h-2.5 w-2.5 absolute bg-amber-400 rounded-full border-white -right-1"></span>
+                        <span className="-top-1 border h-2.5 w-2.5 absolute bg-warning rounded-full border-white -right-1"></span>
                       ) : status.error ? (
-                        <span className="-top-1 border bg-red-400 h-2.5 w-2.5 absolute rounded-full border-white -right-1"></span>
+                        <span className="-top-1 border bg-error h-2.5 w-2.5 absolute rounded-full border-white -right-1"></span>
                       ) : null}
                     </div>
                     <span className="w-full text-xs text-center truncate">{sect.label.split(" ")[0]}</span>
@@ -687,8 +685,8 @@ export default function ProfilePage() {
                     />
                     <defs>
                       <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#0E7C86" />
-                        <stop offset="100%" stopColor="#0a575e" />
+                        <stop offset="0%" stopColor="var(--color-primary)" />
+                        <stop offset="100%" stopColor="var(--color-primary-dark)" />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -735,7 +733,7 @@ export default function ProfilePage() {
                         )}
                       </>
                     ) : (
-                      <div className="justify-center gap-1.5 text-emerald-600 items-center text-center bg-emerald-500/10 p-2.5 border-emerald-500/20 flex type-caption rounded-xl border dark:text-emerald-450">
+                      <div className="justify-center gap-1.5 text-success items-center text-center bg-success-bg p-2.5 border-success/20 flex type-caption rounded-xl border">
                         <BadgeCheck size={16} aria-hidden="true" />
                         Profile fully complete!
                       </div>
@@ -747,10 +745,10 @@ export default function ProfilePage() {
               <div className="border-border shadow-sm bg-card p-5 space-y-4 rounded-xl border">
                 <div className="gap-2 flex items-center">
                   <Eye className="text-primary" size={18} aria-hidden="true" />
-                  <span className="uppercase tracking-wider type-caption text-muted">Profile Visibility</span>
+                  <span className="uppercase tracking-wider type-caption text-muted">Profile visibility</span>
                 </div>
 
-                <div className="space-y-3" role="radiogroup" aria-label="Profile Visibility">
+                <div className="space-y-3" role="radiogroup" aria-label="Profile visibility">
                   {/* Everyone */}
                   <button
                     type="button"

@@ -30,7 +30,7 @@ export default function ProfileSidebar({ completenessPct }: ProfileSidebarProps)
             <Icon name={section.icon} size={20} />
             <span className="text-sm">{section.label}</span>
             {section.missing && (
-              <span className="h-2 w-2 rounded-full ml-auto bg-amber-400" title="Missing fields"></span>
+              <span className="h-2 w-2 rounded-full ml-auto bg-warning" title="Missing fields"></span>
             )}
           </a>
         ))}
@@ -51,7 +51,7 @@ export default function ProfileSidebar({ completenessPct }: ProfileSidebarProps)
             {completenessPct < 100 ? (
               <>Add more details to reach <span className="text-primary">100%</span></>
             ) : (
-              <span className="text-green-500">Profile complete!</span>
+              <span className="text-success">Profile complete!</span>
             )}
           </p>
         </div>

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 
-from apps.candidates.models import SavedJobs, JobSeekers, JobSeekerSkills
+from apps.candidates.models import SavedJobs, JobSeekers, JobSeekerSkills, CandidateProfileViews
 from apps.jobs.models import Jobs, Applications
 from apps.jobs.serializers import JobSerializer
 from apps.candidates.serializers import CandidateProfileSerializer
@@ -183,3 +183,24 @@ class CandidateComparisonView(APIView):
                 candidate_data['whatsapp_number'] = None
 
         return Response(data)
+
+
+class RecordProfileViewView(APIView):
+    """Called when a recruiter/company opens a candidate's profile page.
+    POST /api/candidate/profile/<job_seeker_id>/view/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_seeker_id):
+        # Only recruiters/companies can record views
+        if request.user.account_type not in ['RECRUITER', 'COMPANY']:
+            return Response({"error": "Only recruiters and companies can view candidate profiles."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            job_seeker = JobSeekers.objects.get(id=job_seeker_id)
+        except JobSeekers.DoesNotExist:
+            return Response({"error": "Candidate not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Record the view event
+        CandidateProfileViews.objects.create(job_seeker=job_seeker, viewer=request.user)
+        return Response({"message": "Profile view recorded."}, status=status.HTTP_201_CREATED)

@@ -62,7 +62,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
             <Crown size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-text type-card-title leading-tight">Certifications & Courses</h3>
+            <h3 className="text-text type-card-title leading-tight">Certifications and courses</h3>
             <p className="text-xs text-muted mt-0.5">Prove your specialized knowledge</p>
           </div>
         </div>
@@ -113,14 +113,14 @@ export default function CertificationsSection({ certifications = [], onChange }:
                       <div className="space-y-4 text-left">
                         <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                           <Input
-                            label="Certification Name"
+                            label="Certification name"
                             type="text"
                             value={cert.name || ""}
                             onChange={(e) => updateCertification(cert.id, "name", e.target.value)}
                             placeholder="e.g. AWS Certified Solutions Architect"
                           />
                           <Input
-                            label="Issuing Organization"
+                            label="Issuing organization"
                             type="text"
                             value={cert.issuing_organization || ""}
                             onChange={(e) => updateCertification(cert.id, "issuing_organization", e.target.value)}
@@ -130,13 +130,13 @@ export default function CertificationsSection({ certifications = [], onChange }:
 
                         <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                           <Input
-                            label="Issue Date"
+                            label="Issue date"
                             type="date"
                             value={cert.issue_date || ""}
                             onChange={(e) => updateCertification(cert.id, "issue_date", e.target.value)}
                           />
                           <Input
-                            label="Expiration Date"
+                            label="Expiration date"
                             type="date"
                             value={cert.expiry_date || ""}
                             onChange={(e) => updateCertification(cert.id, "expiry_date", e.target.value)}
@@ -162,7 +162,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
                             type="button"
                             variant="outline"
                             onClick={() => removeCertification(cert.id)}
-                            className="text-red-500 hover:text-red-650 hover:bg-red-500/10 border-border"
+                            className="text-error hover:text-error/90 hover:bg-error-bg border-border"
                           >
                             Delete
                           </Button>
@@ -225,7 +225,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
                             variant="outline"
                             onClick={() => setEditingId(cert.id || null)}
                             className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-muted border-border hover:text-primary"
-                            title="Edit Certificate"
+                            title="Edit certificate"
                           >
                             <Pencil size={16} aria-hidden="true" />
                           </Button>
@@ -233,8 +233,8 @@ export default function CertificationsSection({ certifications = [], onChange }:
                             type="button"
                             variant="outline"
                             onClick={() => removeCertification(cert.id)}
-                            className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-red-500 border-border hover:bg-red-500/10"
-                            title="Delete Certificate"
+                            className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-error border-border hover:bg-error-bg"
+                            title="Delete certificate"
                           >
                             <Trash2 size={16} aria-hidden="true" />
                           </Button>

@@ -7,7 +7,7 @@ import Icon from "@/shared/ui/Icon";
 const actions = [
   { icon: "school", label: "Add Degree", color: "bg-primary-light text-primary ring-primary/10" },
   { icon: "work_history", label: "Add Position", color: "bg-primary/5 text-primary ring-primary/10" },
-  { icon: "person_add", label: "Add Role", color: "bg-violet-50 text-violet-600 ring-violet-100" },
+  { icon: "person_add", label: "Add Role", color: "bg-accent/10 text-accent ring-accent/10" },
   { icon: "info", label: "Add Info", color: "bg-bg text-muted ring-border" },
 ];
 

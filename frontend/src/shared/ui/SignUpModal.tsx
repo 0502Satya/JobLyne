@@ -15,7 +15,7 @@ interface SignUpModalProps {
 export default function SignUpModal({
   isOpen,
   onClose,
-  title = "Join JobLyne to Continue",
+  title = "Join JobLyne to continue",
   description = "Create a free candidate profile to search jobs, match your skills, apply to opportunities, and access premium courses.",
   actionText = "to perform this action"
 }: SignUpModalProps) {
@@ -109,7 +109,7 @@ export default function SignUpModal({
         <div className="border-border/40 border-b pb-3 items-center flex justify-between">
           <h3 id="modal-title" className="type-card-title items-center gap-2 flex font-bold text-text">
             <UserCircle size={24} className="text-primary font-bold" aria-hidden="true" />
-            Account Required
+            Account required
           </h3>
           <button 
             onClick={onClose}
@@ -145,14 +145,14 @@ export default function SignUpModal({
             href="/auth/signin"
             className="flex-grow min-h-[44px] py-2.5 text-center border border-primary text-primary type-ui rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center font-semibold"
           >
-            Log In
+            Log in
           </Link>
 
           <Link 
             href="/auth/signup"
             className="flex-grow min-h-[44px] py-2.5 text-center shadow-lg shadow-primary/20 bg-primary text-white type-ui rounded-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center font-semibold"
           >
-            Sign Up
+            Sign up
           </Link>
         </div>
       </div>

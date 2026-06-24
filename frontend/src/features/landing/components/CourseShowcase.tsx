@@ -40,7 +40,7 @@ export default function CourseShowcase() {
                 {/* Title and a link to see all courses */}
                 <div className="items-end flex-col mb-12 flex gap-6 justify-between md:flex-row">
                     <div>
-                        <h2 className="text-text mb-2 type-h1">Bridge Your Skill Gap</h2>
+                        <h2 className="text-text mb-2 type-h1">Bridge your skill gap</h2>
                         <p className="text-muted">Learn new skills to get better jobs.</p>
                     </div>
                     <a className="text-primary gap-1.5 items-center flex hover:underline" href="#">
@@ -70,8 +70,8 @@ export default function CourseShowcase() {
                             <div className="p-5 sm:p-6">
                                 <div className="gap-2 flex mb-3 items-center">
                                     <span className="px-2 py-1 text-primary type-caption rounded bg-primary/10">{course.category}</span>
-                                    <div className="flex text-yellow-500 items-center">
-                                        <Star size={14} className="fill-current text-yellow-500" aria-hidden="true" />
+                                    <div className="flex text-warning items-center">
+                                        <Star size={14} className="fill-current text-warning" aria-hidden="true" />
                                         <span className="ml-1 type-caption">{course.rating}</span>
                                     </div>
                                 </div>
@@ -79,7 +79,7 @@ export default function CourseShowcase() {
                                 <p className="text-sm leading-relaxed line-clamp-2 text-muted mb-6">{course.description}</p>
                                 <div className="gap-4 flex items-center justify-between">
                                     <span className="text-text type-h2">{course.price}</span>
-                                    <button className="type-ui text-primary min-h-[44px] hover:underline">Enroll Now</button>
+                                    <button className="type-ui text-primary min-h-[44px] hover:underline">Enroll now</button>
                                 </div>
                             </div>
                         </div>
