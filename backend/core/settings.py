@@ -208,6 +208,14 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF trusted origins — required for authenticated form/POST requests from the frontend in production
+csrf_origins_default = '' if not DEBUG else 'http://localhost:3000,http://company.localhost:3000,http://recruiter.localhost:3000'
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', csrf_origins_default).split(',')
+    if o.strip()
+]
+
+
 # Social Auth Credentials
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
