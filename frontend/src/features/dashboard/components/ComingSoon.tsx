@@ -3,18 +3,23 @@
 import React from "react";
 import Link from "next/link";
 import Icon from "@/shared/ui/Icon";
+import { Button } from "@/shared/ui";
 import { ArrowLeft } from "lucide-react";
 
 interface ComingSoonProps {
   title?: string;
   description?: string;
   icon?: string;
+  backHref?: string;
+  backLabel?: string;
 }
 
 export default function ComingSoon({
   title = "Coming soon",
   description = "We're working hard to bring you this feature. Stay tuned!",
-  icon = "rocket_launch"
+  icon = "rocket_launch",
+  backHref = "/dashboard",
+  backLabel = "Back to dashboard"
 }: ComingSoonProps) {
   return (
     <div className="justify-center flex-1 items-center flex p-8 min-h-[60vh]">
@@ -32,13 +37,16 @@ export default function ComingSoon({
         <p className="mb-8 text-muted leading-relaxed type-ui">{description}</p>
 
         {/* Back Button */}
-        <Link
-          href="/dashboard"
-          className="px-8 inline-flex rounded-2xl py-3.5 items-center gap-2 transition-all text-white tracking-widest shadow-xl shadow-primary/20 bg-primary type-badge hover:scale-[1.02] active:scale-95"
+        <Button
+          as={Link}
+          href={backHref}
+          variant="primary"
+          size="lg"
+          className="shadow-xl shadow-primary/20"
+          leftIcon={<ArrowLeft size={16} aria-hidden="true" />}
         >
-          <ArrowLeft size={16} aria-hidden="true" />
-          Back to dashboard
-        </Link>
+          {backLabel}
+        </Button>
       </div>
     </div>
   );

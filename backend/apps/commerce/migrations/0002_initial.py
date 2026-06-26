@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('commerce', '0001_initial'),
         ('companies', '0001_initial'),
-        ('lms', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -23,11 +22,6 @@ class Migration(migrations.Migration):
             model_name='advertiseraccounts',
             name='company',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='advertiser_accounts_company', to='companies.companies'),
-        ),
-        migrations.AddField(
-            model_name='advertiseraccounts',
-            name='institute',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='advertiser_accounts_institute', to='lms.institutes'),
         ),
         migrations.AddField(
             model_name='advertiseraccounts',

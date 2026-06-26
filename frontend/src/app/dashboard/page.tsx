@@ -5,6 +5,7 @@ import { getCandidateProfileAction } from "@/features/auth/actions";
 import DashboardStats from "@/features/dashboard/components/DashboardStats";
 import JobFeed from "@/features/dashboard/components/JobFeed";
 import DashboardRightSidebar from "@/features/dashboard/components/DashboardRightSidebar";
+import { LoadingState } from "@/shared/ui";
 
 export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<any>(null);
@@ -21,15 +22,8 @@ export default function CandidateDashboardPage() {
 
   if (loading) {
     return (
-      <div className="text-text gap-8 animate-pulse flex flex-col">
-        <div className="border-border h-20 bg-surface rounded-xl border"></div>
-        <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 border-border bg-surface rounded-xl border"></div>)}
-        </div>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-           <div className="lg:col-span-2 border-border h-[600px] bg-surface rounded-xl border"></div>
-           <div className="border-border h-[600px] bg-surface rounded-xl border"></div>
-        </div>
+      <div className="flex flex-col gap-8">
+        <LoadingState variant="card" rows={3} />
       </div>
     );
   }
@@ -52,11 +46,7 @@ export default function CandidateDashboardPage() {
         {/* Left: Job Feed */}
         <div className="lg:col-span-2">
           <React.Suspense fallback={
-            <div className="flex gap-6 flex-col">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="border-border animate-pulse shadow-sm h-44 bg-surface rounded-xl border"></div>
-              ))}
-            </div>
+            <LoadingState variant="list" rows={3} />
           }>
             <JobFeed />
           </React.Suspense>

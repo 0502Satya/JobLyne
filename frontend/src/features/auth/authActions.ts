@@ -357,3 +357,59 @@ export async function updateRecruiterProfileAction(data: any) {
   }
 }
 
+
+export async function forgotPasswordAction(email: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) return { error: data.error || "Request failed" };
+    return { success: true, message: data.message };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function resetPasswordAction(token: string, password: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/reset-password/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) return { error: data.error || "Reset password failed" };
+    return { success: true, message: data.message };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function changePasswordAction(data: any) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/auth/change-password/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await res.json();
+    if (!res.ok) return { error: responseData.error || "Change password failed" };
+    return { success: true, message: responseData.message };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+

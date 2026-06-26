@@ -11,7 +11,7 @@ import {
   inviteTeamMemberAction 
 } from "@/features/company/actions";
 import { toast } from "react-hot-toast";
-import { Button, Dialog } from "@/shared/ui";
+import { Button, Dialog, ConfirmDialog, Breadcrumbs } from "@/shared/ui";
 import { 
   Network, 
   LayoutDashboard, 
@@ -189,7 +189,7 @@ export default function CompanyTeamPage() {
     <div className="text-text bg-bg pb-20 transition-colors flex min-h-screen flex-col">
       
       {/* Sticky Header */}
-      <header className="border-b border-border px-6 py-4 items-center sticky z-40 flex top-0 bg-surface justify-between md:px-12">
+      <header className="border-b border-border px-6 py-4 items-center sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
         <div className="flex gap-6 items-center">
           <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
             <Network size={30} aria-hidden="true" />
@@ -217,6 +217,13 @@ export default function CompanyTeamPage() {
         {/* Welcome Section */}
         <div className="flex justify-between gap-6 flex-col sm:flex-row sm:items-center">
           <div>
+            <Breadcrumbs
+              className="mb-2"
+              items={[
+                { label: "Company Hub", href: "/company" },
+                { label: "Team Collaboration" },
+              ]}
+            />
             <h1 className="text-text type-h1">Team Collaboration</h1>
             <p className="type-label">Invite hiring managers, configure sub-roles, and review system logs.</p>
           </div>
@@ -246,8 +253,10 @@ export default function CompanyTeamPage() {
         {/* Filter Input */}
         <section className="rounded-card border-border gap-4 items-center shadow-sm flex-col flex p-5 bg-surface border sm:flex-row">
           <div className="w-full relative flex-1">
+            <label htmlFor="teammate-filter-input" className="sr-only">Filter teammates</label>
             <Search className="left-4 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
             <input 
+              id="teammate-filter-input"
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -369,93 +378,89 @@ export default function CompanyTeamPage() {
       </main>
 
       {/* Invite Modal */}
-      {showInviteModal && (
-        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
-          <div className="w-full rounded-card border-border relative duration-200 animate-in max-w-md shadow-2xl zoom-in-95 p-8 bg-surface border">
-            <button 
-              onClick={() => { setShowInviteModal(false); setInviteEmail(""); setError(null); }}
-              className="min-h-[40px] justify-center rounded-xl min-w-[40px] absolute items-center p-2 right-6 flex top-6 text-muted hover:bg-bg hover:text-text"
-              aria-label="Close modal"
-            >
-              <X size={18} aria-hidden="true" />
-            </button>
-            <div className="space-y-2 mb-6">
-              <h3 className="type-h2">Invite Teammate</h3>
-              <p className="type-label">Send a secure corporate invite to collaborate in this workspace.</p>
-            </div>
-            
-            <form onSubmit={handleInviteSubmit} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="type-badge">Work Email Address</label>
-                <input 
-                  type="email" 
-                  required
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="type-badge">Access Level (Role)</label>
-                <select
-                  value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value as any)}
-                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border focus:ring-2 focus:ring-primary"
-                >
-                  <option value="VIEWER">Viewer (Read-only)</option>
-                  <option value="INTERVIEWER">Interviewer (Assess candidate details)</option>
-                  <option value="HIRING_MANAGER">Hiring Manager (Shortlist, schedule)</option>
-                  <option value="ADMIN">Admin (Full administrative credentials)</option>
-                </select>
-              </div>
-
-              <button 
-                type="submit"
-                disabled={isPending}
-                className="relative w-full justify-center min-h-[48px] py-4 rounded-2xl items-center transition-all gap-2 type-ui shadow-primary/10 shadow-lg flex bg-primary cursor-pointer text-white hover:scale-[1.02]"
-              >
-                <span className="flex items-center gap-2">
-                  <Send size={18} aria-hidden="true" />
-                  <span>Send Invitation</span>
-                </span>
-                {isPending && (
-                  <span className="absolute right-4 flex items-center">
-                    <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                  </span>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       <Dialog
-        isOpen={deleteTarget !== null}
-        onClose={() => setDeleteTarget(null)}
-        title="Confirm member dissociation"
-      >
-        <div className="space-y-4">
-          <p className="text-text">
-            Are you sure you want to remove <strong className="font-semibold text-primary">{deleteTarget?.name}</strong> from your company team? This action is irreversible.
-          </p>
-          <div className="flex gap-3 justify-end pt-2">
+        isOpen={showInviteModal}
+        onClose={() => {
+          setShowInviteModal(false);
+          setInviteEmail("");
+          setError(null);
+        }}
+        title="Invite Teammate"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
             <Button
               variant="secondary"
-              onClick={() => setDeleteTarget(null)}
+              onClick={() => {
+                setShowInviteModal(false);
+                setInviteEmail("");
+                setError(null);
+              }}
+              className="flex-1"
             >
               Cancel
             </Button>
             <Button
-              variant="danger"
-              onClick={confirmRemoveMember}
+              type="submit"
+              form="invite-teammate-form"
+              isLoading={isPending}
+              className="flex-1"
             >
-              Remove Teammate
+              Send Invitation
             </Button>
           </div>
-        </div>
+        }
+      >
+        <p className="type-label mb-4">Send a secure corporate invite to collaborate in this workspace.</p>
+        
+        <form id="invite-teammate-form" onSubmit={handleInviteSubmit} className="space-y-5">
+          <div className="space-y-1.5">
+            <label htmlFor="invite-email-input" className="type-badge block">Work Email Address</label>
+            <input 
+              id="invite-email-input"
+              type="email" 
+              required
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="name@company.com"
+              className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="invite-role-select" className="type-badge block">Access Level (Role)</label>
+            <select
+              id="invite-role-select"
+              value={inviteRole}
+              onChange={(e) => setInviteRole(e.target.value as any)}
+              className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border focus:ring-2 focus:ring-primary"
+            >
+              <option value="VIEWER">Viewer (Read-only)</option>
+              <option value="INTERVIEWER">Interviewer (Assess candidate details)</option>
+              <option value="HIRING_MANAGER">Hiring Manager (Shortlist, schedule)</option>
+              <option value="ADMIN">Admin (Full administrative credentials)</option>
+            </select>
+          </div>
+        </form>
       </Dialog>
+
+      <ConfirmDialog
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmRemoveMember}
+        title="Remove Team Member"
+        description={
+          deleteTarget ? (
+            <span>
+              This will permanently remove <strong className="font-semibold text-primary">{deleteTarget.name}</strong> from your company team. This action is irreversible.
+            </span>
+          ) : (
+            "This will permanently remove this teammate from your company team."
+          )
+        }
+        confirmLabel="Remove Teammate"
+        variant="danger"
+      />
 
     </div>
   );

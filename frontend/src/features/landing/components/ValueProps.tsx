@@ -13,9 +13,9 @@ export default function ValueProps() {
             color: "primary",
         },
         {
-            title: "LMS Marketplace",
-            description: "Find the best courses or teach your own training programs.",
-            icon: "menu_book",
+            title: "Instant Verification",
+            description: "Build trust with employers instantly through verified credentials.",
+            icon: "verified_user",
             color: "accent",
         },
         {

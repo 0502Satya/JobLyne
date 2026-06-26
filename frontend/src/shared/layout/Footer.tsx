@@ -43,7 +43,6 @@ export default function Footer() {
                         <h5 className="text-text uppercase tracking-widest mb-6 type-caption">Platform</h5>
                         <ul className="text-sm space-y-4 text-muted">
                             <li><Link className="hover:text-primary transition-colors" href="/jobs">Find jobs</Link></li>
-                            <li><Link className="hover:text-primary transition-colors" href="/courses">Courses</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Talent Search</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Pricing</Link></li>
                         </ul>
@@ -64,7 +63,6 @@ export default function Footer() {
                         <ul className="text-sm space-y-4 text-muted">
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Help Center</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Partners</Link></li>
-                            <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Institutes</Link></li>
                             <li><Link className="hover:text-primary transition-colors opacity-50 cursor-not-allowed" href="#" aria-disabled="true">Developers</Link></li>
                         </ul>
                     </div>
@@ -83,7 +81,7 @@ export default function Footer() {
                 <div className="pt-8 border-t border-border gap-4 items-center flex justify-between flex-col md:flex-row">
                     <p className="text-xs text-muted">© 2026 JobLyne AI Inc. All rights reserved.</p>
                     <div className="flex gap-6 items-center">
-                        <button className="text-xs gap-1 items-center flex text-muted cursor-pointer">
+                        <button className="text-xs gap-1 items-center flex text-muted cursor-pointer" aria-label="Select language: English (US)">
                             <Languages size={14} aria-hidden="true" />
                             English (US)
                         </button>

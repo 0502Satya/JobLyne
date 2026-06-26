@@ -27,7 +27,7 @@ export default function Toast({ message, type = "success", onClose }: ToastProps
   const iconColor = type === "success" ? "text-success" : type === "error" ? "text-error" : "text-info";
 
   return (
-    <div className={`-translate-x-1/2 transition-all left-1/2 duration-300 bottom-6 z-[200] fixed ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+    <div className={`-translate-x-1/2 transition-all left-1/2 duration-300 bottom-6 z-tooltip fixed ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
       <div className="bg-card rounded-xl items-center gap-2 text-white py-3 type-ui shadow-xl flex px-5 dark:text-text dark:bg-surface">
         <Icon name={icon} size={16} className={iconColor} />
         <span>{message}</span>

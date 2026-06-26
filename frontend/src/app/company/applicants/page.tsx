@@ -21,7 +21,7 @@ import {
   compareCandidatesAction 
 } from "@/features/company/actions";
 import { toast } from "react-hot-toast";
-import { Button } from "@/shared/ui";
+import { Button, Breadcrumbs, Dialog } from "@/shared/ui";
 
 interface Application {
   id: string;
@@ -187,7 +187,7 @@ export default function CompanyApplicantsPage() {
     <div className="text-text bg-bg transition-colors flex min-h-screen flex-col">
       
       {/* Sticky Header */}
-      <header className="border-b border-border px-6 py-4 items-center sticky z-40 flex top-0 bg-surface justify-between md:px-12">
+      <header className="border-b border-border px-6 py-4 items-center sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
         <div className="flex gap-6 items-center">
           <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
             <Network size={30} aria-hidden="true" />
@@ -220,6 +220,13 @@ export default function CompanyApplicantsPage() {
         {/* Welcome Details */}
         <div className="flex justify-between gap-6 flex-col sm:flex-row sm:items-center">
           <div>
+            <Breadcrumbs
+              className="mb-2"
+              items={[
+                { label: "Company Hub", href: "/company" },
+                { label: "Applicant Tracking" },
+              ]}
+            />
             <h1 className="text-text type-h1">Applicant Tracking Pipelines</h1>
             <p className="type-label">Vet developer applications, schedule interviews, and select matches.</p>
           </div>
@@ -252,8 +259,10 @@ export default function CompanyApplicantsPage() {
           
           {/* Sourcing Query */}
           <div className="min-w-[240px] relative flex-1 w-full">
+            <label htmlFor="applicant-search-input" className="sr-only">Search applicants</label>
             <Search className="left-4 absolute top-1/2 -translate-y-1/2 text-muted" size={18} aria-hidden="true" />
             <input 
+              id="applicant-search-input"
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -264,7 +273,9 @@ export default function CompanyApplicantsPage() {
 
           {/* Job select filter */}
           <div className="w-full md:w-56">
+            <label htmlFor="applicant-job-filter-select" className="sr-only">Filter by job</label>
             <select
+              id="applicant-job-filter-select"
               value={jobFilter}
               onChange={(e) => setJobFilter(e.target.value)}
               className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border"
@@ -279,7 +290,9 @@ export default function CompanyApplicantsPage() {
           {/* Status select filter (List view only) */}
           {viewMode === "list" && (
             <div className="w-full md:w-48">
+              <label htmlFor="applicant-status-filter-select" className="sr-only">Filter by status</label>
               <select
+                id="applicant-status-filter-select"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg cursor-pointer type-caption border"
@@ -519,21 +532,18 @@ export default function CompanyApplicantsPage() {
       </main>
 
       {/* MODAL 1: Candidate Comparison Side-by-Side */}
-      {showCompareModal && compareData && (
-        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
-          <div className="w-full rounded-card overflow-y-auto border-border max-w-5xl relative duration-200 animate-in max-h-[90vh] shadow-2xl zoom-in-95 p-8 bg-surface border">
-            <button 
-              onClick={() => { setShowCompareModal(false); setCompareData(null); }}
-              className="min-h-[40px] rounded-xl absolute p-2 right-6 top-6 text-muted hover:bg-bg hover:text-text"
-              aria-label="Close modal"
-            >
-              <X size={18} aria-hidden="true" />
-            </button>
-            <div className="mb-8 space-y-1">
-              <h3 className="text-text type-h2">Candidate Comparison Matrix</h3>
-              <p className="type-label">Side-by-side comparative analysis of selected shortlisted developers.</p>
-            </div>
-            
+      <Dialog
+        isOpen={showCompareModal}
+        onClose={() => {
+          setShowCompareModal(false);
+          setCompareData(null);
+        }}
+        title="Candidate Comparison Matrix"
+        size="lg"
+      >
+        {compareData && (
+          <div>
+            <p className="type-label mb-6">Side-by-side comparative analysis of selected shortlisted developers.</p>
             <div className="items-start gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {compareData.map((cand) => (
                 <div key={cand.id} className="border-border rounded-3xl bg-bg shadow-sm p-6 space-y-5 border">
@@ -588,46 +598,57 @@ export default function CompanyApplicantsPage() {
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
       {/* MODAL 2: Interview Scheduler */}
-      {showSchedulerModal && schedulingAppId && (
-        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
-          <div className="w-full rounded-card border-border relative duration-200 animate-in max-w-md shadow-2xl zoom-in-95 p-8 bg-surface border">
-            <button 
-              onClick={() => { setShowSchedulerModal(false); setSchedulingAppId(null); setInterviewDate(""); }}
-              className="min-h-[40px] rounded-xl absolute p-2 right-6 top-6 text-muted hover:bg-bg hover:text-text"
-              aria-label="Close modal"
+      <Dialog
+        isOpen={showSchedulerModal}
+        onClose={() => {
+          setShowSchedulerModal(false);
+          setSchedulingAppId(null);
+          setInterviewDate("");
+        }}
+        title="Schedule Vetting Interview"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowSchedulerModal(false);
+                setSchedulingAppId(null);
+                setInterviewDate("");
+              }}
+              className="flex-1"
             >
-              <X size={18} aria-hidden="true" />
-            </button>
-            <div className="space-y-2 mb-6">
-              <h3 className="type-h2">Schedule Vetting Interview</h3>
-              <p className="type-label">Book a virtual meeting slot with this developer.</p>
-            </div>
-            
-            <form onSubmit={handleScheduleSubmit} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="type-badge">Date and time</label>
-                <input 
-                  type="datetime-local" 
-                  required
-                  value={interviewDate}
-                  onChange={(e) => setInterviewDate(e.target.value)}
-                  className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="w-full min-h-[48px] py-4 rounded-2xl transition-all type-ui shadow-primary/10 shadow-lg bg-primary cursor-pointer text-white hover:scale-[1.02]"
-              >
-                Confirm Booking
-              </button>
-            </form>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="schedule-interview-form"
+              className="flex-1"
+            >
+              Confirm Booking
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p className="type-label mb-4">Book a virtual meeting slot with this developer.</p>
+
+        <form id="schedule-interview-form" onSubmit={handleScheduleSubmit} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="type-badge block">Date and time</label>
+            <input 
+              type="datetime-local" 
+              required
+              value={interviewDate}
+              onChange={(e) => setInterviewDate(e.target.value)}
+              className="w-full outline-none min-h-[48px] border-border rounded-2xl p-3.5 bg-bg type-caption border focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </form>
+      </Dialog>
 
     </div>
   );

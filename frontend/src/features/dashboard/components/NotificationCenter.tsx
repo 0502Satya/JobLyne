@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { 
   getNotificationsAction, 
   markAllNotificationsReadAction, 
@@ -117,6 +118,7 @@ export default function NotificationCenter() {
     <div className="relative" ref={containerRef}>
       {/* Bell Trigger Button */}
       <button 
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="justify-center h-10 w-10 cursor-pointer relative min-h-[44px] overflow-hidden items-center bg-bg rounded-full transition-colors flex min-w-[44px] text-muted hover:bg-border/20"
         aria-label="Toggle notifications"
@@ -205,14 +207,14 @@ export default function NotificationCenter() {
 
           {/* Footer View Alerts redirect */}
           <div className="border-t bg-bg/20 p-3 border-border/60 text-center">
-            <a 
+            <Link 
               href="/dashboard/alerts" 
               onClick={() => setIsOpen(false)}
               className="justify-center text-primary type-badge gap-1 items-center min-h-[36px] flex hover:underline"
             >
               Manage Alert Settings
               <ChevronRight size={16} className="leading-none" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
         </div>
       )}

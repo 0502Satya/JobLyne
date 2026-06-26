@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { WorkExperience as Experience } from "@/types/profile";
-import { Button, Input, Select, FormField } from "@/shared/ui";
+import { Button, Input, Select, FormField, ConfirmDialog } from "@/shared/ui";
 import { Briefcase, Plus, BriefcaseBusiness, Star, X, ArrowUp, ArrowDown, Pencil, Trash2 } from "lucide-react";
 
 interface WorkExperienceSectionProps {
@@ -16,6 +16,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
   const [experience, setExperience] = useState<Experience[]>(data);
   const [techInput, setTechInput] = useState<{ [key: string]: string }>({});
   const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   React.useEffect(() => {
     setExperience(data);
@@ -390,7 +391,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                         <Button
                           type="button"
                           variant="danger"
-                          onClick={() => removeEntry(exp.id)}
+                          onClick={() => setDeletingId(exp.id || null)}
                         >
                           Delete Entry
                         </Button>
@@ -443,7 +444,7 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => removeEntry(exp.id)}
+                          onClick={() => setDeletingId(exp.id || null)}
                           className="h-10 w-10 p-0 rounded-lg text-error hover:text-error/90 hover:bg-error-bg"
                           title="Delete experience"
                           aria-label="Delete experience"
@@ -492,6 +493,24 @@ export default function WorkExperienceSection({ data = [], onChange }: WorkExper
           </div>
         )}
       </div>
+      
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => {
+          if (deletingId) {
+            removeEntry(deletingId);
+          }
+        }}
+        title="Delete Work Experience"
+        description={
+          deletingId
+            ? `This will permanently remove '${experience.find((e) => e.id === deletingId)?.title || "this role"}' at '${experience.find((e) => e.id === deletingId)?.company || "this company"}' from your profile.`
+            : "This will permanently remove this work experience entry from your profile."
+        }
+        confirmLabel="Delete Experience"
+        variant="danger"
+      />
     </section>
   );
 }

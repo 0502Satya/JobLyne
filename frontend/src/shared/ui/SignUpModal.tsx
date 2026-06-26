@@ -16,7 +16,7 @@ export default function SignUpModal({
   isOpen,
   onClose,
   title = "Join JobLyne to continue",
-  description = "Create a free candidate profile to search jobs, match your skills, apply to opportunities, and access premium courses.",
+  description = "Create a free candidate profile to search jobs, match your skills, and apply to opportunities.",
   actionText = "to perform this action"
 }: SignUpModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);

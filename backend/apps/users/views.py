@@ -6,9 +6,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from django.db import transaction
 import hashlib
 import random
 import string
+import uuid
 
 from apps.users.serializers import (
     UserSignupSerializer, UserResponseSerializer, 
@@ -16,12 +18,12 @@ from apps.users.serializers import (
     RecruiterSignupSerializer, VerifyOTPSerializer,
     UserProfileSerializer
 )
-from apps.users.models import CustomUser, EmailVerificationOTP
+from apps.users.models import CustomUser, EmailVerificationOTP, PasswordResetToken
 from apps.companies.models import Companies, Recruiters
 from apps.candidates.models import JobSeekers
 from apps.commerce.models import AdvertiserAccounts
 from apps.users.social_auth_utils import verify_google_token, verify_linkedin_token
-from apps.users.utils import send_otp_email
+from apps.users.utils import send_otp_email, send_password_reset_email
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -308,4 +310,94 @@ class ResendOTPView(APIView):
         send_otp_email(user.email, otp_code)
 
         return Response({'message': 'If the email exists, a new OTP has been sent.'}, status=status.HTTP_200_OK)
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+    throttle_scope = 'otp'
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'If the email exists, a password reset link has been sent.'}, status=status.HTTP_200_OK)
+
+        PasswordResetToken.objects.filter(user=user, is_used=False).update(is_used=True)
+
+        reset_token = uuid.uuid4().hex
+        expires_at = timezone.now() + timezone.timedelta(hours=1)
+        PasswordResetToken.objects.create(
+            user=user,
+            token=reset_token,
+            expires_at=expires_at
+        )
+
+        send_password_reset_email(user.email, reset_token)
+
+        return Response({'message': 'If the email exists, a password reset link has been sent.'}, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+    throttle_scope = 'otp'
+
+    def post(self, request, *args, **kwargs):
+        token = request.data.get('token')
+        password = request.data.get('password')
+
+        if not token or not password:
+            return Response({'error': 'Both token and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(password) < 8:
+            return Response({'error': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reset_token_obj = PasswordResetToken.objects.get(token=token, is_used=False)
+        except PasswordResetToken.DoesNotExist:
+            return Response({'error': 'Invalid or expired reset token.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if reset_token_obj.expires_at < timezone.now():
+            reset_token_obj.is_used = True
+            reset_token_obj.save()
+            return Response({'error': 'Reset token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        with transaction.atomic():
+            user = reset_token_obj.user
+            user.set_password(password)
+            user.save()
+
+            reset_token_obj.is_used = True
+            reset_token_obj.save()
+
+            PasswordResetToken.objects.filter(user=user, is_used=False).update(is_used=True)
+
+        return Response({'message': 'Password reset successful.'}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+
+        if not current_password or not new_password:
+            return Response({'error': 'Both current and new password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(new_password) < 8:
+            return Response({'error': 'New password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        if not user.check_password(current_password):
+            return Response({'error': 'Incorrect current password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+
 

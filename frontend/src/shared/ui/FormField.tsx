@@ -12,6 +12,7 @@ type FormFieldProps = {
   required?: boolean;
   status?: FormFieldStatus;
   className?: string;
+  labelAction?: React.ReactNode;
 };
 
 // Hook to generate structured field IDs dynamically
@@ -33,6 +34,7 @@ export default function FormField({
   required = false,
   status,
   className = "",
+  labelAction,
 }: FormFieldProps) {
   const childProps = children.props as any;
   // Pick child id, fallback to inputId from useFieldIds
@@ -82,14 +84,21 @@ export default function FormField({
   return (
     <div className={`space-y-1.5 w-full text-left ${className}`}>
       {label && (
-        <label className="text-muted type-caption block uppercase tracking-wider" htmlFor={inputId}>
-          {label}
-          {required ? (
-            <span className="text-error ml-1 select-none" aria-hidden="true">*</span>
-          ) : (
-            <span className="text-[10px] text-muted ml-1.5 font-normal normal-case">(optional)</span>
+        <div className="flex justify-between items-center w-full">
+          <label className="text-muted type-caption block uppercase tracking-wider" htmlFor={inputId}>
+            {label}
+            {required ? (
+              <span className="text-error ml-1 select-none" aria-hidden="true">*</span>
+            ) : (
+              <span className="text-[10px] text-muted ml-1.5 font-normal normal-case">(optional)</span>
+            )}
+          </label>
+          {labelAction && (
+            <div className="text-xs font-normal normal-case leading-none">
+              {labelAction}
+            </div>
           )}
-        </label>
+        </div>
       )}
 
       {React.cloneElement(children, {

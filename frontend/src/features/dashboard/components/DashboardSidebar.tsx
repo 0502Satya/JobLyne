@@ -31,7 +31,7 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
 
   // Height offset by --height-header plus 1px to compensate for the bottom border on the header container.
   return (
-    <aside className="w-64 border-border hidden pt-6 pb-6 border-right px-4 bg-surface flex-col md:flex flex-shrink-0 h-full">
+    <aside className="w-64 border-border hidden pt-6 pb-6 border-r px-4 bg-surface flex-col md:flex flex-shrink-0 h-full">
       {/* User Summary */}
       <div className="border-b border-border items-center text-center pb-6 flex flex-col">
         {/* Avatar */}

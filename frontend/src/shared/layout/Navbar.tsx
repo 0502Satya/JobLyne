@@ -1,20 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Container, ThemeToggle } from "@/shared/ui";
+import { Button, Container, ThemeToggle, Input } from "@/shared/ui";
 import { Search, Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import NotificationCenter from "@/features/dashboard/components/NotificationCenter";
+import UserMenu from "@/features/auth/components/UserMenu";
+import { getCandidateProfileAction } from "@/features/auth/actions";
 
 interface NavbarProps {
     isLoggedIn?: boolean;
 }
 
 export default function Navbar({ isLoggedIn = false }: NavbarProps) {
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-    const [recruiterUrl, setRecruiterUrl] = React.useState("/recruiter");
-    const [companyUrl, setCompanyUrl] = React.useState("/company");
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [recruiterUrl, setRecruiterUrl] = useState("/recruiter");
+    const [companyUrl, setCompanyUrl] = useState("/company");
+    const [profile, setProfile] = useState<any>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         // Resolve URLs dynamically in browser to avoid environment variable baking issues
         const getUrl = (subdomain: "recruiter" | "company") => {
             const envVar = subdomain === "recruiter" 
@@ -34,6 +38,41 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
         setRecruiterUrl(getUrl("recruiter"));
         setCompanyUrl(getUrl("company"));
     }, []);
+
+    useEffect(() => {
+        if (!isLoggedIn) return;
+        async function fetchProfile() {
+            try {
+                const profileData = await getCandidateProfileAction();
+                if (profileData && !profileData.error) {
+                    setProfile(profileData);
+                }
+            } catch (err) {
+                console.error("Failed to load candidate profile in Navbar:", err);
+            }
+        }
+        fetchProfile();
+    }, [isLoggedIn]);
+
+    const initials = profile?.full_name
+        ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2)
+        : "AL";
+    const profileImage = profile?.profile_image;
+
+    const navLinks = isLoggedIn
+        ? [
+            { name: "Home", href: "/dashboard" },
+            { name: "Job", href: "/jobs" },
+            { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
+            { name: "Company", href: `${companyUrl}/auth/signin` },
+            { name: "Pipeline", href: "/dashboard/applications" },
+          ]
+        : [
+            { name: "Home", href: "/" },
+            { name: "Job", href: "/jobs" },
+            { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
+            { name: "Company", href: `${companyUrl}/auth/signin` },
+          ];
 
     return (
         <header className="w-full border-b border-border bg-surface/80 backdrop-blur-md sticky transition-colors z-50 overflow-visible top-0">
@@ -58,33 +97,63 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                         <span className="text-text type-card-title tracking-tighter font-bold">JobLyne</span>
                     </Link>
                     <nav className="gap-6 hidden items-center md:flex">
-                        <Link href="/jobs" className="transition-colors type-label hover:text-primary font-semibold">Jobs</Link>
-                        <Link href="/courses" className="transition-colors type-label hover:text-primary font-semibold">Courses</Link>
-                        <Link href={`${recruiterUrl}/auth/signin`} className="transition-colors type-label hover:text-primary font-semibold">Recruiters</Link>
-                        <Link href={`${companyUrl}/auth/signin`} className="transition-colors type-label hover:text-primary font-semibold">Institutes</Link>
+                        {navLinks.map((link) => (
+                            <Link 
+                                key={link.name} 
+                                href={link.href} 
+                                className="transition-colors type-label hover:text-primary font-semibold"
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
                     </nav>
+                    {isLoggedIn && (
+                        <div className="min-w-40 max-w-64 hidden md:block ml-4">
+                            <label htmlFor="navbar-search" className="sr-only">Search jobs, skills, and companies</label>
+                            <Input 
+                                id="navbar-search"
+                                aria-label="Search jobs, skills, and companies"
+                                icon="search"
+                                placeholder="Search jobs, skills, companies..."
+                                className="h-10 py-1 bg-bg border-none"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Right side: Actions */}
                 <div className="gap-2 flex items-center sm:gap-3">
                     <ThemeToggle />
                     
-                    {/* Search button */}
-                    <button className="justify-center min-h-[44px] hidden items-center p-2 transition-colors min-w-[44px] text-muted sm:flex hover:text-primary">
-                        <Search size={20} aria-hidden="true" />
-                    </button>
+                    {!isLoggedIn && (
+                        /* Search button */
+                        <button aria-label="Search" className="justify-center min-h-[44px] hidden items-center p-2 transition-colors min-w-[44px] text-muted sm:flex hover:text-primary">
+                            <Search size={20} aria-hidden="true" />
+                        </button>
+                    )}
 
-                    {/* Compact Mobile Auth Actions (always visible on mobile) */}
-                    <div className="flex sm:hidden items-center ml-1">
-                        <MobileCompactAuthActions isLoggedIn={isLoggedIn} />
-                    </div>
+                    {isLoggedIn ? (
+                        /* Logged in desktop/mobile actions */
+                        <div className="flex items-center gap-4">
+                            <NotificationCenter />
+                            <UserMenu initials={initials} profileImage={profileImage} />
+                        </div>
+                    ) : (
+                        /* Logged out actions */
+                        <>
+                            {/* Compact Mobile Auth Actions (always visible on mobile) */}
+                            <div className="flex sm:hidden items-center ml-1">
+                                <MobileCompactAuthActions isLoggedIn={isLoggedIn} />
+                            </div>
 
-                    {/* Desktop Auth Actions */}
-                    <div className="border-l border-border hidden items-center gap-2 pl-4 ml-2 sm:flex">
-                        <AuthActions isLoggedIn={isLoggedIn} isMobile={false} />
-                        <div className="hidden h-6 mx-2 w-px bg-border lg:block"></div>
-                        <EmployerDropdown recruiterUrl={recruiterUrl} companyUrl={companyUrl} />
-                    </div>
+                            {/* Desktop Auth Actions */}
+                            <div className="border-l border-border hidden items-center gap-2 pl-4 ml-2 sm:flex">
+                                <AuthActions isLoggedIn={isLoggedIn} isMobile={false} />
+                                <div className="hidden h-6 mx-2 w-px bg-border lg:block"></div>
+                                <EmployerDropdown recruiterUrl={recruiterUrl} companyUrl={companyUrl} />
+                            </div>
+                        </>
+                    )}
 
                     {/* Mobile Menu Button */}
                     <button 
@@ -105,34 +174,45 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
             {isMenuOpen && (
                 <div className="sm:hidden w-full border-b border-border slide-in-from-top-4 absolute left-0 animate-in z-50 shadow-xl duration-300 py-6 flex gap-6 top-full px-4 bg-surface flex-col">
                     <nav className="gap-4 flex flex-col">
-                        <Link onClick={() => setIsMenuOpen(false)} href="/jobs" className="text-text border-b border-border/50 type-card-title py-3">Jobs</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href="/courses" className="text-text border-b border-border/50 type-card-title py-3">Courses</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${recruiterUrl}/auth/signin`} className="text-text border-b border-border/50 type-card-title py-3">Recruiters</Link>
-                        <Link onClick={() => setIsMenuOpen(false)} href={`${companyUrl}/auth/signin`} className="text-text py-3 type-card-title">Institutes</Link>
+                        {navLinks.map((link) => (
+                            <Link 
+                                key={link.name} 
+                                onClick={() => setIsMenuOpen(false)} 
+                                href={link.href} 
+                                className="text-text border-b border-border/50 type-card-title py-3"
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
                     </nav>
 
                     <div className="border-t flex-col gap-3 border-border flex pt-4 dark:border-border">
                         <AuthActions isLoggedIn={isLoggedIn} isMobile={true} />
-                        <div className="mt-2 grid-cols-2 grid gap-3">
-                           <Link 
-                                href={`${recruiterUrl}/auth/signin`}
-                                className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
-                            >
-                                <span className="text-primary type-badge font-bold">Recruiter</span>
-                            </Link>
-                            <Link 
-                                href={`${companyUrl}/auth/signin`}
-                                className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
-                            >
-                                <span className="text-primary type-badge font-bold">Company</span>
-                            </Link>
-                        </div>
+                        {!isLoggedIn && (
+                            <div className="mt-2 grid-cols-2 grid gap-3">
+                               <Link 
+                                    onClick={() => setIsMenuOpen(false)}
+                                    href={`${recruiterUrl}/auth/signin`}
+                                    className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
+                                >
+                                    <span className="text-primary type-badge font-bold">Recruiter</span>
+                                </Link>
+                                <Link 
+                                    onClick={() => setIsMenuOpen(false)}
+                                    href={`${companyUrl}/auth/signin`}
+                                    className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
+                                >
+                                    <span className="text-primary type-badge font-bold">Company</span>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
         </header>
     );
 }
+
 
 /**
  * Compact action button for guest mobile layout context.
@@ -227,11 +307,14 @@ function AuthActions({ isLoggedIn, isMobile }: { isLoggedIn: boolean; isMobile?:
 function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; companyUrl: string }) {
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
+    const triggerRef = React.useRef<HTMLButtonElement>(null);
+    const itemRefs = React.useRef<(HTMLAnchorElement | null)[]>([]);
 
     React.useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === "Escape") {
                 setIsOpen(false);
+                triggerRef.current?.focus();
             }
         }
         function handleClickOutside(e: MouseEvent) {
@@ -249,16 +332,48 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
         };
     }, [isOpen]);
 
+    const handleMenuKeyDown = (e: React.KeyboardEvent) => {
+        if (!isOpen) return;
+
+        const items = itemRefs.current.filter((el): el is HTMLAnchorElement => el !== null);
+        const currentIndex = items.indexOf(document.activeElement as HTMLAnchorElement);
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            const nextIndex = (currentIndex + 1) % items.length;
+            items[nextIndex]?.focus();
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            const prevIndex = (currentIndex - 1 + items.length) % items.length;
+            items[prevIndex]?.focus();
+        } else if (e.key === "Home") {
+            e.preventDefault();
+            items[0]?.focus();
+        } else if (e.key === "End") {
+            e.preventDefault();
+            items[items.length - 1]?.focus();
+        }
+    };
+
     return (
         <div className="p-2 relative" ref={dropdownRef}>
             <button 
                 id="employer-menu-button"
+                ref={triggerRef}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
                 aria-controls="employer-menu"
                 onClick={() => setIsOpen(!isOpen)}
-                onMouseEnter={() => setIsOpen(true)}
-                className="text-text gap-1 items-center type-ui py-2 transition-colors flex hover:text-primary cursor-pointer select-none font-semibold"
+                onKeyDown={(e) => {
+                    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setIsOpen(true);
+                        setTimeout(() => {
+                            itemRefs.current[0]?.focus();
+                        }, 50);
+                    }
+                }}
+                className="text-text gap-1 items-center type-ui py-2 transition-colors flex hover:text-primary cursor-pointer select-none font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
             >
                 For employers
                 <ChevronDown
@@ -272,27 +387,28 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                 id="employer-menu"
                 role="menu"
                 aria-labelledby="employer-menu-button"
-                onMouseEnter={() => setIsOpen(true)}
-                onMouseLeave={() => setIsOpen(false)}
-                className={`z-[100] absolute duration-200 pt-2 transition-all w-56 top-full right-0 ${isOpen ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+                onKeyDown={handleMenuKeyDown}
+                className={`z-dropdown absolute duration-200 pt-2 transition-all w-56 top-full right-0 ${isOpen ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-2 pointer-events-none'}`}
             >
                 <div className="border-border rounded-2xl overflow-hidden p-2 shadow-2xl bg-surface border">
                     <Link 
+                        ref={(el) => { itemRefs.current[0] = el; }}
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
                         href={`${recruiterUrl}/auth/signin`}
-                        className="group p-3 gap-0.5 transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card"
+                        className="group p-3 gap-0.5 transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card focus-visible:bg-bg dark:focus-visible:bg-card outline-none"
                     >
-                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Recruiter portal</span>
+                        <span className="type-ui transition-colors group-hover:text-primary group-focus-visible:text-primary font-bold">Recruiter portal</span>
                         <span className="text-muted text-xs">Find and vet top talent quickly.</span>
                     </Link>
                     <Link 
+                        ref={(el) => { itemRefs.current[1] = el; }}
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
                         href={`${companyUrl}/auth/signin`}
-                        className="border-t group p-3 gap-0.5 border-border transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card dark:border-border/50"
+                        className="border-t group p-3 gap-0.5 border-border transition-colors flex rounded-xl flex-col hover:bg-bg dark:hover:bg-card focus-visible:bg-bg dark:focus-visible:bg-card dark:border-border/50 outline-none"
                     >
-                        <span className="type-ui transition-colors group-hover:text-primary font-bold">Company login</span>
+                        <span className="type-ui transition-colors group-hover:text-primary group-focus-visible:text-primary font-bold">Company login</span>
                         <span className="text-muted text-xs">Manage your organization's hiring.</span>
                     </Link>
                 </div>

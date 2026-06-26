@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSavedJobsAction, unsaveJobAction, applyToJobAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
-import { Button } from "@/shared/ui";
+import { Button, Breadcrumbs, LoadingState } from "@/shared/ui";
 import { Briefcase, Bookmark, Clock, Banknote } from "lucide-react";
 
 export default function SavedJobsPage() {
@@ -22,12 +22,60 @@ export default function SavedJobsPage() {
   useEffect(() => { loadData(); }, []);
 
   const handleUnsave = async (jobId: string) => {
-    const res = await unsaveJobAction(jobId);
-    if (res.error) toast.error(res.error);
-    else {
-      toast.success("Removed from saved");
-      setJobs(jobs.filter(j => j.id !== jobId));
-    }
+    const jobToRestore = jobs.find(j => j.id === jobId);
+    if (!jobToRestore) return;
+
+    // 1. Optimistically remove from UI immediately
+    setJobs(prev => prev.filter(j => j.id !== jobId));
+
+    let undone = false;
+
+    // 2. Show undo toast (5-second window)
+    toast.custom(
+      (t) => (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`${
+            t.visible ? "animate-in fade-in" : "animate-out fade-out"
+          } max-w-sm w-full bg-card border border-border/80 shadow-lg rounded-xl pointer-events-auto flex items-center justify-between p-4 gap-4`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-success">✓</span>
+            <span className="text-sm text-text">Job removed from saved</span>
+          </div>
+          <button
+            onClick={() => {
+              undone = true;
+              toast.dismiss(t.id);
+              // Restore optimistically
+              setJobs(prev => {
+                if (prev.some(j => j.id === jobId)) return prev;
+                return [...prev, jobToRestore];
+              });
+            }}
+            className="text-primary hover:text-primary/80 text-sm font-semibold whitespace-nowrap focus:outline-none"
+          >
+            Undo
+          </button>
+        </div>
+      ),
+      { duration: 5000 }
+    );
+
+    // 3. After toast dismisses, commit the server action
+    setTimeout(async () => {
+      if (!undone) {
+        const res = await unsaveJobAction(jobId);
+        if (res.error) {
+          toast.error("Failed to unsave job");
+          setJobs(prev => {
+            if (prev.some(j => j.id === jobId)) return prev;
+            return [...prev, jobToRestore];
+          });
+        }
+      }
+    }, 5000);
   };
 
   const handleApply = async (jobId: string) => {
@@ -40,14 +88,33 @@ export default function SavedJobsPage() {
 
   if (loading) {
     return (
-      <div className="items-center flex justify-center min-h-[60vh]">
-        <div className="h-10 w-10 border-b-2 rounded-full border-primary animate-spin"></div>
+      <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/dashboard" },
+            { label: "Saved Jobs" },
+          ]}
+          className="mb-4"
+        />
+        {/* Skeleton Header */}
+        <div className="mb-8 animate-pulse">
+          <div className="h-8 bg-border/20 rounded w-48 mb-2"></div>
+          <div className="h-4 bg-border/20 rounded w-64"></div>
+        </div>
+        <LoadingState variant="card" rows={3} />
       </div>
     );
   }
 
   return (
     <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/dashboard" },
+          { label: "Saved Jobs" },
+        ]}
+        className="mb-4"
+      />
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="type-h2 mb-1 text-text">Saved Jobs</h1>

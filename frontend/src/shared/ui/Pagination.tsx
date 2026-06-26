@@ -1,3 +1,13 @@
+/**
+ * Pagination Specification Block:
+ * Heights:        Nav container: py-4; Button items: sm size (32px height)
+ * Padding:        Prev/Next Buttons: standard sm padding; Number items: px-3 py-1; Icon items: px-2.5 py-1
+ * Border radius:  Buttons: rounded-md (6px / sm variant)
+ * Typography:     Page indicator text: text-sm (14px), font-semibold for active numbers, font-normal/text-muted for others
+ * Gaps:           Nav container items: gap-4; Desktop button list items: gap-1
+ * Focus:          Inherits from shared Button component (focus-visible:ring-2 visible on focus-visible only)
+ */
+
 import React from "react";
 import Button from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

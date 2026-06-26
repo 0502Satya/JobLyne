@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getApplicationsAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
 import { Calendar, ClipboardCheck } from "lucide-react";
+import { Breadcrumbs, LoadingState } from "@/shared/ui";
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -22,27 +23,20 @@ export default function ApplicationsPage() {
   if (loading) {
     return (
       <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/dashboard" },
+            { label: "My Applications" },
+          ]}
+          className="mb-4"
+        />
         {/* Skeleton Header */}
         <div className="mb-8 animate-pulse">
           <div className="h-8 bg-border/20 rounded w-48 mb-2"></div>
           <div className="h-4 bg-border/20 rounded w-64"></div>
         </div>
         
-        {/* Skeleton Table Container */}
-        <div className="rounded-2xl overflow-hidden bg-surface border-border shadow-sm border p-6 space-y-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="animate-pulse flex items-center justify-between py-4 border-b border-border/40 last:border-0">
-              <div className="space-y-2 flex-1 max-w-[240px]">
-                <div className="h-4 bg-border/25 rounded w-3/4"></div>
-                <div className="h-3 bg-border/20 rounded w-1/2"></div>
-              </div>
-              <div className="h-4 bg-border/20 rounded w-24 hidden md:block"></div>
-              <div className="h-4 bg-border/20 rounded w-20"></div>
-              <div className="h-6 bg-border/20 rounded-full w-16"></div>
-              <div className="h-4 bg-border/20 rounded w-12"></div>
-            </div>
-          ))}
-        </div>
+        <LoadingState variant="table" rows={4} />
       </div>
     );
   }
@@ -58,6 +52,13 @@ export default function ApplicationsPage() {
 
   return (
     <div className="max-w-[1400px] p-4 mx-auto md:p-8 lg:p-10">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/dashboard" },
+          { label: "My Applications" },
+        ]}
+        className="mb-4"
+      />
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="type-h2 mb-1 text-text">My Applications</h1>

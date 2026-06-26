@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getActionPlanAction } from "@/features/auth/actions";
-import { CalendarClock, ArrowRight, Code2, Brain, Video, FilePen, Palette, Share2 } from "lucide-react";
+import { CalendarClock, ArrowRight, Video, FilePen, Palette, Share2 } from "lucide-react";
 import Icon from "@/shared/ui/Icon";
 
 export default function SidebarWidgets() {
@@ -62,44 +62,6 @@ export default function SidebarWidgets() {
             </li>
           )}
         </ul>
-      </div>
-
-      {/* Learning Progress */}
-      <div className="bg-surface border-border shadow-sm p-6 rounded-2xl border dark:bg-card">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-text type-card-title font-semibold">Learning Progress</h3>
-        </div>
-        <div className="gap-4 flex flex-col">
-          {/* Course 1 */}
-          <div className="flex gap-3 items-start">
-            <div className="flex-shrink-0 justify-center h-10 w-10 text-info items-center bg-info-bg border border-info/10 flex rounded-xl">
-              <Code2 size={20} className="font-bold" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <h4 className="type-ui text-text leading-tight font-semibold">Advanced React Patterns</h4>
-              <p className="text-muted mb-2 text-xs font-medium">Module 4 of 12</p>
-              <div className="w-full h-1.5 bg-bg rounded-full dark:bg-card">
-                <div className="bg-primary h-1.5 rounded-full" style={{ width: "35%" }}></div>
-              </div>
-            </div>
-          </div>
-          {/* Course 2 */}
-          <div className="border-t items-start border-border gap-3 flex pt-4 dark:border-border">
-            <div className="flex-shrink-0 justify-center h-10 w-10 bg-primary/10 border border-primary/5 items-center flex text-primary rounded-xl">
-              <Brain size={20} className="font-bold" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <h4 className="type-ui text-text leading-tight font-semibold">System Design Interview</h4>
-              <p className="text-muted mb-2 text-xs font-medium">Module 8 of 10</p>
-              <div className="w-full h-1.5 bg-bg rounded-full dark:bg-card">
-                <div className="bg-primary h-1.5 rounded-full" style={{ width: "80%" }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button className="w-full mt-5 bg-bg text-text rounded-xl type-ui transition-colors py-2.5 dark:bg-card hover:bg-bg dark:hover:bg-border cursor-pointer font-bold min-h-[40px]">
-          View All Courses
-        </button>
       </div>
 
       {/* Upcoming Interview Promo */}
