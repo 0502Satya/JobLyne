@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
+import Navbar from "@/shared/layout/Navbar";
 import DashboardSidebar from "@/features/dashboard/components/DashboardSidebar";
 import { getCandidateProfileAction, getDashboardStatsAction } from "@/features/auth/actions";
 import { Icon } from "@/shared/ui";
@@ -64,11 +64,7 @@ export default function DashboardLayout({
 
   return (
     <div className="w-full bg-bg flex flex-col" style={{ height: "100dvh" }}>
-      <DashboardHeader
-        initials={initials}
-        userName={profile?.full_name}
-        profileImage={profile?.profile_image}
-      />
+      <Navbar isLoggedIn={true} />
 
       <div className="w-full flex-1 mx-auto max-w-[1440px] flex relative overflow-hidden">
         {!isProfilePage && (

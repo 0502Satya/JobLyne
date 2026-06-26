@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Project } from "@/types/profile";
-import { Button, Input, FormField } from "@/shared/ui";
+import { Button, Input, FormField, ConfirmDialog } from "@/shared/ui";
 import { FolderOpen, Plus, Folder, X, Pencil, Trash2, Link as LinkIcon, Code2 } from "lucide-react";
 
 interface ProjectsSectionProps {
@@ -13,6 +13,7 @@ interface ProjectsSectionProps {
 export default function ProjectsSection({ projects = [], onChange }: ProjectsSectionProps) {
   const [techInput, setTechInput] = useState<{ [key: string]: string }>({});
   const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const addProject = () => {
     const newId = Date.now().toString();
@@ -232,7 +233,7 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                           <Button
                             type="button"
                             variant="danger"
-                            onClick={() => removeProject(proj.id)}
+                            onClick={() => setDeletingId(proj.id || null)}
                           >
                             Delete Entry
                           </Button>
@@ -263,7 +264,7 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => removeProject(proj.id)}
+                            onClick={() => setDeletingId(proj.id || null)}
                             className="h-10 w-10 p-0 rounded-lg flex items-center justify-center text-error border-border hover:bg-error-bg"
                             title="Delete project"
                             aria-label="Delete project"
@@ -348,6 +349,24 @@ export default function ProjectsSection({ projects = [], onChange }: ProjectsSec
           )}
         </div>
       </div>
+      
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => {
+          if (deletingId) {
+            removeProject(deletingId);
+          }
+        }}
+        title="Delete Project"
+        description={
+          deletingId
+            ? `This will permanently remove '${projects.find((p) => p.id === deletingId)?.title || "Untitled Project"}' from your profile.`
+            : "This will permanently remove this project entry from your profile."
+        }
+        confirmLabel="Delete Project"
+        variant="danger"
+      />
     </section>
   );
 }

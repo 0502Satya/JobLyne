@@ -24,7 +24,7 @@ export default function Table<T>({
       {/* Scrollable grid viewport container */}
       <div
         ref={instance.containerRef}
-        className={`w-full overflow-auto border border-border/40 bg-surface-1 rounded-2xl shadow-sm relative ${className}`}
+        className={`w-full overflow-auto border border-[var(--table-border)] bg-[var(--table-bg)] rounded-xl relative ${className}`}
         style={{
           height: instance.features.virtualization?.enabled
             ? `${instance.features.virtualization.containerHeight || 400}px`

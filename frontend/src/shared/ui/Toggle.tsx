@@ -1,24 +1,24 @@
 "use client";
 
-import React, { useId } from "react";
-import { AlertCircle } from "lucide-react";
-
 /**
- * Toggle (Switch) component.
- *
+ * Toggle Specification Block:
+ * Heights:        Fixed min-height 44px container (touch targets)
+ * Track Sizes:     SM: 20px x 36px (h-5 w-9); MD: 24px x 44px (h-6 w-11); LG: 28px x 56px (h-7 w-14)
+ * Thumb Sizes:     SM: 14px x 14px (h-3.5 w-3.5); MD: 18px x 18px (h-4.5 w-4.5); LG: 22px x 22px (h-5.5 w-5.5)
+ * Translation:    SM: 16px; MD: 20px; LG: 28px (checked state offset)
+ * Typography:     14px text (text-sm), font-medium (weight 500)
+ * Gaps:           Label gap: ml-3 (12px); Layout gap: gap-1.5 (6px)
+ * Focus:          Track focus visible ring-2, offset 2px, visible on :focus-visible only.
+ * 
  * UX Note: Toggle represents a binary state with an *immediate* effect.
  * It should never be paired with a "Save" button.
  *
- * Specification:
- * - Markup: Semantic <button role="switch" aria-checked={checked}>
- * - Sizes:
- *   - sm: Track 20px x 36px (h-5 w-9), Thumb 14px x 14px (h-3.5 w-3.5), translate-x-[16px]
- *   - md (default): Track 24px x 44px (h-6 w-11), Thumb 18px x 18px (h-4.5 w-4.5), translate-x-[20px]
- *   - lg: Track 28px x 56px (h-7 w-14), Thumb 22px x 22px (h-5.5 w-5.5), translate-x-[28px]
- * - Focus: Visible focus ring around the track on :focus-visible.
- * - Accessibility: aria-describedby connects helper/error text to the switch.
- * - Performance: Respects prefers-reduced-motion (motion-reduce:transition-none).
+ * Accessibility: aria-describedby connects helper/error text to the switch.
+ * Performance: Respects prefers-reduced-motion (motion-reduce:transition-none).
  */
+
+import React, { useId } from "react";
+import { AlertCircle } from "lucide-react";
 
 type ToggleSize = "sm" | "md" | "lg";
 type ToggleState = "default" | "valid" | "error";

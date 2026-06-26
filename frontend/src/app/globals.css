@@ -54,11 +54,119 @@
   --color-on-warning: #0f172a;
   --color-on-error: #ffffff;
 
+  /* ── Semantic Disabled Tokens ── */
+  --color-surface-disabled: #f1f5f9;
+  --color-text-disabled: #94a3b8;
+  --color-border-disabled: #e2e8f0;
+
   /* ── Component Level Tokens ── */
   --color-btn-primary: var(--color-primary);
   --color-btn-primary-hover: var(--color-primary-dark);
   --color-input-border: var(--color-border);
   --color-focus: var(--color-primary);
+
+  /* ── Button Component Tokens ── */
+  --button-primary-bg: var(--color-primary);
+  --button-primary-bg-hover: var(--color-primary-dark);
+  --button-primary-text: var(--color-on-primary);
+  
+  --button-secondary-bg: var(--color-surface-2);
+  --button-secondary-bg-hover: var(--color-surface-3);
+  --button-secondary-text: var(--color-text);
+  --button-secondary-border: var(--color-border);
+
+  --button-outline-bg: transparent;
+  --button-outline-bg-hover: var(--color-surface-2);
+  --button-outline-text: var(--color-text);
+  --button-outline-border: var(--color-border);
+
+  --button-ghost-bg: transparent;
+  --button-ghost-bg-hover: var(--color-surface-2);
+  --button-ghost-text: var(--color-muted);
+  --button-ghost-text-hover: var(--color-text);
+
+  --button-danger-bg: var(--color-error);
+  --button-danger-bg-hover: var(--color-error-dark);
+  --button-danger-text: var(--color-on-error);
+
+  /* Status Colors */
+  --button-success-bg: var(--color-success);
+  --button-success-bg-hover: var(--color-success-dark);
+  --button-success-text: var(--color-on-success);
+
+  --button-disabled-bg: var(--color-surface-disabled);
+  --button-disabled-text: var(--color-text-disabled);
+  --button-disabled-border: var(--color-border-disabled);
+
+  /* ── Input Component Tokens ── */
+  --input-bg: var(--color-surface-overlay);
+  --input-border: var(--color-border);
+  --input-border-hover: var(--color-muted);
+  --input-border-focus: var(--color-primary);
+  --input-text: var(--color-text);
+  --input-placeholder: var(--color-muted);
+  --input-caret: var(--color-primary);
+  --input-selection-bg: var(--color-primary-light);
+  --input-selection-text: var(--color-primary-dark);
+
+  /* Ring and Focus Details */
+  --input-ring: var(--color-primary);
+  --input-ring-offset: var(--color-surface);
+  --input-shadow-focus: 0 0 0 2px var(--input-ring);
+
+  /* Validation Specific Tokens */
+  --input-error-border: var(--color-error);
+  --input-error-ring: var(--color-error);
+  --input-error-bg: var(--color-error-bg);
+
+  --input-warning-border: var(--color-warning);
+  --input-warning-ring: var(--color-warning);
+  --input-warning-bg: var(--color-warning-bg);
+
+  --input-success-border: var(--color-success);
+  --input-success-ring: var(--color-success);
+  --input-success-bg: var(--color-success-bg);
+
+  /* State Overrides */
+  --input-disabled-bg: var(--color-surface-disabled);
+  --input-disabled-text: var(--color-text-disabled);
+  --input-disabled-border: var(--color-border-disabled);
+
+  --input-readonly-bg: var(--color-surface-2);
+  --input-readonly-text: var(--color-muted);
+  --input-readonly-border: var(--color-border-disabled);
+
+  /* ── Card Component Tokens ── */
+  --card-bg-elevated: var(--color-surface-1);
+  --card-bg-flat: var(--color-surface-2);
+  --card-bg-outline: transparent;
+  --card-border: var(--color-border);
+  --card-border-hover: var(--color-muted);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.07);
+  --card-radius: 12px;
+
+  /* ── Dialog / Modal Component Tokens ── */
+  --dialog-bg: var(--color-surface-overlay);
+  --dialog-border: var(--color-border);
+  --dialog-radius: 16px;
+  --dialog-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --dialog-backdrop-bg: rgba(0, 0, 0, 0.4);
+  --dialog-backdrop-blur: 4px;
+
+  /* ── Toast Component Tokens ── */
+  --toast-bg: var(--color-surface-overlay);
+  --toast-border: var(--color-border);
+  --toast-radius: 8px;
+  --toast-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* ── Table Component Tokens ── */
+  --table-bg: var(--color-surface-1);
+  --table-border: var(--color-border);
+  --table-header-bg: var(--color-surface-2);
+  --table-header-color: var(--color-muted);
+  --table-row-hover: rgba(241, 245, 249, 0.5);
+  --table-row-selected: rgba(0, 111, 255, 0.04);
 
   /* ── Brand Colors & Accents ── */
   --color-accent: #8b5cf6;
@@ -77,6 +185,13 @@
   --color-experience: #ea580c;
   --color-experience-bg: rgba(234, 88, 12, 0.10);
 
+  /* ── Warning Shade (chip gradient light stop) ── */
+  --color-warning-light: #fef3c7;
+
+  /* ── Overlay Tokens (compositing / glassmorphism) ── */
+  --color-overlay-dark:  rgba(0, 0, 0, 0.30);       /* avatar crop mask, modal scrims      */
+  --color-overlay-light: rgba(255, 255, 255, 0.15); /* gradient shine, glassmorphism cards */
+
   /* ── Chart Architecture Tokens ── */
   --color-chart-grid: #e2e8f0;
   --color-chart-surface: rgba(241, 245, 249, 0.20);
@@ -86,17 +201,25 @@
   --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-accent-gradient));
   
   /* ── Z-Index Tokens ── */
+  --z-base: 0;
   --z-dropdown: 1000;
-  --z-sticky: 1100;
-  --z-drawer: 1200;
-  --z-modal: 1300;
-  --z-toast: 1400;
-  --z-tooltip: 1500;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 1050;
+  --z-popover: 1070;
+  --z-tooltip: 1080;
 
   /* ── Motion & Easing Tokens ── */
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
   --transition-duration-fast: 150ms;
   --transition-duration-normal: 250ms;
   --transition-duration-slow: 300ms;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-timing-function-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-timing-function-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -120,6 +243,18 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+
+  /* ── Opacity Tokens ── */
+  --opacity-hover: 0.8;
+  --opacity-pressed: 0.9;
+  --opacity-disabled: 0.5;
+  --opacity-overlay: 0.4;
+
+  /* ── Border Width Tokens ── */
+  --border-width-0: 0px;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-4: 4px;
 
   /* ── Layout & Spacing ── */
   --spacing-section: 80px;
@@ -200,6 +335,10 @@
     --color-surface-3: #2d2d2d;
     --color-surface-overlay: #2d2d2d;
 
+    --color-surface-disabled: #2d2d2d;
+    --color-text-disabled: #64748b;
+    --color-border-disabled: #3d3d3d;
+
     --color-success-bg: rgba(16, 185, 129, 0.20);
     --color-warning-bg: rgba(245, 158, 11, 0.20);
     --color-error-bg: rgba(239, 68, 68, 0.20);
@@ -230,6 +369,20 @@
     --color-recruiter-gradient-end: #b45309;
 
     --color-page: var(--color-bg);
+
+    /* ── Card Component Tokens (Dark Mode Override) ── */
+    --card-shadow: none;
+    --card-shadow-hover: none;
+
+    /* ── Dialog Component Tokens (Dark Mode Override) ── */
+    --dialog-shadow: none;
+
+    /* ── Toast Component Tokens (Dark Mode Override) ── */
+    --toast-shadow: none;
+
+    /* ── Table Component Tokens (Dark Mode Override) ── */
+    --table-row-hover: rgba(30, 30, 30, 0.5);
+    --table-row-selected: rgba(0, 111, 255, 0.08);
   }
 
   :root {
@@ -469,7 +622,8 @@
   background-image: linear-gradient(to right, var(--color-recruiter-accent), var(--color-recruiter-gradient-end));
 }
 @utility bg-card-chip {
-  background-image: linear-gradient(to right, #f59e0b, #fef3c7, #f59e0b);
+  /* Uses design tokens — no hardcoded colors */
+  background-image: linear-gradient(to right, var(--color-warning), var(--color-warning-light), var(--color-warning));
 }
 
 @media (prefers-reduced-motion: reduce) {

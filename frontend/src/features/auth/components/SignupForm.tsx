@@ -2,7 +2,7 @@
 
 import React, { useActionState, useState } from "react";
 import { signupAction } from "@/features/auth/actions";
-import { Input, Button } from "@/shared/ui";
+import { Input, Button, PasswordStrengthBar } from "@/shared/ui";
 import OTPVerification from "./OTPVerification";
 import { AlertCircle } from "lucide-react";
 
@@ -89,26 +89,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
     }
   };
 
-  // Password strength calculation helper
-  const getPasswordStrength = (val: string) => {
-    if (!val) return 0;
-    let score = 0;
-    if (val.length >= 8) score += 1;
-    if (/[0-9]/.test(val)) score += 1;
-    if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score += 1;
-    if (/[^A-Za-z0-9]/.test(val)) score += 1;
-    return score;
-  };
 
-  const strength = getPasswordStrength(password);
-  const strengthLabels = ["Empty", "Very Weak", "Weak", "Medium", "Strong"];
-  const strengthColors = [
-    "bg-border/20",
-    "bg-error",
-    "bg-warning",
-    "bg-warning",
-    "bg-success"
-  ];
 
   if (state?.requiresVerification) {
     return <OTPVerification email={state.email} />;
@@ -188,34 +169,7 @@ export default function SignupForm({ role = "Candidate" }: { role?: string }) {
           onBlur={handleBlur}
         />
         
-        {password && (
-          <div className="space-y-1.5 mt-2 px-1">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-muted">Password Strength:</span>
-              <span className={`font-semibold ${
-                strength === 1 ? "text-error" :
-                strength === 2 ? "text-warning" :
-                strength === 3 ? "text-warning" :
-                strength === 4 ? "text-success" : "text-muted"
-              }`}>
-                {strengthLabels[strength]}
-              </span>
-            </div>
-            <div className="flex gap-1 h-1.5 w-full bg-border/20 rounded-full overflow-hidden">
-              {[1, 2, 3, 4].map((bar) => (
-                <div 
-                  key={bar} 
-                  className={`flex-1 h-full transition-all duration-300 ${
-                    strength >= bar ? strengthColors[strength] : "bg-bg dark:bg-card"
-                  }`}
-                />
-              ))}
-            </div>
-            <p className="text-[10px] text-muted leading-tight">
-              Must be at least 8 characters. Mix letters, numbers, and symbols.
-            </p>
-          </div>
-        )}
+        <PasswordStrengthBar password={password} />
       </div>
 
       {/* Confirm Password */}

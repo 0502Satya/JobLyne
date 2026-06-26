@@ -26,7 +26,7 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
   return (
     <div className="border-border rounded-2xl relative overflow-hidden shadow-sm bg-card mb-6 border">
       <div className="w-full border-b border-border relative overflow-hidden bg-primary h-28 sm:h-32">
-        <div className="inset-0 absolute bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_35%),linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))]" />
+        <div className="inset-0 absolute bg-[radial-gradient(circle_at_20%_20%,var(--color-overlay-light),transparent_35%),linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))]" />
         <div className="bg-white/10 text-xs backdrop-blur text-white/95 uppercase absolute hidden items-center px-3 gap-2 rounded-lg tracking-wide right-6 py-1.5 top-5 sm:flex dark:bg-black/20">
           <BadgeCheck size={14} aria-hidden="true" />
           Candidate profile

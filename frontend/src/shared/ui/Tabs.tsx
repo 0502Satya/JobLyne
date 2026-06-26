@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState, useRef, useId } from "react";
-import Icon from "./Icon";
-
-/* ─── Specification ────────────────────────────────────────────────────────
- * Variants:
- *   underline  →  current border-b-2 style (default)
- *   pill       →  active tab gets rounded background fill
- *
+/**
+ * Tabs Specification Block:
+ * Heights:        Underline: Auto/determined by vertical padding; Pill list: ~40px height for tablist container.
+ * Padding:        Tab buttons: Underline variant has py-3 px-4, Pill variant has py-2 px-4.
+ * Border radius:  Underline: None; Pill tab: rounded-lg (8px); Pill container: rounded-xl (12px)
+ * Typography:     14px text (text-sm), font-medium (weight 500)
+ * Icon gap:        8px (gap-2) between icon and text
+ * Focus ring:      2px (focus-visible:ring-2), offset 2px, visible on :focus-visible only
+ * Keyboard:       ArrowLeft/Right to move focus, Home to first, End to last, Enter/Space to activate. Roving tabIndex managed dynamically.
+ * Variants:       Underline (default), Pill
+ * 
  * Keyboard navigation — MANUAL ACTIVATION pattern (WAI-ARIA recommended
  * for content that is expensive to switch, e.g. data-heavy panels):
  *   ArrowLeft / ArrowRight  →  moves FOCUS only; does NOT switch active tab
@@ -15,17 +18,16 @@ import Icon from "./Icon";
  *   End                     →  focus last enabled tab
  *   Enter / Space           →  activates the focused (but not yet selected) tab
  *
- * This is distinct from "automatic activation" (arrow key immediately switches
- * content). Manual activation is intentional — documented here for future
- * maintainers. To switch to automatic, call handleTabActivate() from ArrowLeft/Right.
- *
  * Accessibility (§16):
  *   - role="tablist" on the container
  *   - role="tab" + aria-selected + aria-controls on each button
  *   - role="tabpanel" + aria-labelledby on each panel
  *   - Roving tabIndex: active=0, rest=-1 (focus managed via ref array)
  *   - Disabled tabs: aria-disabled + pointer-events-none
- * ─────────────────────────────────────────────────────────────────────────── */
+ */
+
+import React, { useState, useRef, useId } from "react";
+import Icon from "./Icon";
 
 type TabVariant = "underline" | "pill";
 

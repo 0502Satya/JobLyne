@@ -208,7 +208,7 @@ function CompanyMessagesContent() {
     <div className="text-text bg-bg transition-colors flex min-h-screen flex-col">
       
       {/* Corporate Header */}
-      <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+      <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
         <div className="flex gap-6 items-center">
           <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
             <Network size={30} aria-hidden="true" />

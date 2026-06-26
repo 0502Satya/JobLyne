@@ -12,7 +12,7 @@ import {
   List,
   TrendingUp
 } from "lucide-react";
-import { Icon } from "@/shared/ui";
+import { Icon, LoadingState } from "@/shared/ui";
 
 /**
  * Specialized Dashboard for Recruiters.
@@ -20,12 +20,17 @@ import { Icon } from "@/shared/ui";
  */
 export default function RecruiterDashboardPage() {
   const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchProfile() {
-      const data = await getRecruiterProfileAction();
-      if (!data.error) {
-        setProfile(data);
+      try {
+        const data = await getRecruiterProfileAction();
+        if (!data.error) {
+          setProfile(data);
+        }
+      } finally {
+        setLoading(false);
       }
     }
     fetchProfile();
@@ -35,7 +40,7 @@ export default function RecruiterDashboardPage() {
     <div className="bg-bg text-text min-h-screen transition-colors">
       
       {/* Dashboard Header */}
-      <header className="border-b border-border px-6 py-4 items-center sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+      <header className="border-b border-border px-6 py-4 items-center sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
         <div className="flex gap-6 items-center">
           <Link href="/recruiter/dashboard" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
             <Network size={28} aria-hidden="true" />
@@ -45,7 +50,7 @@ export default function RecruiterDashboardPage() {
           <span className="px-2 text-primary py-1 type-badge rounded bg-primary/10">Recruiter portal</span>
         </div>
         <div className="gap-4 flex items-center">
-          <button className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary cursor-pointer">
+          <button aria-label="Search" className="justify-center min-h-[44px] items-center p-2 transition-colors flex min-w-[44px] text-muted hover:text-primary cursor-pointer">
             <Search size={20} aria-hidden="true" />
           </button>
           <Link 
@@ -85,65 +90,69 @@ export default function RecruiterDashboardPage() {
       </header>
 
       <main className="mx-auto space-y-8 max-w-7xl p-6 md:p-12">
-        
-        {/* Welcome Section */}
-        <div className="space-y-2">
-          <h1 className="text-text type-h1">
-            Welcome back, {profile?.first_name || "Recruiter"}!
-          </h1>
-          <p className="text-muted">
-            Manage your candidate pipelines and sourcing performance{profile?.agency_name ? ` at ${profile.agency_name}` : ""}.
-          </p>
-        </div>
-
-        <section className="gap-6 grid grid-cols-1 md:grid-cols-4">
-          {[
-            { label: "Total Candidates", value: "1,284", icon: "person", color: "text-info" },
-            { label: "Active Pipelines", value: "12", icon: "reorder", color: "text-primary" },
-            { label: "Interviewed", value: "45", icon: "event", color: "text-success" },
-            { label: "Placements", value: "8", icon: "verified", color: "text-warning" },
-          ].map((stat, i) => (
-            <div key={i} className="border-border rounded-2xl shadow-sm p-6 bg-surface border">
-              <Icon name={stat.icon} className={`mb-2 ${stat.color}`} size={24} aria-hidden="true" />
-              <h4 className="text-text type-h2">{stat.value}</h4>
-              <p className="uppercase tracking-widest type-caption text-muted">{stat.label}</p>
+        {loading ? (
+          <LoadingState variant="card" rows={3} />
+        ) : (
+          <>
+            {/* Welcome Section */}
+            <div className="space-y-2">
+              <h1 className="text-text type-h1">
+                Welcome back, {profile?.first_name || "Recruiter"}!
+              </h1>
+              <p className="text-muted">
+                Manage your candidate pipelines and sourcing performance{profile?.agency_name ? ` at ${profile.agency_name}` : ""}.
+              </p>
             </div>
-          ))}
-        </section>
 
-        <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="border-border rounded-2xl space-y-6 p-8 bg-surface border">
-            <h3 className="type-h3 text-text">Quick Sourcing</h3>
-            <div className="space-y-4">
-              <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
-                <Zap className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
-                <div>
-                  <h4 className="text-text">AI Talent Match</h4>
-                  <p className="text-xs text-muted">Find the 1% for your active jobs instantly.</p>
+            <section className="gap-6 grid grid-cols-1 md:grid-cols-4">
+              {[
+                { label: "Total Candidates", value: "1,284", icon: "person", color: "text-info" },
+                { label: "Active Pipelines", value: "12", icon: "reorder", color: "text-primary" },
+                { label: "Interviewed", value: "45", icon: "event", color: "text-success" },
+                { label: "Placements", value: "8", icon: "verified", color: "text-warning" },
+              ].map((stat, i) => (
+                <div key={i} className="border-border rounded-2xl shadow-sm p-6 bg-surface border">
+                  <Icon name={stat.icon} className={`mb-2 ${stat.color}`} size={24} aria-hidden="true" />
+                  <h4 className="text-text type-h2">{stat.value}</h4>
+                  <p className="uppercase tracking-widest type-caption text-muted">{stat.label}</p>
                 </div>
-              </button>
-              <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
-                <List className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
-                <div>
-                  <h4 className="text-text">Browse Pre-vetted Talent</h4>
-                  <p className="text-xs text-muted">Explore specialists ready to be interviewed.</p>
-                </div>
-              </button>
-            </div>
-          </div>
-          
-          <div className="text-text rounded-2xl relative border-primary/20 border-2 overflow-hidden bg-primary/5 p-8 space-y-4">
-            <h3 className="type-h3 text-primary">Recruiter Intelligence</h3>
-            <p className="leading-relaxed text-sm text-muted">
-              Your placement rate is 12% higher than the platform average this month! Keep it up to earn the "Top Tier Sourced" badge.
-            </p>
-            <button className="px-6 transition-all py-3 text-white rounded-xl bg-btn-primary hover:bg-btn-primary-hover cursor-pointer">
-              View Analytics
-            </button>
-            <TrendingUp className="-right-4 absolute text-primary/10 -bottom-4" size={96} aria-hidden="true" />
-          </div>
-        </section>
+              ))}
+            </section>
 
+            <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              <div className="border-border rounded-2xl space-y-6 p-8 bg-surface border">
+                <h3 className="type-h3 text-text">Quick Sourcing</h3>
+                <div className="space-y-4">
+                  <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
+                    <Zap className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
+                    <div>
+                      <h4 className="text-text">AI Talent Match</h4>
+                      <p className="text-xs text-muted">Find the 1% for your active jobs instantly.</p>
+                    </div>
+                  </button>
+                  <button className="w-full border-border gap-4 group items-center transition-all flex p-4 text-left rounded-xl border hover:border-primary cursor-pointer">
+                    <List className="text-primary transition-transform group-hover:scale-110" size={20} aria-hidden="true" />
+                    <div>
+                      <h4 className="text-text">Browse Pre-vetted Talent</h4>
+                      <p className="text-xs text-muted">Explore specialists ready to be interviewed.</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="text-text rounded-2xl relative border-primary/20 border-2 overflow-hidden bg-primary/5 p-8 space-y-4">
+                <h3 className="type-h3 text-primary">Recruiter Intelligence</h3>
+                <p className="leading-relaxed text-sm text-muted">
+                  Your placement rate is 12% higher than the platform average this month! Keep it up to earn the "Top Tier Sourced" badge.
+                </p>
+                <button className="px-6 transition-all py-3 text-white rounded-xl bg-btn-primary hover:bg-btn-primary-hover cursor-pointer">
+                  View Analytics
+                </button>
+                <TrendingUp className="-right-4 absolute text-primary/10 -bottom-4" size={96} aria-hidden="true" />
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );

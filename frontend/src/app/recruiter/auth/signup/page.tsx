@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { recruiterSignupAction } from "@/features/auth/actions";
 import OTPVerification from "@/features/auth/components/OTPVerification";
+import { Button, Input } from "@/shared/ui";
 import {
   ShieldCheck,
   ArrowRight,
@@ -48,9 +49,9 @@ export default function RecruiterSignupPage() {
             </Link>
             <div className="gap-4 flex items-center">
               <span className="text-muted hidden text-sm md:block">Need help? Contact support</span>
-              <Link href="/recruiter/auth/signin" className="justify-center h-10 cursor-pointer bg-primary items-center transition-all rounded-lg text-white type-ui shadow-primary/20 min-w-[84px] flex shadow-lg px-4 hover:opacity-90 active:scale-[0.98]">
+              <Button as={Link} href="/recruiter/auth/signin" variant="primary" size="sm" className="rounded-lg shadow-lg">
                 Sign In
-              </Link>
+              </Button>
             </div>
           </header>
 
@@ -71,16 +72,19 @@ export default function RecruiterSignupPage() {
                       <ShieldCheck className="text-primary" size={16} aria-hidden="true" />
                       One-Click Verification
                     </h3>
-                    <button className="w-full justify-center rounded-xl px-6 gap-4 py-4 group items-center transition-all text-white flex shadow-lg shadow-linkedin/20 bg-linkedin hover:bg-linkedin-hover active:scale-[0.98]">
+                    <Button 
+                      className="w-full justify-center rounded-xl px-6 gap-4 py-4 group items-center transition-all text-white flex shadow-lg shadow-linkedin/20 bg-linkedin hover:bg-linkedin-hover active:scale-[0.98]"
+                      as="button"
+                    >
                       <svg className="size-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                       </svg>
-                      <div className="flex items-start translate-y-[1px] flex-col">
+                      <div className="flex items-start translate-y-[1px] flex-col text-left">
                         <span className="text-white text-sm">Verify with LinkedIn</span>
                         <span className="opacity-80 italic text-white/90 text-xs -mt-1">Get your Recruiter Trust Badge instantly</span>
                       </div>
                       <ArrowRight className="ml-auto transition-transform group-hover:translate-x-1" size={20} aria-hidden="true" />
-                    </button>
+                    </Button>
                     <p className="text-xs text-muted italic mt-3 text-center">Highly recommended for faster profile approval and better candidate response rates.</p>
                   </section>
 
@@ -99,30 +103,61 @@ export default function RecruiterSignupPage() {
 
                   <form action={formAction} className="space-y-6">
                     <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Full Name</label>
-                        <input name="full_name" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="John Doe" type="text" required />
-                      </div>
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Work Email</label>
-                        <input name="email" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="john@company.com" type="email" required />
-                      </div>
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Company Name</label>
-                        <input name="companyName" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="e.g. Acme Corp" type="text" required />
-                      </div>
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Designation</label>
-                        <input name="designation" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="Technical recruiter" type="text" required />
-                      </div>
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Password</label>
-                        <input name="password" title="At least one letter and one number" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="••••••••" type="password" required />
-                      </div>
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Confirm Password</label>
-                        <input name="password_confirm" className="w-full outline-none h-12 transition-all rounded-lg py-3 border-border text-text px-4 dark:border-border dark:bg-card focus:border-primary focus:ring-primary" placeholder="••••••••" type="password" required />
-                      </div>
+                      <Input
+                        id="full_name"
+                        name="full_name"
+                        label="Full Name"
+                        placeholder="John Doe"
+                        type="text"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
+                      <Input
+                        id="email"
+                        name="email"
+                        label="Work Email"
+                        placeholder="john@company.com"
+                        type="email"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
+                      <Input
+                        id="companyName"
+                        name="companyName"
+                        label="Company Name"
+                        placeholder="e.g. Acme Corp"
+                        type="text"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
+                      <Input
+                        id="designation"
+                        name="designation"
+                        label="Designation"
+                        placeholder="Technical recruiter"
+                        type="text"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
+                      <Input
+                        id="password"
+                        name="password"
+                        label="Password"
+                        placeholder="••••••••"
+                        type="password"
+                        required
+                        title="At least one letter and one number"
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
+                      <Input
+                        id="password_confirm"
+                        name="password_confirm"
+                        label="Confirm Password"
+                        placeholder="••••••••"
+                        type="password"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
                     </div>
                     <div className="items-center bg-bg rounded-lg gap-3 flex p-4 dark:bg-card">
                       <input type="checkbox" name="terms" className="text-primary h-5 w-5 cursor-pointer rounded focus:ring-primary" required />
@@ -130,9 +165,16 @@ export default function RecruiterSignupPage() {
                         I agree to the <Link href="#" className="text-primary hover:underline">Recruiter Terms of service</Link> and <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>.
                       </p>
                     </div>
-                    <button disabled={isPending} className="w-full px-8 bg-card py-4 transition-all text-white shadow-lg rounded-xl dark:text-text dark:bg-bg hover:opacity-90 disabled:opacity-50 active:scale-[0.98]" type="submit">
-                      {isPending ? "Creating Account..." : "Create Recruiter Account"}
-                    </button>
+                    <Button
+                      disabled={isPending}
+                      isLoading={isPending}
+                      className="w-full py-4 text-white shadow-lg rounded-xl dark:text-text hover:opacity-90"
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                    >
+                      Create Recruiter Account
+                    </Button>
                   </form>
                 </div>
               </div>
@@ -208,7 +250,9 @@ export default function RecruiterSignupPage() {
                   <p className="leading-relaxed text-muted italic text-xs">
                     Facing issues with LinkedIn verification? Our support team is ready to help you complete your manual onboarding.
                   </p>
-                  <button className="w-full text-primary border-primary/20 rounded-lg transition-colors cursor-pointer py-2 type-caption border hover:bg-primary/5">Contact Support</button>
+                  <Button variant="outline" className="w-full">
+                    Contact Support
+                  </Button>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
 import { socialLoginAction } from "../actions";
@@ -9,6 +9,39 @@ import { socialLoginAction } from "../actions";
  */
 export default function SocialLogin() {
   const router = useRouter();
+  const [buttonWidth, setButtonWidth] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    // Set initial width immediately on mount to ensure first render is correct
+    const crWidth = containerRef.current.getBoundingClientRect().width;
+    const initialWidth = Math.max(200, Math.min(400, Math.floor(crWidth)));
+    setButtonWidth(initialWidth);
+
+    let timeoutId: NodeJS.Timeout;
+
+    // Dynamically adjust button width based on container width (clamped to Google's limits: 200px - 400px)
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const widthVal = entry.contentRect.width;
+        const clampedWidth = Math.max(200, Math.min(400, Math.floor(widthVal)));
+        
+        // Debounce updates to avoid calling Google's initialization repeatedly during active resize dragging
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setButtonWidth(clampedWidth);
+        }, 150);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     console.log("Google Login Success:", credentialResponse);
@@ -37,10 +70,13 @@ export default function SocialLogin() {
   };
 
   return (
-    <div className="gap-4 flex w-full flex-col">
-      <div className="justify-items-stretch gap-4 items-center grid grid-cols-1 sm:grid-cols-2">
-        {/* Google Login Option */}
-        <div className="w-full justify-center min-h-[44px] overflow-hidden rounded-lg flex">
+    <div ref={containerRef} className="gap-3 flex w-full flex-col items-center">
+      {/* Google Login Option */}
+      <div 
+        className="flex justify-center" 
+        style={{ width: buttonWidth ? `${buttonWidth}px` : "100%", minHeight: "44px" }}
+      >
+        {buttonWidth ? (
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
@@ -49,21 +85,26 @@ export default function SocialLogin() {
             }}
             theme="outline"
             size="large"
-            width="240"
+            shape="rectangular"
+            logo_alignment="left"
+            width={buttonWidth.toString()}
           />
-        </div>
-        
-        {/* LinkedIn Login Option */}
-        <button 
-          onClick={() => handleSocialLogin("linkedin")}
-          className="w-full justify-center min-h-[44px] items-center gap-2 rounded-lg py-3 transition-all text-text border-border type-ui flex px-4 border dark:border-border hover:bg-bg dark:hover:bg-card"
-        >
-          <svg className="h-5 w-5 fill-linkedin" viewBox="0 0 24 24">
-            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-          </svg>
-          LinkedIn
-        </button>
+        ) : (
+          <div className="w-full h-11 bg-border/20 rounded-lg animate-pulse border border-border/40" />
+        )}
       </div>
+      
+      {/* LinkedIn Login Option */}
+      <button 
+        onClick={() => handleSocialLogin("linkedin")}
+        className="justify-center min-h-[44px] items-center gap-2 rounded-lg py-2.5 transition-all text-text border-border type-ui flex px-4 border dark:border-border hover:bg-bg dark:hover:bg-card cursor-pointer"
+        style={{ width: buttonWidth ? `${buttonWidth}px` : "100%" }}
+      >
+        <svg className="h-5 w-5 fill-linkedin" viewBox="0 0 24 24">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        </svg>
+        LinkedIn
+      </button>
     </div>
   );
 }

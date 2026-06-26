@@ -6,6 +6,7 @@ export { default as Toggle } from "./Toggle";
 export { default as Card } from "./Card";
 export { default as Badge } from "./Badge";
 export { default as Dialog } from "./Dialog";
+export { default as ConfirmDialog } from "./ConfirmDialog";
 export { default as Select } from "./Select";
 export { default as Combobox } from "./Combobox";
 export { default as FormField, useFieldIds } from "./FormField";
@@ -40,3 +41,4 @@ export {
   SkeletonCard,
   SkeletonTable,
 } from "./Skeleton";
+export { default as PasswordStrengthBar, getPasswordStrength } from "./PasswordStrengthBar";

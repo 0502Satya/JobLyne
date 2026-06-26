@@ -97,3 +97,58 @@ The JobLyne Team
         logger.error(f"Error sending team invite email to {invited_email}: {str(e)}")
         return False
 
+
+def send_password_reset_email(user_email, reset_token):
+    """
+    Sends a password reset link to the user.
+    """
+    subject = 'Reset your JobLyne password'
+    reset_url = f"http://localhost:3000/auth/reset-password?token={reset_token}"
+    message = f"""
+Hi,
+
+We received a request to reset your JobLyne password. Click the link below to reset your password:
+
+{reset_url}
+
+This link will expire in 1 hour. If you did not request this, please ignore this email.
+
+Best regards,
+The JobLyne Team
+"""
+    html_message = f"""
+<div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px;">
+    <h2 style="color: #135bec; text-align: center;">JobLyne</h2>
+    <hr style="border: 0; border-top: 1px solid #e1e4e8; margin: 20px 0;">
+    <p>Hi,</p>
+    <p>We received a request to reset your JobLyne password. Click the button below to reset your password:</p>
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{reset_url}" style="background-color: #135bec; color: #ffffff !important; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+    </div>
+    <p>This link will expire in 1 hour. If you did not request this, please ignore this email.</p>
+    <p style="font-size: 12px; color: #6a737d; margin-top: 20px;">
+        Or copy and paste this URL into your browser: <br>
+        <a href="{reset_url}" style="color: #135bec;">{reset_url}</a>
+    </p>
+    <hr style="border: 0; border-top: 1px solid #e1e4e8; margin: 20px 0;">
+    <p style="font-size: 12px; color: #6a737d; text-align: center;">
+        &copy; {datetime.now().year} JobLyne. All rights reserved.
+    </p>
+</div>
+"""
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user_email],
+            fail_silently=False,
+            html_message=html_message
+        )
+        logger.info(f"Password reset email sent to {user_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Error sending password reset email to {user_email}: {str(e)}")
+        return False
+
+

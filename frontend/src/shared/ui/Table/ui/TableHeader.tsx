@@ -45,14 +45,14 @@ export default function TableHeader() {
   };
 
   return (
-    <thead className="bg-surface-2 border-b border-border/40 text-left text-xs font-semibold text-muted tracking-wider uppercase sticky top-0 z-20">
+    <thead className="bg-[var(--table-header-bg)] border-b border-[var(--table-border)] text-left text-xs font-semibold text-[var(--table-header-color)] tracking-wider uppercase sticky top-0 z-20">
       <tr role="row">
         {/* Bulk Selection checkbox header cell */}
         {isSelectable && (
           <th
             role="columnheader"
             scope="col"
-            className="p-4 w-12 sticky left-0 bg-surface-2 z-30 border-r border-border/10"
+            className="p-4 w-12 sticky left-0 bg-[var(--table-header-bg)] z-30 border-r border-[var(--table-border)]"
             style={{ width: "48px", minWidth: "48px" }}
           >
             <div className="flex items-center justify-center">
@@ -108,8 +108,8 @@ export default function TableHeader() {
               role="columnheader"
               scope="col"
               className={[
-                "p-4 relative border-r border-border/10 select-none group",
-                isPinnedLeft || isPinnedRight ? "bg-surface-2" : "",
+                "p-4 relative border-r border-[var(--table-border)] select-none group",
+                isPinnedLeft || isPinnedRight ? "bg-[var(--table-header-bg)]" : "",
                 alignClass,
                 col.meta?.headerClassName || "",
               ].join(" ")}
@@ -168,7 +168,7 @@ export default function TableHeader() {
           <th
             role="columnheader"
             scope="col"
-            className="p-4 w-20 sticky right-0 bg-surface-2 z-30 text-right border-l border-border/10"
+            className="p-4 w-20 sticky right-0 bg-[var(--table-header-bg)] z-30 text-right border-l border-[var(--table-border)]"
             style={{ width: "80px", minWidth: "80px" }}
           >
             Actions

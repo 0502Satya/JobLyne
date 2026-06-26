@@ -4,7 +4,7 @@ import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { getCompanyProfileAction, updateCompanyProfileAction, getUserProfileAction, updateUserProfileAction } from "@/features/auth/actions";
 import VerificationWizard from "@/features/company/components/VerificationWizard";
-import { Input } from "@/shared/ui";
+import { Input, Breadcrumbs } from "@/shared/ui";
 import { 
   AlertCircle, 
   Network, 
@@ -128,7 +128,7 @@ export default function OrganizationSettingsPage() {
     return (
       <div className="text-text bg-bg pb-20 transition-colors flex min-h-screen flex-col">
         {/* Settings Header */}
-        <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+        <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
           <div className="flex gap-6 items-center">
             <Link href="/company" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
               <Network size={30} aria-hidden="true" />
@@ -212,6 +212,14 @@ export default function OrganizationSettingsPage() {
       </header>
 
       <main className="w-full mx-auto flex-1 max-w-5xl p-6 md:p-12">
+        <Breadcrumbs
+          className="mb-8"
+          items={[
+            { label: "Company Hub", href: "/company" },
+            { label: "Settings" },
+            { label: "Organization Profile" },
+          ]}
+        />
         <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
           
           {/* Left Sidebar: Progress and Step Navigation */}

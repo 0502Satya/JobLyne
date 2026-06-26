@@ -8,7 +8,7 @@ export default function PlatformStats() {
     const stats = [
         { value: "500k+", label: "Active candidates" },
         { value: "10k+", label: "Global companies" },
-        { value: "2k+", label: "Premium courses" },
+        { value: "45k+", label: "Active jobs" },
     ];
 
     return (

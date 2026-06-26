@@ -231,7 +231,6 @@ class AdvertiserAccounts(models.Model):
     user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=True, blank=True, related_name='advertiser_accounts_user')
     advertiser_type = models.CharField(max_length=255, null=True, blank=True)
     company = models.ForeignKey('companies.Companies', on_delete=models.CASCADE, null=True, blank=True, related_name='advertiser_accounts_company')
-    institute = models.ForeignKey('lms.Institutes', on_delete=models.CASCADE, null=True, blank=True, related_name='advertiser_accounts_institute')
     wallet = models.ForeignKey('Wallets', on_delete=models.CASCADE, null=True, blank=True, related_name='advertiser_accounts_wallet')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 

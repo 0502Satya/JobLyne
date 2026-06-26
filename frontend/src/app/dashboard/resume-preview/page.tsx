@@ -96,6 +96,13 @@ export default function ResumePreviewPage() {
       <style jsx global>{`
         @media print {
           body {
+            /*
+             * INTENTIONAL EXCEPTION: CSS custom properties (--color-surface, --color-text)
+             * are not guaranteed to resolve in @media print contexts in Safari and some
+             * Chromium builds. These absolute values (#ffffff, #000000) are required for
+             * reliable cross-browser print output and are correct per the CSS spec.
+             * See: https://caniuse.com/css-variables (print support caveat)
+             */
             background-color: #ffffff !important;
             color: #000000 !important;
             margin: 0 !important;

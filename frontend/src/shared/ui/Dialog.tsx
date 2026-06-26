@@ -1,21 +1,26 @@
 "use client";
 
-import React, { useEffect, useRef, useId } from "react";
-import { X, AlertTriangle, Info, AlertCircle } from "lucide-react";
-
-/* ─── Specification ────────────────────────────────────────────────────────
- * Sizes:   sm (max-w-sm) | md (max-w-lg, default) | lg (max-w-2xl) | full (max-w-full)
- * Status:  default | destructive | warning | info
- *          → drives a 4px left-border strip on the header
- * Footer:  optional ReactNode rendered in a sticky bottom action row
- *
+/**
+ * Dialog Specification Block:
+ * Heights:        Fluid, bounded by viewport constraints.
+ * Padding:        Header: px-6 py-4 (24px horizontal, 16px vertical); Body: px-6 py-5 (24px horizontal, 20px vertical); Footer: px-6 py-4 (24px horizontal, 16px vertical).
+ * Border radius:  Rounded value defined by CSS variable `var(--dialog-radius)`.
+ * Typography:     Header title: semibold text-base (type-card-title); Body: text-sm leading-relaxed.
+ * Gaps:           Header items: gap-3; Status icon-to-title: gap-2; Footer items: gap-3.
+ * Focus:          Close button: focus-visible:ring-2 focus-visible:ring-offset-2. Roving focus trapped inside dialog, restored to active element on close.
+ * Sizes:          sm (max-w-sm), md (max-w-lg, default), lg (max-w-2xl), full (max-w-full).
+ * Status:         default, destructive, warning, info.
+ * 
  * Accessibility (§16 — required):
  *   - On open:  save document.activeElement; move focus to first focusable child
  *   - While open: Tab / Shift+Tab cycles inside dialog only (focus trap)
  *   - On close:   restore focus to the saved trigger element
  *   - Esc:       handled by native <dialog> cancel event
  *   - role="dialog" aria-modal="true" aria-labelledby wired to title
- * ─────────────────────────────────────────────────────────────────────────── */
+ */
+
+import React, { useEffect, useRef, useId } from "react";
+import { X, AlertTriangle, Info, AlertCircle } from "lucide-react";
 
 type DialogSize = "sm" | "md" | "lg" | "full";
 type DialogStatus = "default" | "destructive" | "warning" | "info";
@@ -146,9 +151,9 @@ export default function Dialog({
       aria-labelledby={title ? titleId : undefined}
       className={[
         // Base
-        "rounded-2xl border border-border/60 bg-dialog-bg shadow-xl outline-none",
+        "rounded-[var(--dialog-radius)] border border-[var(--dialog-border)] bg-[var(--dialog-bg)] [box-shadow:var(--dialog-shadow)] outline-none",
         "w-full p-0",
-        "backdrop:bg-black/40 backdrop:backdrop-blur-xs",
+        "backdrop:bg-[var(--dialog-backdrop-bg)] backdrop:backdrop-blur-[var(--dialog-backdrop-blur)]",
         // Entry animation — respects prefers-reduced-motion
         "motion-safe:animate-in motion-safe:scale-in motion-safe:duration-200",
         SIZE_CLASSES[size],
@@ -158,7 +163,7 @@ export default function Dialog({
       style={{ zIndex: "var(--z-modal)" }}
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between border-b border-border/40 px-6 py-4 gap-3">
+      <div className="flex items-center justify-between border-b border-[var(--dialog-border)] px-6 py-4 gap-3">
         <div className="flex items-center gap-2 min-w-0">
           {STATUS_ICON[status]}
           {title ? (
@@ -175,9 +180,9 @@ export default function Dialog({
           className={[
             "flex-shrink-0 h-8 w-8 cursor-pointer rounded-full",
             "flex items-center justify-center text-muted",
-            "hover:bg-surface-2 hover:text-text transition-colors",
+            "hover:bg-[var(--color-surface-2)] hover:text-text transition-colors",
             // Explicit focus ring (§16 — never remove outline without a replacement)
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2",
           ].join(" ")}
           aria-label="Close dialog"
         >
@@ -192,7 +197,7 @@ export default function Dialog({
 
       {/* ── Footer (optional) ───────────────────────────────────────────── */}
       {footer && (
-        <div className="flex items-center justify-end gap-3 border-t border-border/40 px-6 py-4">
+        <div className="flex items-center justify-end gap-3 border-t border-[var(--dialog-border)] px-6 py-4">
           {footer}
         </div>
       )}

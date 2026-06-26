@@ -34,7 +34,7 @@ class CandidateProfileView(APIView):
         if not job_seeker:
             return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = CandidateProfileSerializer(job_seeker)
+        serializer = CandidateProfileSerializer(job_seeker, context={'request': request})
         return Response(serializer.data)
 
     def patch(self, request):
@@ -44,7 +44,7 @@ class CandidateProfileView(APIView):
         if not job_seeker:
             return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = CandidateProfileSerializer(job_seeker, data=request.data, partial=True)
+        serializer = CandidateProfileSerializer(job_seeker, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

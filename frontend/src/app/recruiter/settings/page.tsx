@@ -84,7 +84,7 @@ export default function RecruiterSettingsPage() {
     <div className="max-w-full box-sizing-border-box animate-fade-in overflow-hidden pb-20 text-muted flex bg-surface min-h-screen flex-col">
       
       {/* Settings Header */}
-      <header className="border-b px-6 py-4 items-center backdrop-blur-md bg-card/60 sticky z-50 flex top-0 border-border justify-between">
+      <header className="border-b px-6 py-4 items-center backdrop-blur-md bg-card/60 sticky z-sticky flex top-0 border-border justify-between">
         <div className="flex gap-3 items-center">
           <Link href="/recruiter/dashboard" className="bg-gradient-primary type-h3 text-transparent bg-clip-text">
             JobLyne Recruiter

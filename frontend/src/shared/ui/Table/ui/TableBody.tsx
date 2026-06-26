@@ -26,7 +26,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
       return (
         <tbody>
           <tr>
-            <td colSpan={colSpan} className="p-8 text-center bg-surface-1">
+            <td colSpan={colSpan} className="p-8 text-center bg-[var(--table-bg)]">
               {slots.Offline}
             </td>
           </tr>
@@ -38,7 +38,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
       return (
         <tbody>
           <tr>
-            <td colSpan={colSpan} className="p-8 text-center bg-surface-1">
+            <td colSpan={colSpan} className="p-8 text-center bg-[var(--table-bg)]">
               {slots.Error}
             </td>
           </tr>
@@ -50,7 +50,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
       return (
         <tbody>
           <tr>
-            <td colSpan={colSpan} className="p-0 bg-surface-1">
+            <td colSpan={colSpan} className="p-0 bg-[var(--table-bg)]">
               {slots.Loading}
             </td>
           </tr>
@@ -62,7 +62,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
       return (
         <tbody>
           <tr>
-            <td colSpan={colSpan} className="p-8 text-center bg-surface-1">
+            <td colSpan={colSpan} className="p-8 text-center bg-[var(--table-bg)]">
               {slots?.Empty || (
                 <div className="flex flex-col items-center justify-center p-6 text-muted">
                   <span className="text-sm font-semibold mb-1">No Records Found</span>
@@ -79,7 +79,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
   // If custom children are provided, render them directly inside tbody
   if (children) {
     return (
-      <tbody className="divide-y divide-border/40 text-text bg-surface-1 relative">
+      <tbody className="divide-y divide-[var(--table-border)] text-text bg-[var(--table-bg)] relative">
         {children}
       </tbody>
     );
@@ -87,7 +87,7 @@ export default function TableBody({ children }: { children?: React.ReactNode }) 
 
   // Render Body Rows (Virtualized or Standard)
   return (
-    <tbody role="rowgroup" className="divide-y divide-border/40 text-text bg-surface-1 relative">
+    <tbody role="rowgroup" className="divide-y divide-[var(--table-border)] text-text bg-[var(--table-bg)] relative">
       {isVirtualized && virtualizer ? (
         <>
           {/* Virtual spacing blocks */}

@@ -13,6 +13,7 @@ import {
   getPendingVerificationsAction, 
   verifyCompanyAction 
 } from "@/features/company/actions";
+import { Dialog, Button } from "@/shared/ui";
 
 export default function AdminVerificationPage() {
   const [companies, setCompanies] = useState<any[]>([]);
@@ -146,7 +147,9 @@ export default function AdminVerificationPage() {
               </div>
               <div className="relative w-full sm:w-80">
                 <Search className="left-3.5 absolute top-1/2 -translate-y-1/2 text-muted h-4 w-4" aria-hidden="true" />
+                <label htmlFor="admin-search-input" className="sr-only">Search submissions</label>
                 <input 
+                  id="admin-search-input"
                   type="text" 
                   placeholder="Search legal name, email, CIN..." 
                   value={searchQuery}
@@ -488,27 +491,44 @@ export default function AdminVerificationPage() {
       </main>
 
       {/* APPROVE DIALOG MODAL */}
-      {showApproveDialog && selectedCompany && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface border border-border rounded-card p-8 max-w-md w-full shadow-2xl relative space-y-6 animate-in fade-in zoom-in-95 duration-200">
-            <button 
+      <Dialog
+        isOpen={showApproveDialog}
+        onClose={() => {
+          setShowApproveDialog(false);
+          setActionNotes("");
+        }}
+        title="Confirm Verification Approval"
+        status="info"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              type="button"
+              variant="secondary"
               onClick={() => {
                 setShowApproveDialog(false);
                 setActionNotes("");
               }}
-              className="absolute top-4 right-4 text-muted hover:text-text cursor-pointer"
+              className="flex-1"
             >
-              <X size={20} />
-            </button>
-            
-            <div className="space-y-2">
-              <h3 className="type-h3 text-text font-bold flex items-center gap-2">
-                <CheckCircle2 className="text-success" /> Confirm Verification Approval
-              </h3>
-              <p className="type-label">
-                This will mark <strong className="text-text font-semibold">{selectedCompany.legal_name}</strong> as verified and grant immediate job posting privileges.
-              </p>
-            </div>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isPending}
+              onClick={() => handleAction("approve")}
+              className="flex-1 bg-success hover:bg-success/95 text-white shadow-md shadow-success/15 font-semibold"
+            >
+              {isPending ? "Approving..." : "Approve & Verify"}
+            </Button>
+          </div>
+        }
+      >
+        {selectedCompany && (
+          <div className="space-y-4">
+            <p className="type-label">
+              This will mark <strong className="text-text font-semibold">{selectedCompany.legal_name}</strong> as verified and grant immediate job posting privileges.
+            </p>
 
             <div className="space-y-2">
               <label className="type-ui text-text font-medium block">Verification Notes (Optional)</label>
@@ -520,53 +540,49 @@ export default function AdminVerificationPage() {
                 className="w-full border-border rounded-xl px-4 py-3 bg-bg outline-none border focus:ring-2 focus:ring-primary type-ui"
               />
             </div>
-
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowApproveDialog(false);
-                  setActionNotes("");
-                }}
-                className="px-4 py-2 border border-border text-muted hover:bg-bg rounded-xl text-sm font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => handleAction("approve")}
-                className="px-5 py-2 bg-success text-white hover:bg-success/95 shadow-md shadow-success/15 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                {isPending ? "Approving..." : "Approve & Verify"}
-              </button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
       {/* REJECT DIALOG MODAL */}
-      {showRejectDialog && selectedCompany && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface border border-border rounded-card p-8 max-w-md w-full shadow-2xl relative space-y-6 animate-in fade-in zoom-in-95 duration-200">
-            <button 
+      <Dialog
+        isOpen={showRejectDialog}
+        onClose={() => {
+          setShowRejectDialog(false);
+          setActionNotes("");
+        }}
+        title="Reject Verification Request"
+        status="destructive"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              type="button"
+              variant="secondary"
               onClick={() => {
                 setShowRejectDialog(false);
                 setActionNotes("");
               }}
-              className="absolute top-4 right-4 text-muted hover:text-text cursor-pointer"
+              className="flex-1"
             >
-              <X size={20} />
-            </button>
-            
-            <div className="space-y-2">
-              <h3 className="type-h3 text-text font-bold flex items-center gap-2">
-                <AlertTriangle className="text-error animate-bounce" /> Reject Verification Request
-              </h3>
-              <p className="type-label">
-                Provide clear audit feedback to <strong className="text-text font-semibold">{selectedCompany.legal_name}</strong>. They will need to edit their inputs and resubmit.
-              </p>
-            </div>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isPending}
+              onClick={() => handleAction("reject")}
+              className="flex-1 bg-error hover:bg-error/95 text-white shadow-md shadow-error/15 font-semibold"
+            >
+              {isPending ? "Rejecting..." : "Confirm Rejection"}
+            </Button>
+          </div>
+        }
+      >
+        {selectedCompany && (
+          <div className="space-y-4">
+            <p className="type-label">
+              Provide clear audit feedback to <strong className="text-text font-semibold">{selectedCompany.legal_name}</strong>. They will need to edit their inputs and resubmit.
+            </p>
 
             <div className="space-y-2">
               <label className="type-ui text-text font-medium block">Reason for Rejection *</label>
@@ -579,30 +595,9 @@ export default function AdminVerificationPage() {
                 className="w-full border-border rounded-xl px-4 py-3 bg-bg outline-none border focus:ring-2 focus:ring-primary type-ui border-error/40 focus:border-error focus:ring-error/25"
               />
             </div>
-
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowRejectDialog(false);
-                  setActionNotes("");
-                }}
-                className="px-4 py-2 border border-border text-muted hover:bg-bg rounded-xl text-sm font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => handleAction("reject")}
-                className="px-5 py-2 bg-error text-white hover:bg-error/95 shadow-md shadow-error/15 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                {isPending ? "Rejecting..." : "Confirm Rejection"}
-              </button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
     </div>
   );

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Education } from "@/types/profile";
-import { Button, Input, FormField } from "@/shared/ui";
+import { Button, Input, FormField, ConfirmDialog } from "@/shared/ui";
 import { GraduationCap, Plus, ScrollText, ArrowUp, ArrowDown, Pencil, Trash2 } from "lucide-react";
 
 interface EducationSectionProps {
@@ -28,6 +28,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
   const [education, setEducation] = useState<Education[]>(data);
   const [showSuggestions, setShowSuggestions] = useState<{ [key: string]: boolean }>({});
   const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   React.useEffect(() => {
     setEducation(data);
@@ -253,7 +254,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                           />
                           <div className="md:col-span-2">
                             <Input
-                              label="Courses and activities"
+                              label="Activities and honors"
                               value={edu.certifications || ""}
                               onChange={(e) => updateEntry(edu.id, "certifications", e.target.value)}
                               placeholder="e.g. Algorithms, Data Structures, Varsity Football"
@@ -275,7 +276,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                           <Button
                             type="button"
                             variant="danger"
-                            onClick={() => removeEntry(edu.id)}
+                            onClick={() => setDeletingId(edu.id || null)}
                           >
                             Delete Entry
                           </Button>
@@ -328,7 +329,7 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => removeEntry(edu.id)}
+                            onClick={() => setDeletingId(edu.id || null)}
                             className="h-10 w-10 p-0 rounded-lg text-error hover:text-error/90 hover:bg-error-bg"
                             title="Delete education"
                             aria-label="Delete education"
@@ -348,10 +349,10 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
                             {formatEducationMeta(edu)}
                           </p>
 
-                          {/* Certifications / Courses */}
+                          {/* Activities and honors */}
                           {edu.certifications && (
                             <p className="leading-relaxed type-caption text-muted">
-                              <span className="text-text/90">Courses:</span> {edu.certifications}
+                              <span className="text-text/90">Activities:</span> {edu.certifications}
                             </p>
                           )}
 
@@ -375,11 +376,29 @@ export default function EducationSection({ data = [], onChange }: EducationSecti
             <GraduationCap size={18} className="text-primary mt-0.5" aria-hidden="true" />
             <div className="text-text/85 text-xs leading-normal">
               <span className="block text-primary mb-0.5">Freshers & student tips</span>
-              Highlight key academic projects, hackathon achievements, and major course topics to capture entry-level recruiter attention.
+              Highlight key academic projects, hackathon achievements, and notable activities to capture entry-level recruiter attention.
             </div>
           </div>
         </div>
       </div>
+      
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => {
+          if (deletingId) {
+            removeEntry(deletingId);
+          }
+        }}
+        title="Delete Education"
+        description={
+          deletingId
+            ? `This will permanently remove '${education.find((e) => e.id === deletingId)?.degree || "this degree"}' from '${education.find((e) => e.id === deletingId)?.school || "this institution"}' from your profile.`
+            : "This will permanently remove this education entry from your profile."
+        }
+        confirmLabel="Delete Education"
+        variant="danger"
+      />
     </section>
   );
 }

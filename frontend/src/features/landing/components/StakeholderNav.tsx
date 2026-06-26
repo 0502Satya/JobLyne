@@ -9,8 +9,6 @@ export default function StakeholderNav() {
         { name: "Candidates", icon: "person" },
         { name: "Companies", icon: "corporate_fare" },
         { name: "Recruiters", icon: "search_check" },
-        { name: "Institutes", icon: "school" },
-        { name: "Trainers", icon: "model_training" },
     ];
 
     return (
@@ -19,7 +17,7 @@ export default function StakeholderNav() {
                 <p className="mb-10 type-label uppercase text-center tracking-widest">Tailored for your journey</p>
 
                 {/* We map (loop) through the list of people names and icons above */}
-                <div className="grid-cols-2 grid gap-6 sm:grid-cols-3 sm:gap-8 md:grid-cols-5">
+                <div className="grid-cols-1 grid gap-6 sm:grid-cols-3 sm:gap-8 max-w-3xl mx-auto">
                     {stakeholders.map((item) => (
                         <a key={item.name} className="group items-center flex-col flex py-2 min-w-0" href="#">
                             {/* The box containing the icon */}

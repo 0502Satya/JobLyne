@@ -12,7 +12,6 @@ import SkillsSection from "@/features/dashboard/components/profile/SkillsSection
 import ProjectsSection from "@/features/dashboard/components/profile/ProjectsSection";
 import CertificationsSection from "@/features/dashboard/components/profile/CertificationsSection";
 import PrivacySettingsSection from "@/features/dashboard/components/profile/PrivacySettingsSection";
-import UnsavedChangesBar from "@/features/dashboard/components/profile/UnsavedChangesBar";
 import { toast } from "react-hot-toast";
 import ProfileInfoCard from "@/features/dashboard/components/profile/ProfileInfoCard";
 import { Button, ErrorState, Icon } from "@/shared/ui";
@@ -424,11 +423,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      <UnsavedChangesBar 
-        isVisible={hasUnsavedChanges} 
-        onSave={handleSave} 
-        onDiscard={handleDiscard} 
-      />
       {/* Height offset by --height-header plus 1px for the bottom header border */}
       <main
         className="custom-scrollbar flex-1 overflow-y-auto pb-32 pt-6 bg-bg h-[calc(100vh-var(--height-header)-1px)] candidate-profile-reference px-4 md:px-8 md:py-8"

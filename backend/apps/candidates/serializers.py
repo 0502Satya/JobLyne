@@ -86,7 +86,7 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
     languages = CandidateLanguageSerializer(many=True, source='candidate_languages_job_seeker', required=False)
     portfolio_links = CandidatePortfolioLinkSerializer(many=True, source='candidate_portfolio_links_job_seeker', required=False)
     skills = serializers.SerializerMethodField()
-    bio = serializers.CharField(source='summary', allow_blank=True, required=False)
+    bio = serializers.CharField(source='summary', allow_blank=True, required=False, allow_null=True)
     completeness = serializers.SerializerMethodField()
 
     class Meta:
@@ -132,7 +132,8 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
         project_data = validated_data.pop('candidate_projects_job_seeker', None)
         language_data = validated_data.pop('candidate_languages_job_seeker', None)
         portfolio_data = validated_data.pop('candidate_portfolio_links_job_seeker', None)
-        skills_data = self.context['request'].data.get('skills', None)
+        request = self.context.get('request')
+        skills_data = request.data.get('skills', None) if request and hasattr(request, 'data') else None
         
         # Update JobSeeker main fields
         for attr, value in validated_data.items():
