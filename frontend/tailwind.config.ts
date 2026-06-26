@@ -42,10 +42,6 @@ const config: Config = {
         "chart-grid": "var(--color-chart-grid)",
         "chart-surface": "var(--color-chart-surface)",
         "chart-fill": "var(--color-chart-fill)",
-        sidebar: {
-          bg: "var(--color-primary-dark)",
-          hover: "var(--color-primary-dark)",
-        }
       },
       fontFamily: {
         sans: ["var(--font-primary)", "sans-serif"],

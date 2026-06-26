@@ -46,7 +46,7 @@ export default function UserMenu({
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="slide-in-from-top-2 fade-in border-border z-[100] rounded-2xl absolute overflow-hidden duration-200 mt-3 animate-in shadow-2xl w-56 right-0 bg-surface border">
+                <div className="slide-in-from-top-2 fade-in border-border z-dropdown rounded-2xl absolute overflow-hidden duration-200 mt-3 animate-in shadow-2xl w-56 right-0 bg-surface border">
                     <div className="border-border/40 border-b py-3 px-5">
                         <p className="uppercase tracking-wider type-caption text-muted">Account</p>
                     </div>

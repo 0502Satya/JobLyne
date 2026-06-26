@@ -12,7 +12,7 @@ interface UnsavedChangesBarProps {
 
 export default function UnsavedChangesBar({ isVisible, onSave, onDiscard }: UnsavedChangesBarProps) {
   return (
-    <div className={`bg-warning px-6 items-center transition-all left-0 text-white fixed py-2.5 duration-300 type-ui z-[100] flex justify-between shadow-lg right-0 top-0 ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
+    <div className={`bg-warning px-6 items-center transition-all left-0 text-white fixed py-2.5 duration-300 type-ui z-sticky flex justify-between shadow-lg right-0 top-0 ${isVisible ? 'translate-y-0 opacity-100' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
       <div className="gap-2 flex items-center">
         <AlertTriangle size={16} aria-hidden="true" />
         You have unsaved changes

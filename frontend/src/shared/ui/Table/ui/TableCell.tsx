@@ -62,9 +62,9 @@ export default function TableCell<T>({ row, column, rowIndex, colIndex }: TableC
       tabIndex={isFocused ? 0 : -1}
       onFocus={() => setFocusedCell({ rowIndex, colIndex })}
       className={[
-        "p-4 border-r border-border/10 truncate focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset bg-inherit",
+        "p-4 border-r border-[var(--table-border)] truncate focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset bg-inherit",
         alignClass,
-        isPinnedLeft || isPinnedRight ? "bg-surface-1 shadow-xs" : "",
+        isPinnedLeft || isPinnedRight ? "bg-[var(--table-bg)] shadow-xs" : "",
         state.density === "compact" ? "py-2" : "py-4",
         column.meta?.cellClassName || "",
       ].join(" ")}

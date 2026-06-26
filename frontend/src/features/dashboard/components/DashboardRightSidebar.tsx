@@ -2,48 +2,26 @@
 
 import React from "react";
 import Link from "next/link";
-import { Code2, Brain, Video, FilePen, Palette, Share2 } from "lucide-react";
+import { Video, FilePen, Palette, Share2 } from "lucide-react";
+import { toast } from "@/shared/ui";
 
 export default function DashboardRightSidebar() {
+  const handleShareProfile = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== "undefined") {
+      const profileUrl = `${window.location.origin}/dashboard/profile`;
+      navigator.clipboard.writeText(profileUrl)
+        .then(() => {
+          toast.success("Profile link copied to clipboard!");
+        })
+        .catch(() => {
+          toast.error("Failed to copy profile link");
+        });
+    }
+  };
+
   return (
     <div className="flex gap-8 flex-col">
-      {/* Learning Progress */}
-      <div className="border-border shadow-sm p-6 bg-surface rounded-xl border">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-text type-card-title">Learning Progress</h3>
-        </div>
-        <div className="gap-4 flex flex-col">
-          {/* Course 1 */}
-          <div className="flex gap-3 items-start">
-            <div className="flex-shrink-0 justify-center h-10 w-10 text-primary items-center flex rounded bg-primary/10">
-              <Code2 size={20} aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <h4 className="text-text type-ui leading-tight">Advanced React Patterns</h4>
-              <p className="mb-2 text-xs text-muted">Module 4 of 12</p>
-              <div className="w-full bg-border/20 h-1.5 rounded-full">
-                <div className="bg-primary h-1.5 rounded-full" style={{ width: "35%" }}></div>
-              </div>
-            </div>
-          </div>
-          {/* Course 2 */}
-          <div className="border-t border-border items-start gap-3 flex pt-4">
-            <div className="flex-shrink-0 justify-center h-10 w-10 items-center bg-accent/10 flex text-accent rounded">
-              <Brain size={20} aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <h4 className="text-text type-ui leading-tight">System Design Interview</h4>
-              <p className="mb-2 text-xs text-muted">Module 8 of 10</p>
-              <div className="w-full bg-border/20 h-1.5 rounded-full">
-                <div className="bg-accent h-1.5 rounded-full" style={{ width: "80%" }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button className="w-full mt-5 type-label bg-bg rounded-lg transition-colors py-2 hover:bg-border/40">
-          View All Courses
-        </button>
-      </div>
 
       {/* Upcoming Interview Promo */}
       <div className="bg-gradient-primary shadow-md relative overflow-hidden text-white p-6 rounded-xl">
@@ -55,7 +33,10 @@ export default function DashboardRightSidebar() {
           </div>
           <h3 className="mb-1 type-card-title">Interview Prep</h3>
           <p className="mb-4 text-sm text-white/80">Practice with our AI interviewer to boost your confidence.</p>
-          <button className="w-full text-primary bg-surface rounded-lg type-ui transition-colors py-2 hover:bg-primary/10">
+          <button 
+            onClick={() => toast.info("AI Interview Prep session is coming soon!")}
+            className="w-full text-primary bg-surface rounded-lg type-ui transition-colors py-2 hover:bg-primary/10 cursor-pointer"
+          >
             Start Session
           </button>
         </div>
@@ -66,7 +47,7 @@ export default function DashboardRightSidebar() {
         <h3 className="mb-4 text-text type-card-title">Resume Services</h3>
         <ul className="space-y-3">
           <li>
-            <Link href="#" className="flex gap-3 items-center group">
+            <Link href="/dashboard/resume-preview" className="flex gap-3 items-center group">
               <div className="justify-center items-center bg-bg rounded-full transition-colors h-8 flex w-8 text-muted group-hover:bg-primary group-hover:text-white">
                 <FilePen size={14} aria-hidden="true" />
               </div>
@@ -74,20 +55,26 @@ export default function DashboardRightSidebar() {
             </Link>
           </li>
           <li>
-            <Link href="#" className="flex gap-3 items-center group">
+            <button 
+              onClick={() => toast.info("Cover Letter Generator is coming soon!")}
+              className="flex w-full gap-3 items-center group text-left cursor-pointer focus:outline-none"
+            >
               <div className="justify-center items-center bg-bg rounded-full transition-colors h-8 flex w-8 text-muted group-hover:bg-primary group-hover:text-white">
                 <Palette size={14} aria-hidden="true" />
               </div>
               <span className="transition-colors type-label group-hover:text-primary">Cover Letter Generator</span>
-            </Link>
+            </button>
           </li>
           <li>
-            <Link href="#" className="flex gap-3 items-center group">
+            <button 
+              onClick={handleShareProfile}
+              className="flex w-full gap-3 items-center group text-left cursor-pointer focus:outline-none"
+            >
               <div className="justify-center items-center bg-bg rounded-full transition-colors h-8 flex w-8 text-muted group-hover:bg-primary group-hover:text-white">
                 <Share2 size={14} aria-hidden="true" />
               </div>
               <span className="transition-colors type-label group-hover:text-primary">Share Profile</span>
-            </Link>
+            </button>
           </li>
         </ul>
       </div>

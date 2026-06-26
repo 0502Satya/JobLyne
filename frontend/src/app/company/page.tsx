@@ -8,7 +8,7 @@ import { getJobsAction } from "@/features/auth/jobActions";
 import { createJobAction, updateJobAction } from "@/features/company/actions";
 import { getRecruiterDashboardAction, postRecruiterCandidateAction } from "@/features/recruiter/actions";
 import { toast } from "react-hot-toast";
-import { EmptyState } from "@/shared/ui";
+import { EmptyState, Dialog, Button } from "@/shared/ui";
 import { 
   Network, 
   Columns3, 
@@ -88,14 +88,6 @@ export default function CompanyDashboardPage() {
 
   // Filter Sourcing State
   const [searchQuery, setSearchQuery] = useState("");
-
-  const getStableApplicantCount = (jobId: string) => {
-    let hash = 0;
-    for (let i = 0; i < jobId.length; i++) {
-      hash = jobId.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash % 15) + 2; // Stable number between 2 and 16 applicants
-  };
 
   const mapDbJobToJobPost = (dbJob: any): JobPost => {
     let statusMapped: JobPost["status"] = "Active";
@@ -314,7 +306,7 @@ export default function CompanyDashboardPage() {
     <div className="text-text bg-bg transition-colors flex min-h-screen flex-col">
       
       {/* Dashboard Sticky Header */}
-      <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-50 flex top-0 bg-surface justify-between md:px-12">
+      <header className="border-b border-border px-6 py-4 items-center transition-all sticky z-sticky flex top-0 bg-surface justify-between md:px-12">
         <div className="flex gap-6 items-center">
           <Link href="/" className="text-primary items-center gap-2 flex transition-opacity hover:opacity-90">
             <Network size={30} aria-hidden="true" />
@@ -880,107 +872,100 @@ export default function CompanyDashboardPage() {
       </main>
 
       {/* Interactive Modal: New Job Requisition */}
-      {showJobModal && (
-        <div className="justify-center fade-in inset-0 items-center duration-200 animate-in flex backdrop-blur-sm p-6 z-50 bg-black/60 fixed">
-          <div className="w-full rounded-card overflow-y-auto border-border relative duration-200 animate-in max-h-[90vh] shadow-2xl zoom-in-95 max-w-xl p-8 bg-surface border">
-            <button 
+      <Dialog
+        isOpen={showJobModal}
+        onClose={() => setShowJobModal(false)}
+        title="Create Job Requisition"
+        size="md"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button 
+              type="button" 
+              variant="secondary"
               onClick={() => setShowJobModal(false)}
-              className="min-h-[40px] justify-center rounded-xl min-w-[40px] absolute items-center p-2 right-6 flex top-6 text-muted hover:bg-bg hover:text-text"
-              aria-label="Close modal"
+              className="flex-1"
             >
-              <X size={18} aria-hidden="true" />
-            </button>
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              form="create-job-form"
+              className="flex-1"
+            >
+              Post Position
+            </Button>
+          </div>
+        }
+      >
+        <p className="type-label mb-4">Post a new position live into our software engineering taxonomy.</p>
 
-            <div className="space-y-2 mb-6">
-              <h3 className="type-h2">Create Job Requisition</h3>
-              <p className="type-label">Post a new position live into our software engineering taxonomy.</p>
+        <form id="create-job-form" onSubmit={handleCreateJob} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="type-badge block">Job Title</label>
+            <input 
+              type="text" 
+              required
+              value={newJob.title}
+              onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+              placeholder="e.g. Lead Frontend Engineer"
+              className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="type-badge block">Department</label>
+              <select 
+                value={newJob.department}
+                onChange={(e) => setNewJob({ ...newJob, department: e.target.value })}
+                className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
+              >
+                <option>Engineering</option>
+                <option>Design</option>
+                <option>Product</option>
+                <option>Operations</option>
+              </select>
             </div>
 
-            <form onSubmit={handleCreateJob} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="type-badge">Job Title</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newJob.title}
-                  onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-                  placeholder="e.g. Lead Frontend Engineer"
-                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="type-badge">Department</label>
-                  <select 
-                    value={newJob.department}
-                    onChange={(e) => setNewJob({ ...newJob, department: e.target.value })}
-                    className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
-                  >
-                    <option>Engineering</option>
-                    <option>Design</option>
-                    <option>Product</option>
-                    <option>Operations</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="type-badge">Employment Type</label>
-                  <select 
-                    value={newJob.type}
-                    onChange={(e) => setNewJob({ ...newJob, type: e.target.value })}
-                    className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
-                  >
-                    <option>Full-time</option>
-                    <option>Contract</option>
-                    <option>Part-time</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="type-badge">Location</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newJob.location}
-                  onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
-                  placeholder="e.g. Remote / New York, NY"
-                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="type-badge">Salary Range</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newJob.salary}
-                  onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
-                  placeholder="e.g. $130,000 - $160,000"
-                  className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button 
-                  type="button" 
-                  onClick={() => setShowJobModal(false)}
-                  className="text-text flex-1 min-h-[48px] rounded-2xl py-3.5 bg-bg type-ui hover:bg-border"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="flex-1 min-h-[48px] rounded-2xl py-3.5 transition-all type-ui shadow-lg shadow-primary/25 bg-primary text-white hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Post Position
-                </button>
-              </div>
-            </form>
+            <div className="space-y-1.5">
+              <label className="type-badge block">Employment Type</label>
+              <select 
+                value={newJob.type}
+                onChange={(e) => setNewJob({ ...newJob, type: e.target.value })}
+                className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
+              >
+                <option>Full-time</option>
+                <option>Contract</option>
+                <option>Part-time</option>
+              </select>
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="space-y-1.5">
+            <label className="type-badge block">Location</label>
+            <input 
+              type="text" 
+              required
+              value={newJob.location}
+              onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
+              placeholder="e.g. Remote / New York, NY"
+              className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="type-badge block">Salary Range</label>
+            <input 
+              type="text" 
+              required
+              value={newJob.salary}
+              onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
+              placeholder="e.g. $130,000 - $160,000"
+              className="w-full outline-none min-h-[48px] border-border bg-bg py-3 type-ui px-4 rounded-xl border focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </form>
+      </Dialog>
 
     </div>
   );

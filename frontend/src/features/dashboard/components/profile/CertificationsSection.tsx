@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Certification } from "@/types/profile";
-import { Button, Input } from "@/shared/ui";
+import { Button, Input, ConfirmDialog } from "@/shared/ui";
 import { Crown, Plus, ExternalLink, Pencil, Trash2 } from "lucide-react";
 
 interface CertificationsSectionProps {
@@ -12,6 +12,7 @@ interface CertificationsSectionProps {
 
 export default function CertificationsSection({ certifications = [], onChange }: CertificationsSectionProps) {
   const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const addCertification = () => {
     const newId = Date.now().toString();
@@ -62,7 +63,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
             <Crown size={20} aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-text type-card-title leading-tight">Certifications and courses</h3>
+            <h3 className="text-text type-card-title leading-tight">Certifications</h3>
             <p className="text-xs text-muted mt-0.5">Prove your specialized knowledge</p>
           </div>
         </div>
@@ -87,7 +88,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
             <div className="border-dashed bg-bg/50 border-border text-center py-10 rounded-xl border">
               <Crown size={32} className="text-muted/60 block mx-auto mb-2" aria-hidden="true" />
               <span className="text-text mb-0.5 block type-ui">No certifications added yet</span>
-              <span className="block mb-4 type-caption text-muted">Prove your domain credentials by adding coursework certifications.</span>
+              <span className="block mb-4 type-caption text-muted">Prove your specialized knowledge with professional certifications.</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -161,7 +162,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => removeCertification(cert.id)}
+                            onClick={() => setDeletingId(cert.id || null)}
                             className="text-error hover:text-error/90 hover:bg-error-bg border-border"
                           >
                             Delete
@@ -232,7 +233,7 @@ export default function CertificationsSection({ certifications = [], onChange }:
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => removeCertification(cert.id)}
+                            onClick={() => setDeletingId(cert.id || null)}
                             className="h-10 w-10 p-0 min-w-0 flex items-center justify-center text-error border-border hover:bg-error-bg"
                             title="Delete certificate"
                           >
@@ -248,6 +249,24 @@ export default function CertificationsSection({ certifications = [], onChange }:
           )}
         </div>
       </div>
+      
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => {
+          if (deletingId) {
+            removeCertification(deletingId);
+          }
+        }}
+        title="Delete Certification"
+        description={
+          deletingId
+            ? `This will permanently remove '${certifications.find((c) => c.id === deletingId)?.name || "this certification"}' from '${certifications.find((c) => c.id === deletingId)?.issuing_organization || "this organization"}' from your profile.`
+            : "This will permanently remove this certification entry from your profile."
+        }
+        confirmLabel="Delete Certification"
+        variant="danger"
+      />
     </section>
   );
 }

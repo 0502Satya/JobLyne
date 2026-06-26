@@ -306,6 +306,13 @@ class NotificationListView(APIView):
             return paginator.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
+    def post(self, request):
+        Notifications.objects.filter(user=request.user, status='UNREAD').update(
+            status='READ',
+            read_at=timezone.now()
+        )
+        return Response({"message": "All notifications marked as read."})
+
 
 class NotificationMarkReadView(APIView):
     permission_classes = [IsAuthenticated]

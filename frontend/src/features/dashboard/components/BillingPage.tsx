@@ -234,7 +234,7 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
       {/* Header bar */}
       <header className="border-b px-6 py-4 items-center backdrop-blur-md bg-card/60 sticky z-50 flex top-0 border-border justify-between">
         <div className="flex gap-3 items-center">
-          <Link href={role === "COMPANY" ? "/company" : "/recruiter/dashboard"} className={`bg-gradient-to-r ${textGradient} type-h3 text-transparent bg-clip-text font-bold`}>
+          <Link href={role === "COMPANY" ? "/company" : "/recruiter"} className={`bg-gradient-to-r ${textGradient} type-h3 text-transparent bg-clip-text font-bold`}>
             JobLyne {role === "COMPANY" ? "Enterprise" : "Recruiter"}
           </Link>
           <span className={`px-2 border py-0.5 type-caption rounded-full ${badgeClass}`}>
@@ -242,9 +242,9 @@ export default function BillingPage({ role, theme }: BillingPageProps) {
           </span>
         </div>
         <div className="gap-4 flex items-center">
-          <Link href={role === "COMPANY" ? "/company" : "/recruiter/dashboard"} className="min-h-[44px] px-3 items-center type-ui text-muted transition-colors flex py-2 hover:text-white">
+          <Button as={Link} href={role === "COMPANY" ? "/company" : "/recruiter"} variant="ghost" size="sm" className="text-muted hover:text-white">
             {role === "COMPANY" ? "Corporate Console" : "Sourcing Hub"}
-          </Link>
+          </Button>
           <button
             onClick={handleLogout}
             className="min-h-[44px] px-3 text-error/80 items-center type-ui transition-colors flex py-2 hover:text-error"

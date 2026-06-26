@@ -14,7 +14,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster 
+        position="top-right" 
+        reverseOrder={false} 
+        {...({ containerAriaProps: { "aria-live": "polite", "aria-atomic": "true" } } as any)} 
+      />
       <OverlayProvider>
         {children}
       </OverlayProvider>

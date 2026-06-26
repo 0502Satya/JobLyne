@@ -81,8 +81,8 @@ export default function TableRow<T>({ row, index, measureRef, children }: TableR
       role="row"
       onKeyDown={handleKeyDown}
       className={[
-        "transition-colors hover:bg-surface-2/40 border-b border-border/10",
-        isSelected ? "bg-primary/5" : "bg-surface-1",
+        "transition-colors hover:bg-[var(--table-row-hover)] border-b border-[var(--table-border)]",
+        isSelected ? "bg-[var(--table-row-selected)]" : "bg-[var(--table-bg)]",
         state.density === "compact" ? "h-10" : "h-13",
       ].join(" ")}
       aria-selected={isSelectable ? isSelected : undefined}
@@ -98,7 +98,7 @@ export default function TableRow<T>({ row, index, measureRef, children }: TableR
               tabIndex={state.focusedCell?.rowIndex === index && state.focusedCell?.colIndex === 0 ? 0 : -1}
               onFocus={() => setFocusedCell({ rowIndex: index, colIndex: 0 })}
               className={[
-                "p-4 sticky left-0 z-10 bg-inherit border-r border-border/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset",
+                "p-4 sticky left-0 z-10 bg-inherit border-r border-[var(--table-border)] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset",
                 state.density === "compact" ? "py-2" : "py-4",
               ].join(" ")}
               style={{ width: "48px", minWidth: "48px" }}
@@ -146,7 +146,7 @@ export default function TableRow<T>({ row, index, measureRef, children }: TableR
                 })
               }
               className={[
-                "p-4 sticky right-0 z-10 bg-inherit border-l border-border/10 text-right focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset",
+                "p-4 sticky right-0 z-10 bg-inherit border-l border-[var(--table-border)] text-right focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset",
                 state.density === "compact" ? "py-2" : "py-4",
               ].join(" ")}
               style={{ width: "80px", minWidth: "80px" }}

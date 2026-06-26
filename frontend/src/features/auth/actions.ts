@@ -14,7 +14,10 @@ export {
   getUserProfileAction,
   updateUserProfileAction,
   getRecruiterProfileAction,
-  updateRecruiterProfileAction
+  updateRecruiterProfileAction,
+  forgotPasswordAction,
+  resetPasswordAction,
+  changePasswordAction
 } from "./authActions";
 
 export {

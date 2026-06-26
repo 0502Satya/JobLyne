@@ -118,3 +118,115 @@ To ensure compliance with **WCAG 2.2 AA** (Section 16), follow these keyboard an
   2. Pressing `ArrowRight` or `ArrowDown` focuses and checks the next option, skipping any disabled options.
   3. Arrowing past the end wraps selection to the first enabled radio option.
   4. Pressing `Tab` exits the group.
+
+---
+
+## 4. Design Tokens System
+
+To establish a single source of truth and guarantee consistency, JobLyne enforces a rigorous, multi-layered Design Token System. All components must resolve layouts and behaviors via standard token references.
+
+### 🏢 Token Hierarchy & Architecture
+
+```mermaid
+graph TD
+    A["1. Primitive Tokens\n- Core values (e.g. Hex values, pixel sizes)\n- No semantic meaning"] --> B["2. Semantic Tokens\n- Purpose-driven (e.g. --color-primary, --spacing-space-1)\n- Maps primitives to intent"]
+    B --> C["3. Component-Level Tokens\n- Scoped to elements (e.g. --button-primary-bg, --input-border)\n- Insulates component styles"]
+```
+
+- **Primitive Layer**: Defines raw variables without context (e.g., `#006fff`, `8px`, `12px`).
+- **Semantic Layer**: Defines variables matching purpose or visual role (e.g., `--color-primary`, `--spacing-space-2`, `--radius-md`).
+- **Component Layer**: Scopes style variables strictly to the element block (e.g., `--button-primary-bg: var(--color-primary)`).
+
+---
+
+### 📏 Token Scales
+
+#### Color System
+- **Primary / Brand**: `--color-primary` (`#006fff`), `--color-primary-dark` (`#0056c6`).
+- **Semantic Feedback**: Success (`--color-success`), Warning (`--color-warning`), Error (`--color-error`), Info (`--color-info`).
+- **Surface Elevation (Semantic)**:
+  - Base Layout Background: `--color-bg` (`#f6f6f8` / `#121212` in dark mode)
+  - Card/Section Surface: `--color-surface` (`#ffffff` / `#1e1e1e` in dark mode)
+  - Raised/Secondary: `--color-surface-2` (`#f1f5f9` / `#252525` in dark mode)
+
+#### Spacing System
+All layout gutters, margins, and padding must utilize multiples of the 8px spacing grid:
+- `space-1`: `4px` (sub-unit allowed for tiny padding/gaps)
+- `space-2`: `8px`
+- `space-3`: `12px`
+- `space-4`: `16px`
+- `space-5`: `20px`
+- `space-6`: `24px`
+- `space-8`: `32px`
+
+#### Typography System
+Modular scale progression used strictly for all headings and text components:
+- Font family: `--font-primary` (Inter system font stack)
+- Size Scale:
+  - `xs`: `12px` (0.75rem) — captions, badges, tiny labels
+  - `sm`: `14px` (0.875rem) — labels, body descriptions, buttons
+  - `base`: `16px` (1rem) — body copy, values
+  - `lg`: `18px` (1.125rem) — card titles
+  - `xl`: `20px` (1.25rem) — section headings
+  - `2xl` / `3xl` / `4xl`: Page headings & Hero headings
+- Line heights: display (`1.1`), heading (`1.25`), body (`1.6`), UI buttons (`1.4`)
+- Font weights: body (`400`), UI (`500`), heading (`600`), display (`900`)
+
+#### Border Radius Scale
+Defines corners and curves:
+- `none`: `0px`
+- `xs`: `4px`
+- `sm`: `6px`
+- `md`: `8px`
+- `lg`: `12px`
+- `xl`: `16px`
+- `full`: `9999px`
+
+#### Shadow & Elevation Scale
+- `sm`: `0 1px 2px 0 rgba(0, 0, 0, 0.05)` (e.g. badges, small items)
+- `md`: `0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08)` (default raised surface cards)
+- `lg` / `xl`: High elevation layers (modals, dropdown popovers)
+
+#### Motion & Animation System
+- **Durations**:
+  - `duration-instant`: `50ms` (immediate state feedback, hover exit)
+  - `duration-fast`: `150ms` (hover entry, checklist ticks)
+  - `duration-normal`: `250ms` (drawer transitions, sliders)
+  - `duration-slow`: `350ms` (large page entries, layout swaps)
+- **Easing Curves**:
+  - `--ease-in`: `cubic-bezier(0.4, 0, 1, 1)` (elements exiting)
+  - `--ease-out`: `cubic-bezier(0, 0, 0.2, 1)` (elements entering)
+  - `--ease-in-out`: `cubic-bezier(0.4, 0, 0.2, 1)` (standard movement)
+
+#### Opacity System
+- `--opacity-hover`: `0.8` (pointer interaction highlight)
+- `--opacity-pressed`: `0.9` (compression overlay highlight)
+- `--opacity-disabled`: `0.5` (disabled control dimmer)
+- `--opacity-overlay`: `0.4` (modal/backdrop darkness dim)
+
+#### Z-Index System
+Establishes standardized overlays to prevent index overlap bugs:
+- `--z-base`: `0`
+- `--z-dropdown`: `1000`
+- `--z-sticky`: `1020`
+- `--z-fixed`: `1030`
+- `--z-modal`: `1050`
+- `--z-popover`: `1070`
+- `--z-tooltip`: `1080`
+
+#### Responsive Breakpoints (Reference only)
+Handled via standard media queries, but referenced for consistency:
+- **Mobile**: `360px`
+- **Tablet**: `768px`
+- **Laptop**: `1024px`
+- **Desktop**: `1440px`
+
+---
+
+### 🛑 Strict Design Governance Rules (Do Nots)
+
+* **Never hardcode raw hex colors** (e.g. `bg-[#006fff]`) in styling layout classes. Always map to design system tokens (e.g. `bg-primary`).
+* **Never hardcode arbitrary pixel values** (e.g. `w-[21px]` or `p-[13px]`). Align strictly with the `8px` spacing scale (using standard Tailwind utilities `w-5` or `p-3`).
+* **Never define inline animation/transition duration parameters** (e.g. `transition-duration: 200ms`). Select duration tokens (`duration-fast`, `duration-normal`) and easing curves (`ease-out`, `ease-in`).
+* **Never use arbitrary z-index values** (e.g. `z-[9999]`). Bind element layers to standard z-index tokens (`z-modal`, `z-tooltip`, etc.).
+* **Never bypass semantic tokens to apply raw component values** (e.g., using `--button-primary-bg` directly on cards or form headers). Keep namespace styling separated.

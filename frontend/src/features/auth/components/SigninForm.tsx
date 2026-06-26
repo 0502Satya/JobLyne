@@ -104,33 +104,27 @@ export default function SigninForm({ role = "Candidate" }: { role?: string }) {
         onBlur={handleBlur}
       />
 
-      {/* Input for Password with Show/Hide visibility */}
-      <div className="space-y-1.5 w-full">
-        <div className="flex items-center justify-between">
-          <label className="text-text type-ui block font-medium" htmlFor="password">
-            Password
-          </label>
-          <button 
-            type="button"
-            onClick={() => toast.info("Password recovery is coming soon. Please contact system support.")}
-            className="type-ui text-primary transition-colors hover:text-primary/80 font-medium cursor-pointer"
+      <Input
+        label="Password"
+        id="password"
+        name="password"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        showVisibilityToggle={true}
+        required
+        disabled={isPending}
+        error={errors.password}
+        onBlur={handleBlur}
+        labelAction={
+          <Link
+            href="/auth/forgot-password"
+            className="text-primary hover:underline font-semibold"
           >
             Forgot password?
-          </button>
-        </div>
-        <Input
-          id="password"
-          name="password"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          showVisibilityToggle={true}
-          required
-          disabled={isPending}
-          error={errors.password}
-          onBlur={handleBlur}
-        />
-      </div>
+          </Link>
+        }
+      />
 
       {/* Checkbox to stay logged in */}
       <Checkbox 

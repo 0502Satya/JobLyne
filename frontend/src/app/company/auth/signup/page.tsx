@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { companySignupAction } from "@/features/auth/actions";
 import OTPVerification from "@/features/auth/components/OTPVerification";
+import { Button, Input } from "@/shared/ui";
 import { 
   Users, 
   Zap, 
@@ -81,9 +82,9 @@ export default function CompanySignupPage() {
             </Link>
             <div className="gap-4 flex items-center">
               <span className="text-muted hidden text-sm md:block">Already have an account?</span>
-              <Link href="/auth/signin" className="justify-center h-10 cursor-pointer bg-primary items-center transition-all rounded-lg text-white type-ui shadow-primary/20 min-w-[84px] flex shadow-lg px-4 hover:opacity-90 active:scale-[0.98]">
+              <Button as={Link} href="/auth/signin" variant="primary" size="sm" className="rounded-lg shadow-lg">
                 Sign In
-              </Link>
+              </Button>
             </div>
           </header>
 
@@ -153,92 +154,73 @@ export default function CompanySignupPage() {
                     )}
 
                     <div className="space-y-6">
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Organization Name *</label>
-                        <div className="relative">
-                          <Building2 className="left-4 text-muted absolute top-1/2 -translate-y-1/2" size={18} aria-hidden="true" />
-                          <input 
-                            name="companyName"
-                            value={formData.companyName}
-                            onChange={handleInputChange}
-                            className="w-full placeholder:text-muted outline-none pl-12 transition-all bg-bg py-3 border-border text-text pr-4 rounded-xl border dark:border-border dark:bg-card focus:ring-2 focus:border-transparent focus:ring-primary" 
-                            placeholder="e.g. Acme Corporation" 
-                            type="text" 
-                            required
-                          />
-                        </div>
-                      </div>
+                      <Input
+                        id="companyName"
+                        name="companyName"
+                        label="Organization Name *"
+                        leftSlot={<Building2 size={18} aria-hidden="true" />}
+                        value={formData.companyName}
+                        onChange={handleInputChange}
+                        placeholder="e.g. Acme Corporation"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
 
-                      <div className="gap-2 flex flex-col">
-                        <label className="text-text type-ui">Work Email *</label>
-                        <div className="relative">
-                          <Mail className="left-4 text-muted absolute top-1/2 -translate-y-1/2" size={18} aria-hidden="true" />
-                          <input 
-                            name="email" 
-                            value={formData.email} 
-                            onChange={handleInputChange} 
-                            className="w-full placeholder:text-muted outline-none pl-12 transition-all bg-bg py-3 border-border text-text pr-4 rounded-xl border dark:border-border dark:bg-card focus:ring-2 focus:border-transparent focus:ring-primary" 
-                            placeholder="you@company.com" 
-                            type="email" 
-                            required 
-                          />
-                        </div>
-                      </div>
+                      <Input
+                        id="email"
+                        name="email"
+                        label="Work Email *"
+                        leftSlot={<Mail size={18} aria-hidden="true" />}
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="you@company.com"
+                        type="email"
+                        required
+                        className="dark:border-border dark:bg-card rounded-xl"
+                      />
 
-                      <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
-                        <div className="gap-2 flex flex-col">
-                          <label className="text-text type-ui">Password *</label>
-                          <div className="relative">
-                            <Lock className="left-4 text-muted absolute top-1/2 -translate-y-1/2" size={18} aria-hidden="true" />
-                            <input 
-                              name="password" 
-                              value={formData.password} 
-                              onChange={handleInputChange} 
-                              className="w-full placeholder:text-muted outline-none pl-12 transition-all bg-bg py-3 border-border text-text pr-4 rounded-xl border dark:border-border dark:bg-card focus:ring-2 focus:border-transparent focus:ring-primary" 
-                              placeholder="••••••••" 
-                              type="password" 
-                              minLength={8} 
-                              required 
-                            />
-                          </div>
-                        </div>
-                        <div className="gap-2 flex flex-col">
-                          <label className="text-text type-ui">Confirm Password *</label>
-                          <div className="relative">
-                            <Lock className="left-4 text-muted absolute top-1/2 -translate-y-1/2" size={18} aria-hidden="true" />
-                            <input 
-                              name="password_confirm" 
-                              value={formData.password_confirm} 
-                              onChange={handleInputChange} 
-                              className="w-full placeholder:text-muted outline-none pl-12 transition-all bg-bg py-3 border-border text-text pr-4 rounded-xl border dark:border-border dark:bg-card focus:ring-2 focus:border-transparent focus:ring-primary" 
-                              placeholder="••••••••" 
-                              type="password" 
-                              minLength={8} 
-                              required 
-                            />
-                          </div>
-                        </div>
+                      <div className="gap-4 grid grid-cols-1 md:grid-cols-2 animate-none">
+                        <Input
+                          id="password"
+                          name="password"
+                          label="Password *"
+                          leftSlot={<Lock size={18} aria-hidden="true" />}
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          placeholder="••••••••"
+                          type="password"
+                          minLength={8}
+                          required
+                          className="dark:border-border dark:bg-card rounded-xl"
+                        />
+
+                        <Input
+                          id="password_confirm"
+                          name="password_confirm"
+                          label="Confirm Password *"
+                          leftSlot={<Lock size={18} aria-hidden="true" />}
+                          value={formData.password_confirm}
+                          onChange={handleInputChange}
+                          placeholder="••••••••"
+                          type="password"
+                          minLength={8}
+                          required
+                          className="dark:border-border dark:bg-card rounded-xl"
+                        />
                       </div>
                     </div>
 
                     <div className="pt-2">
-                      <button 
+                      <Button 
                         type="submit"
-                        disabled={isPending}
-                        className="w-full justify-center type-card-title py-3.5 transition-all items-center text-white gap-2 bg-primary flex rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none disabled:hover:transform-none"
+                        isLoading={isPending}
+                        variant="primary"
+                        size="lg"
+                        className="w-full rounded-xl"
+                        rightIcon={<ArrowRight size={18} aria-hidden="true" />}
                       >
-                        {isPending ? (
-                          <span className="gap-2 flex items-center">
-                            <svg className="h-5 animate-spin text-current w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Creating account...
-                          </span>
-                        ) : (
-                          <>
-                            <span>Register Company</span>
-                            <ArrowRight size={18} aria-hidden="true" />
-                          </>
-                        )}
-                      </button>
+                        Register Company
+                      </Button>
                     </div>
                     
                     <p className="pt-2 text-center text-muted type-caption">

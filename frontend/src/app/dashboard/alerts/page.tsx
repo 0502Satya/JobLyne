@@ -2,35 +2,46 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  getPreferencesAction, 
-  updatePreferencesAction, 
-  getSavedSearchesAction, 
-  createSavedSearchAction, 
-  deleteSavedSearchAction 
+import {
+  getPreferencesAction,
+  updatePreferencesAction,
+  getSavedSearchesAction,
+  createSavedSearchAction,
+  deleteSavedSearchAction,
+  getNotificationsAction,
+  markAllNotificationsReadAction,
+  markNotificationReadAction
 } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
-import { 
-  BellRing, 
-  PlusCircle, 
-  Settings, 
-  Mail, 
-  Bell, 
-  MessageSquare, 
-  Search, 
-  MapPin, 
-  Rocket, 
-  BellOff, 
-  Trash2 
+import {
+  Input,
+  Button,
+  Tabs,
+  Toggle,
+  Card,
+  Text,
+  LoadingState,
+  Icon,
+  Dialog,
+  Breadcrumbs
+} from "@/shared/ui";
+import {
+  BellRing,
+  PlusCircle,
+  Search,
+  MapPin,
+  Rocket,
+  BellOff,
+  Trash2,
+  Clock,
+  Check
 } from "lucide-react";
 
-/**
- * Premium Job Alerts & Notification Preferences Manager.
- */
 export default function JobAlertsPage() {
   const router = useRouter();
   const [preferences, setPreferences] = useState<any>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Alert creation modal states
@@ -41,7 +52,6 @@ export default function JobAlertsPage() {
   const [isAlertEnabled, setIsAlertEnabled] = useState(true);
   const [creating, setCreating] = useState(false);
 
-  // Sync all details
   const syncData = async () => {
     try {
       const prefRes = await getPreferencesAction();
@@ -53,8 +63,13 @@ export default function JobAlertsPage() {
       if (alertsRes && !alertsRes.error) {
         setAlerts(alertsRes);
       }
+
+      const notificationsRes = await getNotificationsAction();
+      if (notificationsRes && !notificationsRes.error) {
+        setNotifications(Array.isArray(notificationsRes) ? notificationsRes : (notificationsRes.results || []));
+      }
     } catch (err) {
-      console.error("Failed to load alerts manager details:", err);
+      console.error("Failed to load alerts page details:", err);
     } finally {
       setLoading(false);
     }
@@ -64,7 +79,6 @@ export default function JobAlertsPage() {
     syncData();
   }, []);
 
-  // Handle preference toggles
   const handleTogglePref = async (key: string, currentValue: boolean) => {
     if (!preferences) return;
     const originalPref = { ...preferences };
@@ -75,7 +89,7 @@ export default function JobAlertsPage() {
       const res = await updatePreferencesAction({ [key]: !currentValue });
       if (res.error) {
         toast.error(res.error);
-        setPreferences(originalPref); // Rollback
+        setPreferences(originalPref);
       } else {
         toast.success("Preferences updated successfully!");
       }
@@ -85,7 +99,6 @@ export default function JobAlertsPage() {
     }
   };
 
-  // Toggle active status for saved search alerts
   const handleToggleAlertActive = async (alert: any) => {
     const originalAlerts = [...alerts];
     const updatedAlerts = alerts.map(a => a.id === alert.id ? { ...a, alert_enabled: !alert.alert_enabled } : a);
@@ -98,9 +111,9 @@ export default function JobAlertsPage() {
       });
       if (res.error) {
         toast.error(res.error);
-        setAlerts(originalAlerts); // Rollback
+        setAlerts(originalAlerts);
       } else {
-        toast.success(alert.alert_enabled ? "Alert paused" : "Alert activated!");
+        toast.success(!alert.alert_enabled ? "Alert activated!" : "Alert paused");
       }
     } catch (err) {
       toast.error("Failed to toggle alert status");
@@ -108,26 +121,71 @@ export default function JobAlertsPage() {
     }
   };
 
-  // Delete saved search alert
   const handleDeleteAlert = async (alertId: string) => {
-    const originalAlerts = [...alerts];
+    const alertToRestore = alerts.find(a => a.id === alertId);
+    if (!alertToRestore) return;
+
+    // 1. Optimistically remove from UI immediately
     setAlerts(prev => prev.filter(a => a.id !== alertId));
 
-    try {
-      const res = await deleteSavedSearchAction(alertId);
-      if (res.error) {
-        toast.error(res.error);
-        setAlerts(originalAlerts); // Rollback
-      } else {
-        toast.success("Job alert unsubscribed");
+    let undone = false;
+
+    // 2. Show undo toast (5-second window)
+    toast.custom(
+      (t) => (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`${
+            t.visible ? "animate-in fade-in" : "animate-out fade-out"
+          } max-w-sm w-full bg-card border border-border/80 shadow-lg rounded-xl pointer-events-auto flex items-center justify-between p-4 gap-4`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-success">✓</span>
+            <span className="text-sm text-text">Job alert unsubscribed</span>
+          </div>
+          <button
+            onClick={() => {
+              undone = true;
+              toast.dismiss(t.id);
+              // Restore optimistically
+              setAlerts(prev => {
+                if (prev.some(a => a.id === alertId)) return prev;
+                return [...prev, alertToRestore];
+              });
+            }}
+            className="text-primary hover:text-primary/80 text-sm font-semibold whitespace-nowrap focus:outline-none"
+          >
+            Undo
+          </button>
+        </div>
+      ),
+      { duration: 5000 }
+    );
+
+    // 3. After toast dismisses, commit the server action
+    setTimeout(async () => {
+      if (!undone) {
+        try {
+          const res = await deleteSavedSearchAction(alertId);
+          if (res.error) {
+            toast.error(res.error);
+            setAlerts(prev => {
+              if (prev.some(a => a.id === alertId)) return prev;
+              return [...prev, alertToRestore];
+            });
+          }
+        } catch (err) {
+          toast.error("Failed to delete alert");
+          setAlerts(prev => {
+            if (prev.some(a => a.id === alertId)) return prev;
+            return [...prev, alertToRestore];
+          });
+        }
       }
-    } catch (err) {
-      toast.error("Failed to delete alert");
-      setAlerts(originalAlerts);
-    }
+    }, 5000);
   };
 
-  // Submit custom job alert
   const handleCreateAlert = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!alertName.trim()) {
@@ -154,7 +212,6 @@ export default function JobAlertsPage() {
         toast.success("Job alert created successfully!");
         setAlerts(prev => [res, ...prev]);
         setIsModalOpen(false);
-        // Clear inputs
         setAlertName("");
         setKeywords("");
         setLocation("");
@@ -167,7 +224,6 @@ export default function JobAlertsPage() {
     }
   };
 
-  // Redirect to jobs feed running search terms
   const handleRunSearch = (alert: any) => {
     const criteria = alert.search_criteria || {};
     const query = criteria.query || "";
@@ -176,310 +232,354 @@ export default function JobAlertsPage() {
     const params = new URLSearchParams();
     if (query) params.append("query", query);
     if (loc) params.append("location", loc);
-    params.append("sort", "match"); // AI sort by default for alerts!
+    params.append("sort", "match");
 
     router.push(`/jobs?${params.toString()}`);
   };
 
+  const handleMarkAllRead = async () => {
+    try {
+      const res = await markAllNotificationsReadAction();
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        setNotifications(prev => prev.map(n => ({ ...n, status: "READ", read_at: new Date().toISOString() })));
+        toast.success("All alerts marked as read!");
+      }
+    } catch (err) {
+      toast.error("Failed to update alerts");
+    }
+  };
+
+  const handleMarkSingleRead = async (id: string) => {
+    try {
+      const res = await markNotificationReadAction(id);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, status: "READ", read_at: new Date().toISOString() } : n));
+        toast.success("Alert marked as read");
+      }
+    } catch (err) {
+      toast.error("Failed to update alert");
+    }
+  };
+
+  const getNotificationIcon = (key: string) => {
+    const k = key?.toLowerCase() || "";
+    if (k.includes("message") || k.includes("chat")) return "chat";
+    if (k.includes("interview") || k.includes("schedule")) return "calendar_month";
+    if (k.includes("job") || k.includes("match")) return "work";
+    if (k.includes("skill") || k.includes("profile")) return "bolt";
+    return "notifications";
+  };
+
   if (loading) {
     return (
-      <div className="text-text gap-8 animate-pulse flex flex-col">
-        <div className="h-40 border-border rounded-2xl bg-surface border"></div>
-        <div className="border-border rounded-2xl h-60 bg-surface border"></div>
+      <div className="flex h-[400px] items-center justify-center w-full">
+        <LoadingState variant="list" rows={4} />
       </div>
     );
   }
 
-  return (
-    <div className="w-full text-text max-w-full box-sizing-border-box gap-8 overflow-hidden flex flex-col">
-      {/* Header Block */}
-      <div className="gap-4 flex justify-between flex-col md:flex-row md:items-center">
-        <div>
-          <h2 className="text-text items-center type-h1 gap-2 flex">
-            <BellRing className="text-primary" size={30} aria-hidden="true" />
-            Job Alerts Manager
-          </h2>
-          <p className="mt-1 text-muted">Configure real-time matching alerts and custom search deliveries.</p>
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="justify-center min-h-[48px] gap-1.5 px-6 items-center transition-all py-3 shadow bg-primary flex type-caption text-white rounded-xl hover:opacity-90"
-        >
-          <PlusCircle size={18} aria-hidden="true" />
-          Create Job Alert
-        </button>
-      </div>
+  const unreadCount = notifications.filter(n => n.status === "UNREAD").length;
 
-      <div className="w-full gap-8 items-start grid grid-cols-1 lg:grid-cols-3">
-        
-        {/* Left Column: Notification Channel Preferences */}
-        <div className="lg:col-span-1 rounded-2xl border-border/60 flex-col p-6 flex gap-6 bg-surface border">
-          <h3 className="border-border/40 border-b pb-3 text-base items-center gap-2 flex">
-            <Settings className="text-primary" size={20} aria-hidden="true" />
-            Delivery Channels
-          </h3>
-
-          <div className="gap-4 flex flex-col">
-            {/* Email Preferences Toggle */}
-            <div className="border-border/40 bg-bg/20 items-center flex justify-between p-4 rounded-xl border">
-              <div className="flex gap-3 items-center">
-                <div className={`justify-center h-10 w-10 items-center flex rounded-xl border ${preferences?.email_enabled ? "text-primary border-primary/20 bg-primary/10" : "bg-bg text-muted border-border/30"}`}>
-                  <Mail size={18} aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="type-ui">Email Alerts</p>
-                  <p className="text-xs mt-0.5 text-muted">Receive matches in inbox.</p>
-                </div>
+  const tabItems = [
+    {
+      id: "inbox",
+      label: `Inbox Alerts (${unreadCount})`,
+      icon: "notifications",
+      content: (
+        <Card className="p-6">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <Text variant="h3" className="text-text mb-1">Alert Inbox</Text>
+                <Text variant="body-sm" color="muted">View persistent notifications and historical match listings.</Text>
               </div>
-              <button 
-                onClick={() => handleTogglePref("email_enabled", !!preferences?.email_enabled)}
-                className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.email_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle email alerts"
-              >
-                <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.email_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
-              </button>
+              {unreadCount > 0 && (
+                <Button variant="secondary" onClick={handleMarkAllRead}>
+                  Mark all as read
+                </Button>
+              )}
             </div>
 
-            {/* Push Notifications Toggle */}
-            <div className="border-border/40 bg-bg/20 items-center flex justify-between p-4 rounded-xl border">
-              <div className="flex gap-3 items-center">
-                <div className={`justify-center h-10 w-10 items-center flex rounded-xl border ${preferences?.push_enabled ? "text-primary border-primary/20 bg-primary/10" : "bg-bg text-muted border-border/30"}`}>
-                  <Bell size={18} aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="type-ui">Push Alerts</p>
-                  <p className="text-xs mt-0.5 text-muted">Real-time browser popups.</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleTogglePref("push_enabled", !!preferences?.push_enabled)}
-                className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.push_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle push alerts"
-              >
-                <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.push_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
-              </button>
-            </div>
-
-            {/* SMS Notifications Toggle */}
-            <div className="border-border/40 bg-bg/20 items-center flex justify-between p-4 rounded-xl border">
-              <div className="flex gap-3 items-center">
-                <div className={`justify-center h-10 w-10 items-center flex rounded-xl border ${preferences?.sms_enabled ? "text-primary border-primary/20 bg-primary/10" : "bg-bg text-muted border-border/30"}`}>
-                  <MessageSquare size={18} aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="type-ui">SMS Texts</p>
-                  <p className="text-xs mt-0.5 text-muted">Alerts sent directly to phone.</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleTogglePref("sms_enabled", !!preferences?.sms_enabled)}
-                className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${preferences?.sms_enabled ? "bg-primary" : "bg-border"}`}
-                aria-label="Toggle SMS alerts"
-              >
-                <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${preferences?.sms_enabled ? "translate-x-6" : "translate-x-0"}`}></div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: List of Saved Alerts */}
-        <div className="lg:col-span-2 flex gap-6 flex-col">
-          <div className="rounded-2xl border-border/60 flex-col p-6 flex gap-6 bg-surface border">
-            <h3 className="border-border/40 border-b pb-3 text-base items-center gap-2 flex">
-              <BellRing className="text-primary" size={20} aria-hidden="true" />
-              Active Subscriptions
-            </h3>
-
-            {alerts.length > 0 ? (
-              <div className="gap-4 flex flex-col">
-                {alerts.map((alert) => {
-                  const criteria = alert.search_criteria || {};
-                  
+            {notifications.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {notifications.map((n) => {
+                  const isUnread = n.status === "UNREAD";
                   return (
-                    <div 
-                      key={alert.id}
-                      className="border-border/40 bg-bg/20 gap-4 items-start transition-all flex-col flex justify-between p-5 rounded-xl border hover:border-primary/40 sm:flex-row sm:items-center"
+                    <div
+                      key={n.id}
+                      className={`py-4 flex gap-4 items-start ${isUnread ? "bg-primary/5 rounded-xl px-4" : ""}`}
                     >
-                      {/* Alert details */}
-                      <div className="gap-1 flex flex-col">
-                        <div className="gap-2 flex items-center">
-                          <h4 className="text-text type-ui">{alert.search_type || "Untitled Alert"}</h4>
-                          {!alert.alert_enabled && (
-                            <span className="px-2 uppercase text-xs tracking-wider py-0.5 bg-border/40 rounded text-muted">Paused</span>
-                          )}
-                        </div>
-                        <div className="items-center gap-2 flex-wrap flex mt-1.5">
-                          {criteria.query && (
-                            <span className="gap-1 border-border/30 items-center bg-bg px-2.5 py-0.5 flex type-caption rounded text-muted border">
-                              <Search className="leading-none text-muted" size={12} aria-hidden="true" />
-                              &ldquo;{criteria.query}&rdquo;
-                            </span>
-                          )}
-                          {criteria.location && (
-                            <span className="gap-1 border-border/30 items-center bg-bg px-2.5 py-0.5 flex type-caption rounded text-muted border">
-                              <MapPin className="leading-none text-muted" size={12} aria-hidden="true" />
-                              {criteria.location}
-                            </span>
-                          )}
-                        </div>
+                      <div className={`justify-center w-10 shrink-0 items-center flex h-10 rounded-xl border ${isUnread ? "text-primary border-primary/20 bg-primary/10" : "bg-bg text-muted border-border/30"}`}>
+                        <Icon name={getNotificationIcon(n.template_key)} size={20} aria-hidden="true" />
                       </div>
-
-                      {/* Actions */}
-                      <div className="w-full justify-end shrink-0 items-center gap-2 flex sm:w-auto">
-                        {/* Run Search */}
-                        <button 
-                          onClick={() => handleRunSearch(alert)}
-                          className="justify-center text-primary type-badge gap-1.5 min-h-[44px] items-center transition-all py-2.5 flex px-4 rounded-xl bg-primary/10 hover:bg-primary hover:text-white"
-                        >
-                          <Rocket size={14} aria-hidden="true" />
-                          Search Feed
-                        </button>
-
-                        {/* Toggle Alert Enabled */}
-                        <button 
-                          onClick={() => handleToggleAlertActive(alert)}
-                          className={`w-11 justify-center min-h-[44px] items-center transition-colors h-11 flex min-w-[44px] rounded-xl border ${alert.alert_enabled ? "text-success bg-success-bg border-success/20 hover:bg-success-bg/80" : "bg-bg text-muted border-border/30 hover:text-text"}`}
-                          aria-label={alert.alert_enabled ? "Pause alert" : "Activate alert"}
-                        >
-                          {alert.alert_enabled ? (
-                            <Bell size={20} aria-hidden="true" />
-                          ) : (
-                            <BellOff size={20} aria-hidden="true" />
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <Text variant="body" weight={isUnread ? "semibold" : "regular"} className="text-text">
+                            {n.subject || "Alert Notification"}
+                          </Text>
+                          {isUnread && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleMarkSingleRead(n.id)}
+                              leftIcon={<Check size={14} />}
+                            >
+                              Mark read
+                            </Button>
                           )}
-                        </button>
-
-                        {/* Delete Alert */}
-                        <button 
-                          onClick={() => handleDeleteAlert(alert.id)}
-                          className="w-11 justify-center shrink-0 min-w-[44px] min-h-[44px] items-center text-error transition-all bg-error-bg h-11 flex border-error/20 rounded-xl border hover:bg-error hover:text-white hover:border-error"
-                          aria-label="Delete alert"
-                        >
-                          <Trash2 size={20} aria-hidden="true" />
-                        </button>
+                        </div>
+                        <Text variant="body-sm" color={isUnread ? "default" : "muted"} className="mt-1 block">
+                          {n.body || n.content?.message || "Opportunity listing update."}
+                        </Text>
+                        <div className="flex items-center gap-1.5 mt-2 text-xs text-muted">
+                          <Clock size={12} />
+                          <span>
+                            {new Date(n.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(n.sent_at).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="justify-center gap-4 items-center py-20 text-center flex flex-col">
-                <div className="bg-border/20 p-4 rounded-full text-muted">
-                  <BellOff size={48} aria-hidden="true" />
+              <div className="justify-center py-20 text-center gap-4 flex flex-col items-center">
+                <div className="bg-border/20 p-4 text-muted rounded-full">
+                  <BellOff size={48} />
                 </div>
                 <div>
-                  <p className="text-text text-base">No active job alerts</p>
-                  <p className="mt-1 text-xs text-muted max-w-sm">Subscribing to alerts allows our AI-matching engine to notify you instantly when matching jobs appear.</p>
+                  <Text variant="body" className="text-text">All caught up!</Text>
+                  <Text variant="body-sm" color="muted">You have zero unread alerts or notifications.</Text>
                 </div>
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="min-h-[48px] rounded-xl mt-2 py-3 bg-primary type-caption text-white px-5 transition-opacity hover:opacity-90"
-                >
-                  Create your first alert
-                </button>
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Floating Create Alert Modal Dialog */}
-      {isModalOpen && (
-        <div className="justify-center fade-in inset-0 items-center animate-in bg-card/60 flex backdrop-blur-sm duration-300 z-50 p-4 fixed">
-          <div className="inset-0 absolute" onClick={() => setIsModalOpen(false)}></div>
-          
-          <div className="w-full border-border rounded-3xl relative overflow-hidden duration-200 scale-in flex-col animate-in p-6 max-w-md shadow-2xl flex gap-6 bg-surface border">
-            <div className="border-border/40 border-b pb-3 items-center flex justify-between">
-              <h3 className="type-card-title items-center gap-2 flex">
-                <PlusCircle className="text-primary" size={20} aria-hidden="true" />
+        </Card>
+      )
+    },
+    {
+      id: "subscriptions",
+      label: "Job Subscriptions",
+      icon: "rss_feed",
+      content: (
+        <Card className="p-6">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <Text variant="h3" className="text-text mb-1">Active Subscriptions</Text>
+                <Text variant="body-sm" color="muted">Manage your saved search keywords and matching filters.</Text>
+              </div>
+              <Button onClick={() => setIsModalOpen(true)} leftIcon={<PlusCircle size={16} />}>
                 Create Job Alert
-              </h3>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="justify-center items-center bg-bg rounded-full h-8 flex w-8 text-muted hover:text-text hover:bg-border/20"
-              >
-                ✕
-              </button>
+              </Button>
             </div>
 
-            <form onSubmit={handleCreateAlert} className="gap-4 flex flex-col">
-              {/* Alert Name */}
-              <div className="flex gap-1.5 flex-col">
-                <label className="uppercase tracking-wider type-caption text-muted">Alert Subtitle Name</label>
-                <input 
-                  type="text" 
-                  value={alertName}
-                  onChange={(e) => setAlertName(e.target.value)}
-                  placeholder="e.g. Senior React Developer Alert" 
-                  className="w-full min-h-[44px] px-3 text-sm border-border/60 bg-bg py-2.5 rounded-xl border focus:outline-none focus:border-primary"
-                  required
-                />
-              </div>
+            {alerts.length > 0 ? (
+              <div className="space-y-4">
+                {alerts.map((alert) => {
+                  const criteria = alert.search_criteria || {};
+                  return (
+                    <div 
+                      key={alert.id}
+                      className="border border-border/60 bg-bg/20 flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl gap-4 hover:border-primary/40 transition-colors"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Text variant="body" weight="semibold" className="text-text">
+                            {alert.search_type || "Untitled Alert"}
+                          </Text>
+                          {!alert.alert_enabled && (
+                            <span className="px-2 py-0.5 bg-border/40 text-[10px] font-semibold text-muted rounded uppercase tracking-wider">Paused</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          {criteria.query && (
+                            <span className="inline-flex items-center gap-1 bg-bg px-2.5 py-0.5 rounded text-xs text-muted border border-border/30">
+                              <Search size={12} />
+                              &ldquo;{criteria.query}&rdquo;
+                            </span>
+                          )}
+                          {criteria.location && (
+                            <span className="inline-flex items-center gap-1 bg-bg px-2.5 py-0.5 rounded text-xs text-muted border border-border/30">
+                              <MapPin size={12} />
+                              {criteria.location}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-              {/* Keywords */}
-              <div className="flex gap-1.5 flex-col">
-                <label className="uppercase tracking-wider type-caption text-muted">Target Keywords</label>
-                <input 
-                  type="text" 
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  placeholder="React, Django, Senior..." 
-                  className="w-full min-h-[44px] px-3 text-sm border-border/60 bg-bg py-2.5 rounded-xl border focus:outline-none focus:border-primary"
-                />
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRunSearch(alert)}
+                          leftIcon={<Rocket size={14} />}
+                        >
+                          Run Search
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleToggleAlertActive(alert)}
+                          aria-label={alert.alert_enabled ? "Pause alert" : "Activate alert"}
+                        >
+                          {alert.alert_enabled ? <BellOff size={16} /> : <BellRing size={16} />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteAlert(alert.id)}
+                          aria-label="Delete alert"
+                          className="text-error hover:bg-error-bg hover:text-error"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* Location */}
-              <div className="flex gap-1.5 flex-col">
-                <label className="uppercase tracking-wider type-caption text-muted">Desired City / Region</label>
-                <input 
-                  type="text" 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. Remote, Austin" 
-                  className="w-full min-h-[44px] px-3 text-sm border-border/60 bg-bg py-2.5 rounded-xl border focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              {/* Alert toggler */}
-              <div className="border-border/40 bg-bg/20 mt-2 items-center flex justify-between p-4 rounded-xl border">
-                <div>
-                  <p className="type-caption">Alert Deliveries Enabled</p>
-                  <p className="mt-0.5 text-xs text-muted">Toggle to instantly receive notifications.</p>
+            ) : (
+              <div className="justify-center py-20 text-center gap-4 flex flex-col items-center">
+                <div className="bg-border/20 p-4 text-muted rounded-full">
+                  <BellOff size={48} />
                 </div>
-                <button 
-                  type="button"
-                  onClick={() => setIsAlertEnabled(!isAlertEnabled)}
-                  className={`w-12 h-6 p-1 rounded-full transition-colors cursor-pointer ${isAlertEnabled ? "bg-primary" : "bg-border"}`}
-                  aria-label="Toggle alert enabled status"
-                >
-                  <div className={`transition-transform rounded-full shadow h-4 w-4 bg-surface ${isAlertEnabled ? "translate-x-6" : "translate-x-0"}`}></div>
-                </button>
+                <div>
+                  <Text variant="body" className="text-text">No active job alerts</Text>
+                  <Text variant="body-sm" color="muted">Subscribe to job alerts to get notified of matching listings automatically.</Text>
+                </div>
+                <Button onClick={() => setIsModalOpen(true)} className="mt-2">
+                  Create your first alert
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
+      )
+    },
+    {
+      id: "channels",
+      label: "Channels",
+      icon: "settings",
+      content: (
+        <Card className="p-6">
+          <div className="space-y-6 max-w-lg">
+            <div>
+              <Text variant="h3" className="text-text mb-1">Delivery Settings</Text>
+              <Text variant="body-sm" color="muted">Choose channels to deliver match listings and system reminders.</Text>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-bg/40">
+                <div className="space-y-0.5">
+                  <Text variant="body-sm" weight="semibold" className="text-text">Email Alerts</Text>
+                  <Text variant="caption" color="muted">Receive job matches in your email inbox.</Text>
+                </div>
+                <Toggle
+                  checked={!!preferences?.email_enabled}
+                  onChange={() => handleTogglePref("email_enabled", !!preferences?.email_enabled)}
+                  aria-label="Toggle Email Alerts"
+                />
               </div>
 
-              <div className="border-border/40 border-t gap-3 flex mt-4 pt-4">
-                <button 
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 min-h-[48px] py-3.5 border-border/60 type-caption rounded-xl border hover:bg-bg/40"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  disabled={creating}
-                  className="relative justify-center type-badge flex-1 min-h-[48px] gap-1.5 py-3.5 items-center shadow bg-primary flex text-white rounded-xl transition-opacity hover:opacity-90"
-                >
-                  <span>Save and subscribe</span>
-                  {creating && (
-                    <span className="absolute right-4 flex items-center">
-                      <span className="border-2 rounded-full h-4 border-t-transparent w-4 animate-spin border-white"></span>
-                    </span>
-                  )}
-                </button>
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-bg/40">
+                <div className="space-y-0.5">
+                  <Text variant="body-sm" weight="semibold" className="text-text">Push Notifications</Text>
+                  <Text variant="caption" color="muted">Show real-time alerts in browser popups.</Text>
+                </div>
+                <Toggle
+                  checked={!!preferences?.push_enabled}
+                  onChange={() => handleTogglePref("push_enabled", !!preferences?.push_enabled)}
+                  aria-label="Toggle Push Notifications"
+                />
               </div>
-            </form>
+
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-bg/40">
+                <div className="space-y-0.5">
+                  <Text variant="body-sm" weight="semibold" className="text-text">SMS Text Alerts</Text>
+                  <Text variant="caption" color="muted">Receive mobile reminders directly to your phone.</Text>
+                </div>
+                <Toggle
+                  checked={!!preferences?.sms_enabled}
+                  onChange={() => handleTogglePref("sms_enabled", !!preferences?.sms_enabled)}
+                  aria-label="Toggle SMS Alerts"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        </Card>
+      )
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/dashboard" },
+          { label: "Job Alerts" },
+        ]}
+      />
+      <div>
+        <Text variant="h1" className="text-text mb-1">Job Alerts Manager</Text>
+        <Text variant="body" color="muted">Configure real-time matching alerts, custom search deliveries, and notifications inbox.</Text>
+      </div>
+
+      <Tabs items={tabItems} variant="underline" />
+
+      <Dialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Create Job Alert"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)} className="flex-1">Cancel</Button>
+            <Button type="submit" form="create-alert-form" isLoading={creating} className="flex-1">Save and subscribe</Button>
+          </div>
+        }
+      >
+        <form id="create-alert-form" onSubmit={handleCreateAlert} className="gap-4 flex flex-col pt-2">
+          <Input 
+            label="Alert Subtitle Name"
+            id="alertName"
+            value={alertName}
+            onChange={(e) => setAlertName(e.target.value)}
+            placeholder="e.g. Senior React Developer Alert" 
+            required
+          />
+
+          <Input 
+            label="Target Keywords"
+            id="keywords"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder="React, Django, Senior..." 
+          />
+
+          <Input 
+            label="Desired City / Region"
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="e.g. Remote, Austin" 
+          />
+
+          <div className="border border-border/40 bg-bg/20 mt-2 p-4 rounded-xl">
+            <Toggle 
+              checked={isAlertEnabled}
+              onChange={(checked) => setIsAlertEnabled(checked)}
+              label="Alert Deliveries Enabled"
+              helper="Toggle to instantly receive notifications."
+            />
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }

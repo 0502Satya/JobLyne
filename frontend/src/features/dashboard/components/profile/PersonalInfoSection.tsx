@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { Dialog, Button } from "@/shared/ui";
 import { Profile } from "@/types/profile";
 import { User, Check, Pencil, Camera, FileUp, CheckCircle2, Link as LinkIcon, Briefcase, Code2 } from "lucide-react";
 
@@ -492,69 +493,70 @@ export default function PersonalInfoSection({ profile, onChange }: PersonalInfoS
       </div>
 
       {/* Image Cropper Modal */}
-      {showCropModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[200] flex items-center justify-center p-4">
-          <div className="bg-card rounded-2xl p-6 max-w-sm w-full space-y-5 shadow-lg border border-border">
-            <div>
-              <h4 className="text-base font-bold text-text tracking-tight font-display">Adjust Profile Picture</h4>
-              <p className="text-xs text-muted mt-1 font-display">Position and zoom your photo to look your best.</p>
-            </div>
+      <Dialog
+        isOpen={showCropModal}
+        onClose={() => setShowCropModal(false)}
+        title="Adjust Profile Picture"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowCropModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleApplyCrop}
+              className="flex-1"
+            >
+              Apply Crop
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          <p className="text-xs text-muted mb-4 font-display">Position and zoom your photo to look your best.</p>
 
-            {/* Cropper viewport mock */}
-            <div className="w-full aspect-square rounded-xl overflow-hidden bg-bg border border-border flex items-center justify-center relative">
-              <div className="absolute inset-4 rounded-full border border-white/80 border-dashed z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]"></div>
-              {tempPhotoUrl && (
-                <img
-                  src={tempPhotoUrl}
-                  alt="Crop preview"
-                  className="max-w-none transition-transform"
-                  style={{
-                    transform: `scale(${cropZoom}) translate(${cropOffset.x}px, ${cropOffset.y}px)`,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              )}
-            </div>
-
-            {/* Zoom Slider */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-semibold text-muted uppercase">
-                <span>Zoom</span>
-                <span>{cropZoom.toFixed(1)}x</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="3"
-                step="0.1"
-                value={cropZoom}
-                onChange={(e) => setCropZoom(parseFloat(e.target.value))}
-                className="w-full accent-primary"
+          {/* Cropper viewport mock */}
+          <div className="w-full aspect-square rounded-xl overflow-hidden bg-bg border border-border flex items-center justify-center relative">
+            <div className="absolute inset-4 rounded-full border border-white/80 border-dashed z-10 pointer-events-none shadow-[0_0_0_9999px_var(--color-overlay-dark)]"></div>
+            {tempPhotoUrl && (
+              <img
+                src={tempPhotoUrl}
+                alt="Crop preview"
+                className="max-w-none transition-transform"
+                style={{
+                  transform: `scale(${cropZoom}) translate(${cropOffset.x}px, ${cropOffset.y}px)`,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
               />
-            </div>
+            )}
+          </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowCropModal(false)}
-                className="flex-1 py-2.5 text-text hover:bg-bg bg-card font-bold text-xs rounded-lg transition-all min-h-[44px] border border-border cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleApplyCrop}
-                className="flex-1 py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/95 transition-all min-h-[44px] shadow-sm cursor-pointer"
-              >
-                Apply Crop
-              </button>
+          {/* Zoom Slider */}
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs font-semibold text-muted uppercase">
+              <span>Zoom</span>
+              <span>{cropZoom.toFixed(1)}x</span>
             </div>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.1"
+              value={cropZoom}
+              onChange={(e) => setCropZoom(parseFloat(e.target.value))}
+              className="w-full accent-primary"
+            />
           </div>
         </div>
-      )}
+      </Dialog>
     </section>
   );
 }
