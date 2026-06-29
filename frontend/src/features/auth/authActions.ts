@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { API_BASE_URL } from "./config";
 import { setAuthCookies, authenticatedFetch } from "./apiClient";
 
@@ -324,6 +325,8 @@ export async function updateUserProfileAction(data: any) {
     });
     const responseData = await res.json();
     if (!res.ok) return { error: responseData.error || "Failed to update profile details" };
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/settings");
     return responseData;
   } catch (err) {
     return { error: "Network error" };

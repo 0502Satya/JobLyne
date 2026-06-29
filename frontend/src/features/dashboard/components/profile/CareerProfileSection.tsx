@@ -4,8 +4,10 @@ import React from "react";
 import { Button, Icon } from "@/shared/ui";
 import { Target, Pencil, Banknote, CheckCircle2 } from "lucide-react";
 
+import { Profile } from "@/types/profile";
+
 interface CareerProfileSectionProps {
-  profile: any;
+  profile: Profile | null;
   onEdit: () => void;
 }
 

@@ -13,4 +13,6 @@ export interface Job {
   created_at: string;
   posted_at?: string;
   match_score?: number;
+  description?: string;
+  requirements?: string;
 }

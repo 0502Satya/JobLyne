@@ -1,19 +1,25 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ErrorState } from '@/shared/ui';
+import React, { useEffect } from "react";
+import { ErrorState } from "@/shared/ui";
 
-export default function DashboardError({ error, reset }: {
+interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function Error({ error, reset }: ErrorProps) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
-    <div className="my-12">
+    <main className="justify-center flex-1 overflow-y-auto items-center py-8 bg-bg/50 flex h-[calc(100vh-var(--height-header)-1px)] px-4 md:py-12 md:px-10">
       <ErrorState
-        title="Something went wrong"
-        description="An error occurred while loading the dashboard components."
+        title="Dashboard failed to load"
+        description="We couldn't load your candidate dashboard statistics. Please try refreshing or checking your login session."
         onRetry={reset}
       />
-    </div>
+    </main>
   );
 }

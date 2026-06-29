@@ -81,7 +81,7 @@ export default function JobsFilterSidebar({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Role, title, or skill..."
+              placeholder="Role, Title, or Skills"
               className="w-full pl-9 min-h-[44px] pr-8 text-sm border-border/60 bg-bg py-2.5 rounded-xl border focus:outline-none focus:border-primary"
             />
             <Search size={18} className="left-3 absolute text-muted top-3" aria-hidden="true" />

@@ -3,12 +3,14 @@
 import React from "react";
 import { Briefcase, Bookmark, BookmarkPlus, Clock, Sparkles } from "lucide-react";
 
+import { Job } from "@/types/job";
+
 interface JobListItemProps {
-  job: any;
+  job: Job;
   isSelected: boolean;
   savingId: string | null;
   onSelect: () => void;
-  onToggleSave: (e: React.MouseEvent, job: any) => void;
+  onToggleSave: (e: React.MouseEvent, job: Job) => void;
 }
 
 export default function JobListItem({
@@ -106,7 +108,7 @@ export default function JobListItem({
       <div className="border-border/40 border-t items-center flex justify-between type-caption text-muted pt-4 text-xs">
         <div className="flex gap-1.5 items-center">
           <Clock size={14} className="text-muted" aria-hidden="true" />
-          Posted {new Date(job.posted_at).toLocaleDateString()}
+          Posted {new Date(job.posted_at || job.created_at).toLocaleDateString()}
         </div>
 
         <div className="flex gap-3 items-center">

@@ -17,33 +17,10 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
   const workModes = ["Remote", "Hybrid", "On-site"];
   const companySizes = ["Startup (<50)", "Mid-size (50-500)", "Enterprise (>500)", "No preference"];
 
-  // Helper to safely parse preferred locations
-  const getPreferredLocations = (): string[] => {
-    if (!data.preferred_locations) return [];
-    if (Array.isArray(data.preferred_locations)) return data.preferred_locations;
-    try {
-      const parsed = JSON.parse(data.preferred_locations);
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) {}
-    if (typeof data.preferred_locations === "string") {
-      return data.preferred_locations.split(",").map((l) => l.trim()).filter(Boolean);
-    }
-    return [];
-  };
-
-  const locations = getPreferredLocations();
+  const locations = data.preferred_locations || [];
 
   const handleToggleWorkMode = (mode: string) => {
-    let current: string[] = [];
-    if (Array.isArray(data.work_mode)) {
-      current = data.work_mode;
-    } else if (typeof data.work_mode === "string") {
-      try {
-        current = JSON.parse(data.work_mode);
-      } catch (e) {
-        current = data.work_mode.split(",").map((m) => m.trim()).filter(Boolean);
-      }
-    }
+    const current = data.work_mode || [];
     const updated = current.includes(mode)
       ? current.filter((m) => m !== mode)
       : [...current, mode];
@@ -67,20 +44,7 @@ export default function JobPreferencesSection({ data, onChange }: JobPreferences
     onChange("preferred_locations", updated);
   };
 
-  // Helper to safely get work modes array for rendering
-  const getActiveWorkModes = (): string[] => {
-    if (Array.isArray(data.work_mode)) return data.work_mode;
-    if (typeof data.work_mode === "string") {
-      try {
-        const parsed = JSON.parse(data.work_mode);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) {}
-      return data.work_mode.split(",").map((m) => m.trim()).filter(Boolean);
-    }
-    return [];
-  };
-
-  const activeModes = getActiveWorkModes();
+  const activeModes = data.work_mode || [];
 
   return (
     <section className="border-border rounded-2xl overflow-hidden transition-all shadow-sm duration-350 bg-card border" id="preferences">

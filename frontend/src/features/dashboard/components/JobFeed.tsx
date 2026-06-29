@@ -129,11 +129,11 @@ export default function JobFeed() {
       {jobs.length > 0 ? jobs.map((job) => (
         <div key={job.id}
           onClick={() => router.push(`/jobs/${generateJobSlug(job)}`)}
-          className="border-border group shadow-sm transition-shadow p-6 bg-surface rounded-xl border hover:shadow-md cursor-pointer text-left"
+          className="border-border/60 group shadow-sm transition-all duration-300 p-6 bg-surface rounded-2xl border hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 cursor-pointer text-left border-l-4 border-l-transparent hover:border-l-primary"
         >
           <div className="mb-4 flex items-start justify-between">
             <div className="gap-4 flex">
-              <div className="border-border/40 justify-center h-12 w-12 items-center p-2 bg-bg rounded-lg flex border">
+              <div className="border-border/40 justify-center h-12 w-12 items-center p-2 bg-bg rounded-xl flex border transition-transform duration-300 group-hover:scale-105">
                 {job.company_logo
                   ? <Image src={job.company_logo} alt={`${job.company_name} logo`}
                             width={40} height={40} className="w-full h-full object-contain" />
@@ -141,17 +141,17 @@ export default function JobFeed() {
                 }
               </div>
               <div>
-                <h4 className="text-text transition-colors type-card-title group-hover:text-primary font-semibold">
+                <h4 className="text-text transition-colors type-card-title group-hover:text-primary font-bold text-base leading-snug">
                   {job.title}
                 </h4>
-                <p className="text-sm text-muted">{job.company_name} • {job.location}</p>
+                <p className="text-xs text-muted font-medium mt-0.5">{job.company_name} • {job.location}</p>
               </div>
             </div>
 
             <button
               onClick={(e) => { e.stopPropagation(); handleSave(job.id, !!job.is_saved); }}
               aria-label={job.is_saved ? "Remove from saved jobs" : "Save this job"}
-              className={`transition-colors cursor-pointer ${job.is_saved ? "text-primary" : "text-muted hover:text-primary"}`}
+              className={`transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-bg ${job.is_saved ? "text-primary" : "text-muted hover:text-primary"}`}
             >
               {job.is_saved
                 ? <Bookmark size={20} className="fill-current" aria-hidden="true" />
@@ -163,12 +163,12 @@ export default function JobFeed() {
           {job.skills && job.skills.length > 0 && (
             <div className="gap-2 flex mb-4 flex-wrap">
               {job.skills.slice(0, 3).map((skill) => (
-                <span key={skill} className="py-1 bg-bg px-2.5 rounded-md type-caption text-muted font-medium">
+                <span key={skill} className="py-1 bg-bg px-2.5 rounded-lg text-xs text-muted font-medium border border-border/20">
                   {skill}
                 </span>
               ))}
               {job.salary_min && (
-                <span className="py-1 text-success bg-success-bg border border-success/10 px-2.5 rounded-md type-caption font-semibold">
+                <span className="py-1 text-success bg-success-bg/30 border border-success/20 px-2.5 rounded-lg text-xs font-semibold">
                   {job.currency}{job.salary_min.toLocaleString()}
                   {job.salary_max ? ` - ${job.salary_max.toLocaleString()}` : "+"}
                 </span>
@@ -177,18 +177,18 @@ export default function JobFeed() {
           )}
 
           <div className="border-border/40 border-t items-center flex justify-between pt-4">
-            <div className="text-xs gap-1 items-center flex text-muted">
+            <div className="text-xs gap-1 items-center flex text-muted font-medium">
               <Clock size={14} aria-hidden="true" />
               Posted {job.posted_at ? new Date(job.posted_at).toLocaleDateString() : "N/A"}
             </div>
             <div className="gap-2 flex items-center">
               {job.match_score != null && job.match_score > 0 && (
-                <span className="px-2 text-primary py-1 type-caption rounded bg-primary/10 font-bold border border-primary/5">
+                <span className="px-2.5 text-primary py-1 text-xs rounded-lg bg-primary/10 font-bold border border-primary/20 shadow-sm shadow-primary/5">
                   {job.match_score}% Match
                 </span>
               )}
               {job.has_applied ? (
-                <Button size="sm" variant="secondary" disabled className="bg-success-bg border border-success/20 text-success">
+                <Button size="sm" variant="secondary" disabled className="bg-success-bg/30 border border-success/20 text-success rounded-lg">
                   Applied
                 </Button>
               ) : (
@@ -197,6 +197,7 @@ export default function JobFeed() {
                   variant="primary"
                   isLoading={applying === job.id}
                   onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleApply(job.id); }}
+                  className="rounded-lg shadow-sm font-semibold cursor-pointer"
                 >
                   Apply now
                 </Button>

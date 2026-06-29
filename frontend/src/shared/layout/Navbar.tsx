@@ -21,8 +21,8 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
     useEffect(() => {
         // Resolve URLs dynamically in browser to avoid environment variable baking issues
         const getUrl = (subdomain: "recruiter" | "company") => {
-            const envVar = subdomain === "recruiter" 
-                ? process.env.NEXT_PUBLIC_RECRUITER_URL 
+            const envVar = subdomain === "recruiter"
+                ? process.env.NEXT_PUBLIC_RECRUITER_URL
                 : process.env.NEXT_PUBLIC_COMPANY_URL;
             if (envVar) return envVar;
 
@@ -59,20 +59,11 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
         : "AL";
     const profileImage = profile?.profile_image;
 
-    const navLinks = isLoggedIn
-        ? [
-            { name: "Home", href: "/dashboard" },
-            { name: "Job", href: "/jobs" },
-            { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
-            { name: "Company", href: `${companyUrl}/auth/signin` },
-            { name: "Pipeline", href: "/dashboard/applications" },
-          ]
-        : [
-            { name: "Home", href: "/" },
-            { name: "Job", href: "/jobs" },
-            { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
-            { name: "Company", href: `${companyUrl}/auth/signin` },
-          ];
+    const navLinks = [
+        { name: "Job", href: "/jobs" },
+        { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
+        { name: "Company", href: `${companyUrl}/auth/signin` },
+    ];
 
     return (
         <header className="w-full border-b border-border bg-surface/80 backdrop-blur-md sticky transition-colors z-50 overflow-visible top-0">
@@ -98,9 +89,9 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                     </Link>
                     <nav className="gap-6 hidden items-center md:flex">
                         {navLinks.map((link) => (
-                            <Link 
-                                key={link.name} 
-                                href={link.href} 
+                            <Link
+                                key={link.name}
+                                href={link.href}
                                 className="transition-colors type-label hover:text-primary font-semibold"
                             >
                                 {link.name}
@@ -108,13 +99,13 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                         ))}
                     </nav>
                     {isLoggedIn && (
-                        <div className="min-w-40 max-w-64 hidden md:block ml-4">
-                            <label htmlFor="navbar-search" className="sr-only">Search jobs, skills, and companies</label>
-                            <Input 
+                        <div className="w-80 hidden md:block ml-4">
+                            <label htmlFor="navbar-search" className="sr-only">Search Jobs, Skills, and Companies</label>
+                            <Input
                                 id="navbar-search"
-                                aria-label="Search jobs, skills, and companies"
+                                aria-label="Search Jobs, Skills, and Companies"
                                 icon="search"
-                                placeholder="Search jobs, skills, companies..."
+                                placeholder="Search Jobs, Skills, and Companies"
                                 className="h-10 py-1 bg-bg border-none"
                             />
                         </div>
@@ -124,7 +115,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                 {/* Right side: Actions */}
                 <div className="gap-2 flex items-center sm:gap-3">
                     <ThemeToggle />
-                    
+
                     {!isLoggedIn && (
                         /* Search button */
                         <button aria-label="Search" className="justify-center min-h-[44px] hidden items-center p-2 transition-colors min-w-[44px] text-muted sm:flex hover:text-primary">
@@ -156,7 +147,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                     )}
 
                     {/* Mobile Menu Button */}
-                    <button 
+                    <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className="sm:hidden w-11 justify-center items-center transition-colors h-11 flex text-muted hover:text-primary cursor-pointer select-none"
                         aria-label="Toggle menu"
@@ -175,10 +166,10 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                 <div className="sm:hidden w-full border-b border-border slide-in-from-top-4 absolute left-0 animate-in z-50 shadow-xl duration-300 py-6 flex gap-6 top-full px-4 bg-surface flex-col">
                     <nav className="gap-4 flex flex-col">
                         {navLinks.map((link) => (
-                            <Link 
-                                key={link.name} 
-                                onClick={() => setIsMenuOpen(false)} 
-                                href={link.href} 
+                            <Link
+                                key={link.name}
+                                onClick={() => setIsMenuOpen(false)}
+                                href={link.href}
                                 className="text-text border-b border-border/50 type-card-title py-3"
                             >
                                 {link.name}
@@ -190,14 +181,14 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                         <AuthActions isLoggedIn={isLoggedIn} isMobile={true} />
                         {!isLoggedIn && (
                             <div className="mt-2 grid-cols-2 grid gap-3">
-                               <Link 
+                                <Link
                                     onClick={() => setIsMenuOpen(false)}
                                     href={`${recruiterUrl}/auth/signin`}
                                     className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
                                 >
                                     <span className="text-primary type-badge font-bold">Recruiter</span>
                                 </Link>
-                                <Link 
+                                <Link
                                     onClick={() => setIsMenuOpen(false)}
                                     href={`${companyUrl}/auth/signin`}
                                     className="gap-1 p-3 items-center bg-bg text-center flex rounded-xl flex-col dark:bg-card"
@@ -220,9 +211,9 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
 function MobileCompactAuthActions({ isLoggedIn }: { isLoggedIn: boolean }) {
     if (isLoggedIn) {
         return (
-            <Button 
+            <Button
                 as={Link}
-                href="/dashboard" 
+                href="/dashboard"
                 variant="primary"
                 size="sm"
                 aria-label="Dashboard"
@@ -233,9 +224,9 @@ function MobileCompactAuthActions({ isLoggedIn }: { isLoggedIn: boolean }) {
     }
 
     return (
-        <Button 
+        <Button
             as={Link}
-            href="/auth/signup" 
+            href="/auth/signup"
             variant="primary"
             size="sm"
         >
@@ -251,24 +242,24 @@ function AuthActions({ isLoggedIn, isMobile }: { isLoggedIn: boolean; isMobile?:
     if (isLoggedIn) {
         return (
             <div className={`flex items-center ${isMobile ? 'w-full gap-3 flex-col' : 'gap-4'}`}>
-                <Button 
-                    as={Link} 
-                    href="/dashboard" 
-                    variant="primary" 
+                <Button
+                    as={Link}
+                    href="/dashboard"
+                    variant="primary"
                     className={`${isMobile ? 'w-full py-4' : ''}`}
                 >
                     <LayoutDashboard size={18} aria-hidden="true" />
                     Dashboard
                 </Button>
-                <form 
-                  className={isMobile ? 'w-full' : ''}
-                  action={async () => {
-                    const { logoutAction } = await import("@/features/auth/actions");
-                    await logoutAction();
-                }}>
-                    <Button 
-                        type="submit" 
-                        variant="ghost" 
+                <form
+                    className={isMobile ? 'w-full' : ''}
+                    action={async () => {
+                        const { logoutAction } = await import("@/features/auth/actions");
+                        await logoutAction();
+                    }}>
+                    <Button
+                        type="submit"
+                        variant="ghost"
                         className={`text-muted hover:text-error ${isMobile ? 'w-full py-3 bg-surface-2 rounded-xl' : ''}`}
                     >
                         <LogOut size={18} aria-hidden="true" />
@@ -281,18 +272,18 @@ function AuthActions({ isLoggedIn, isMobile }: { isLoggedIn: boolean; isMobile?:
 
     return (
         <div className={`flex items-center ${isMobile ? 'w-full gap-3 flex-col' : 'gap-2'}`}>
-            <Button 
-                as={Link} 
-                href="/auth/signin" 
-                variant="outline" 
+            <Button
+                as={Link}
+                href="/auth/signin"
+                variant="outline"
                 className={`${isMobile ? 'w-full py-4' : ''}`}
             >
                 Login
             </Button>
-            <Button 
-                as={Link} 
-                href="/auth/signup" 
-                variant="primary" 
+            <Button
+                as={Link}
+                href="/auth/signup"
+                variant="primary"
                 className={`shadow-md shadow-primary/10 ${isMobile ? 'w-full py-4' : ''}`}
             >
                 Register
@@ -357,7 +348,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
 
     return (
         <div className="p-2 relative" ref={dropdownRef}>
-            <button 
+            <button
                 id="employer-menu-button"
                 ref={triggerRef}
                 aria-expanded={isOpen}
@@ -383,7 +374,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                 />
             </button>
 
-            <div 
+            <div
                 id="employer-menu"
                 role="menu"
                 aria-labelledby="employer-menu-button"
@@ -391,7 +382,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                 className={`z-dropdown absolute duration-200 pt-2 transition-all w-56 top-full right-0 ${isOpen ? 'translate-y-0 opacity-100' : 'opacity-0 translate-y-2 pointer-events-none'}`}
             >
                 <div className="border-border rounded-2xl overflow-hidden p-2 shadow-2xl bg-surface border">
-                    <Link 
+                    <Link
                         ref={(el) => { itemRefs.current[0] = el; }}
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
@@ -401,7 +392,7 @@ function EmployerDropdown({ recruiterUrl, companyUrl }: { recruiterUrl: string; 
                         <span className="type-ui transition-colors group-hover:text-primary group-focus-visible:text-primary font-bold">Recruiter portal</span>
                         <span className="text-muted text-xs">Find and vet top talent quickly.</span>
                     </Link>
-                    <Link 
+                    <Link
                         ref={(el) => { itemRefs.current[1] = el; }}
                         role="menuitem"
                         onClick={() => setIsOpen(false)}

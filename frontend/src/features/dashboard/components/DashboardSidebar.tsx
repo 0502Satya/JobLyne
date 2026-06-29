@@ -5,9 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Icon from "@/shared/ui/Icon";
 
+import { Profile, DashboardStats } from "@/types/profile";
+
 interface DashboardSidebarProps {
-  profile: any;
-  stats: any;
+  profile: Profile | null;
+  stats: DashboardStats | null;
 }
 
 const sidebarLinks = [
@@ -31,7 +33,7 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
 
   // Height offset by --height-header plus 1px to compensate for the bottom border on the header container.
   return (
-    <aside className="w-64 border-border hidden pt-6 pb-6 border-r px-4 bg-surface flex-col md:flex flex-shrink-0 h-full">
+    <aside className="w-64 border-border hidden pt-6 pb-6 border-r px-4 bg-surface flex-col md:flex flex-shrink-0 md:sticky md:top-[var(--height-header)] md:h-[calc(100vh-var(--height-header))] overflow-hidden">
       {/* User Summary */}
       <div className="border-b border-border items-center text-center pb-6 flex flex-col">
         {/* Avatar */}
@@ -96,7 +98,7 @@ export default function DashboardSidebar({ profile, stats }: DashboardSidebarPro
               <span className="type-ui">{link.name}</span>
               {link.name === "My Applications" && (stats?.applications ?? 0) > 0 && (
                 <span className="px-2 ml-auto rounded-full py-0.5 bg-border/40 type-caption text-muted">
-                  {stats.applications}
+                  {stats?.applications}
                 </span>
               )}
             </Link>

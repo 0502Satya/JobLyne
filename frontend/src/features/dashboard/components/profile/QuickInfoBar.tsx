@@ -3,8 +3,10 @@
 import React from "react";
 import Icon from "@/shared/ui/Icon";
 
+import { Profile } from "@/types/profile";
+
 interface QuickInfoBarProps {
-  profile: any;
+  profile: Profile | null;
 }
 
 export default function QuickInfoBar({ profile }: QuickInfoBarProps) {
