@@ -6,6 +6,7 @@ import { getSavedJobsAction, unsaveJobAction, applyToJobAction } from "@/feature
 import { toast } from "react-hot-toast";
 import { Button, Breadcrumbs, LoadingState } from "@/shared/ui";
 import { Briefcase, Bookmark, Clock, Banknote } from "lucide-react";
+import { generateJobSlug } from "@/shared/utils/slug";
 
 export default function SavedJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -82,7 +83,10 @@ export default function SavedJobsPage() {
     setApplying(jobId);
     const res = await applyToJobAction(jobId);
     if (res.error) toast.error(res.error);
-    else toast.success("Application submitted successfully!");
+    else {
+      toast.success("Application submitted successfully!");
+      setJobs(prev => prev.map(j => j.id === jobId ? { ...j, has_applied: true } : j));
+    }
     setApplying(null);
   };
 
@@ -171,19 +175,31 @@ export default function SavedJobsPage() {
             {/* Actions */}
             <div className="border-t mt-auto items-center gap-2 border-border flex pt-4">
               <Button 
+                as={Link}
+                href={`/jobs/${generateJobSlug(job)}`}
                 variant="ghost" 
                 className="flex-1 py-2 min-h-0"
               >
                 View Details
               </Button>
-              <Button
-                onClick={() => handleApply(job.id)}
-                disabled={applying === job.id}
-                variant="primary"
-                className="flex-1 py-2 min-h-0"
-              >
-                {applying === job.id ? "Applying..." : "Apply now"}
-              </Button>
+              {job.has_applied ? (
+                <Button
+                  disabled
+                  variant="secondary"
+                  className="flex-1 py-2 min-h-0 bg-success-bg border border-success/20 text-success"
+                >
+                  Applied
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleApply(job.id)}
+                  disabled={applying === job.id}
+                  variant="primary"
+                  className="flex-1 py-2 min-h-0"
+                >
+                  {applying === job.id ? "Applying..." : "Apply now"}
+                </Button>
+              )}
             </div>
           </div>
         ))}

@@ -5,6 +5,7 @@ export interface Job {
   company_logo?: string;
   location: string;
   is_saved?: boolean;
+  has_applied?: boolean;
   skills?: string[];
   salary_min?: number;
   salary_max?: number;

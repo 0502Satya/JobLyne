@@ -10,7 +10,6 @@ from django.utils import timezone
 from apps.candidates.models import JobSeekers, CandidateShortlists
 from apps.jobs.models import Jobs, Applications, ApplicationStatusHistory
 from apps.companies.models import Companies, Recruiters
-from apps.commerce.models import AdvertiserAccounts
 from apps.companies.serializers import CompanyProfileSerializer, RecruiterProfileSerializer
 from apps.users.pagination import StandardPagination
 from django.db import IntegrityError, transaction
@@ -46,13 +45,7 @@ class CompanyProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_company(self, user):
-        if getattr(user, 'company', None):
-            return user.company
-        try:
-            adv_account = AdvertiserAccounts.objects.get(user=user)
-            return adv_account.company
-        except AdvertiserAccounts.DoesNotExist:
-            return None
+        return getattr(user, 'company', None)
 
     def get(self, request):
         if request.user.account_type != 'COMPANY':
@@ -746,13 +739,7 @@ class CompanySubmitVerificationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_company(self, user):
-        if getattr(user, 'company', None):
-            return user.company
-        try:
-            adv_account = AdvertiserAccounts.objects.get(user=user)
-            return adv_account.company
-        except AdvertiserAccounts.DoesNotExist:
-            return None
+        return getattr(user, 'company', None)
 
     def post(self, request, *args, **kwargs):
         if request.user.account_type != 'COMPANY':
