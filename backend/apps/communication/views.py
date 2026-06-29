@@ -18,7 +18,6 @@ from apps.communication.models import (
 from apps.users.models import CustomUser
 from apps.candidates.models import JobSeekers
 from apps.companies.models import Recruiters, Companies
-from apps.commerce.models import AdvertiserAccounts
 from apps.users.pagination import StandardPagination
 
 def clean_attachment_url(url_val):
@@ -106,10 +105,7 @@ class ThreadListView(APIView):
 
         seekers = {s.user_id: s for s in JobSeekers.objects.filter(user_id__in=other_user_ids)}
         recruiters = {r.user_id: r for r in Recruiters.objects.filter(user_id__in=other_user_ids)}
-        adv_accounts = {}
-        for acc in AdvertiserAccounts.objects.filter(user_id__in=other_user_ids).select_related('company'):
-            if acc.company:
-                adv_accounts[acc.user_id] = acc.company
+        companies = {u.id: u.company for u in CustomUser.objects.filter(id__in=other_user_ids).select_related('company') if u.company}
 
         thread_list_data = []
         for thread in threads:
@@ -144,7 +140,7 @@ class ThreadListView(APIView):
                         other_participant_data["name"] = recruiter.agency_name or "Recruiter"
                         other_participant_data["headline"] = "Recruiter Agent"
                 elif other_user.account_type == 'COMPANY':
-                    comp = adv_accounts.get(other_user.id)
+                    comp = companies.get(other_user.id)
                     if comp:
                         other_participant_data["name"] = comp.name or "Company Admin"
                         other_participant_data["headline"] = comp.industry or "Company"

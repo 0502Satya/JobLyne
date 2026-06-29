@@ -14,8 +14,10 @@ import {
   ClipboardCheck,
   Bookmark,
   BookmarkPlus,
-  Rocket
+  Rocket,
+  ExternalLink
 } from "lucide-react";
+import Link from "next/link";
 
 interface JobDetailPanelProps {
   selectedJob: any;
@@ -90,13 +92,24 @@ export default function JobDetailPanel({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-11 justify-center items-center bg-bg text-muted transition-colors h-11 flex rounded-xl hover:text-text hover:bg-border/20 cursor-pointer"
-            aria-label="Close details"
-          >
-            <X size={20} aria-hidden="true" />
-          </button>
+          <div className="flex gap-2 items-center">
+            <Link
+              href={`/jobs/${selectedJob.id}`}
+              className="w-11 justify-center items-center bg-bg text-muted transition-colors h-11 flex rounded-xl hover:text-primary hover:bg-border/20 cursor-pointer"
+              title="Open full page details"
+              aria-label="Open full page details"
+            >
+              <ExternalLink size={20} aria-hidden="true" />
+            </Link>
+
+            <button
+              onClick={onClose}
+              className="w-11 justify-center items-center bg-bg text-muted transition-colors h-11 flex rounded-xl hover:text-text hover:bg-border/20 cursor-pointer"
+              aria-label="Close details"
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable details body */}

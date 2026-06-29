@@ -15,6 +15,7 @@ import {
   ArrowRight 
 } from "lucide-react";
 import { Breadcrumbs } from "@/shared/ui";
+import { generateJobSlug } from "@/shared/utils/slug";
 
 interface JobPost {
   id: string;
@@ -189,7 +190,7 @@ export default function CompanyProfilePageClient({ profile, jobs }: CompanyProfi
                   </div>
                   
                   <Link 
-                    href={`/jobs/${job.id}`} 
+                    href={`/jobs/${generateJobSlug({ ...job, company_name: profile.name })}`} 
                     className="w-full min-h-[40px] justify-center type-badge cursor-pointer gap-1.5 items-center transition-all py-3 shadow-sm bg-primary flex text-white rounded-xl hover:scale-[1.02] active:scale-[0.98]"
                   >
                     View Details

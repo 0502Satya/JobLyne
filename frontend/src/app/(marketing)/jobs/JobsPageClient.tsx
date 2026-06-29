@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useTransition, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { 
   getJobsAction, 
   applyToJobAction, 
@@ -15,7 +15,7 @@ import { SignUpModal, EmptyState } from "@/shared/ui";
 import { Compass, SlidersHorizontal } from "lucide-react";
 import JobsFilterSidebar from "@/features/jobs/components/JobsFilterSidebar";
 import JobListItem from "@/features/jobs/components/JobListItem";
-import JobDetailPanel from "@/features/jobs/components/JobDetailPanel";
+import { generateJobSlug } from "@/shared/utils/slug";
 
 /**
  * High-fidelity, real-time Job Search & AI Skill-Matching Dashboard.
@@ -23,6 +23,7 @@ import JobDetailPanel from "@/features/jobs/components/JobDetailPanel";
  */
 function SearchJobPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [jobs, setJobs] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ function SearchJobPageContent() {
   // Active filters & search terms initialized from search params if present
   const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
   const [locationQuery, setLocationQuery] = useState(searchParams.get("location") || "");
-  const [experienceLevel, setExperienceLevel] = useState(searchParams.get("experience") || "All"); // All, Entry, Mid, Senior
+  const [experienceLevel, setExperienceLevel] = useState(searchParams.get("experience") || "All"); // All, Entry, Mid, Senior, or numeric
   const [salaryMin, setSalaryMin] = useState(searchParams.get("salaryMin") || "");
   const [salaryMax, setSalaryMax] = useState(searchParams.get("salaryMax") || "");
   const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(
@@ -45,11 +46,8 @@ function SearchJobPageContent() {
   );
 
   // UX states
-  const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [applyingId, setApplyingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [updatingSkill, setUpdatingSkill] = useState<string | null>(null);
 
   // Guest Interceptor Modal states
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
@@ -153,9 +151,29 @@ function SearchJobPageContent() {
     }
 
     // 2. Experience Level filter
-    if (experienceLevel !== "All") {
+    if (experienceLevel !== "All" && experienceLevel !== "30") {
       result = result.filter(job => {
         const req = job.experience_required ?? 0;
+        
+        // Determine category range based on selected years
+        const years = Number(experienceLevel);
+        if (!isNaN(years)) {
+          if (years === 0) {
+            return req === 0;
+          } else if (years >= 1 && years <= 2) {
+            return req >= 1 && req <= 2;
+          } else if (years >= 3 && years <= 5) {
+            return req >= 3 && req <= 5;
+          } else if (years >= 6 && years <= 9) {
+            return req >= 6 && req <= 9;
+          } else if (years >= 10 && years <= 14) {
+            return req >= 10 && req <= 14;
+          } else {
+            return req >= 15;
+          }
+        }
+        
+        // Fallback for Entry/Mid/Senior string categories
         if (experienceLevel === "Entry") return req <= 1;
         if (experienceLevel === "Mid") return req > 1 && req <= 4;
         if (experienceLevel === "Senior") return req >= 5;
@@ -201,94 +219,18 @@ function SearchJobPageContent() {
         if (!res.error) {
           toast.success("Removed from saved list");
           setJobs(prev => prev.map(j => j.id === job.id ? { ...j, is_saved: false } : j));
-          if (selectedJob?.id === job.id) {
-            setSelectedJob((prev: any) => ({ ...prev, is_saved: false }));
-          }
         }
       } else {
         const res = await saveJobAction(job.id);
         if (!res.error) {
           toast.success("Opportunity bookmarked!");
           setJobs(prev => prev.map(j => j.id === job.id ? { ...j, is_saved: true } : j));
-          if (selectedJob?.id === job.id) {
-            setSelectedJob((prev: any) => ({ ...prev, is_saved: true }));
-          }
         }
       }
     } catch (err) {
       toast.error("Failed to bookmark job");
     } finally {
       setSavingId(null);
-    }
-  };
-
-  // Submit job application
-  const handleApply = async (jobId: string) => {
-    if (!profile) {
-      setSignUpActionText("to apply for this job opportunity");
-      setIsSignUpModalOpen(true);
-      return;
-    }
-    setApplyingId(jobId);
-    try {
-      const res = await applyToJobAction(jobId);
-      if (res.error) {
-        toast.error(res.error);
-      } else {
-        toast.success("Application submitted successfully!");
-        setSelectedJob((prev: any) => prev ? { ...prev, has_applied: true } : null);
-      }
-    } catch (err) {
-      toast.error("Failed to apply");
-    } finally {
-      setApplyingId(null);
-    }
-  };
-
-  // Dynamically add a missing skill to the candidate profile and recalculate match score optimistically
-  const handleAddSkill = async (skillName: string) => {
-    if (!profile) {
-      setSignUpActionText("to update your skill profiles");
-      setIsSignUpModalOpen(true);
-      return;
-    }
-    setUpdatingSkill(skillName);
-    
-    // Optimistic profile update locally
-    const currentSkills = profile.skills || [];
-    const updatedSkills = [...new Set([...currentSkills, skillName])];
-    
-    const originalProfile = { ...profile };
-    setProfile((prev: any) => ({ ...prev, skills: updatedSkills }));
-    
-    try {
-      const res = await updateCandidateProfileAction({ skills: updatedSkills });
-      if (res.error) {
-        toast.error(res.error);
-        setProfile(originalProfile); // Rollback
-      } else {
-        toast.success(`"${skillName}" successfully added to your profile!`);
-        
-        // Dynamically recalculate match score of the currently selected job optimistically
-        if (selectedJob) {
-          const reqSkills = selectedJob.skills || [];
-          const candidateSkillsSet = new Set(updatedSkills.map(s => s.toLowerCase()));
-          
-          let newScore = 60;
-          if (reqSkills.length > 0) {
-            const overlap = reqSkills.filter((s: string) => candidateSkillsSet.has(s.toLowerCase()));
-            newScore = Math.round((overlap.length / reqSkills.length) * 100);
-          }
-          
-          setSelectedJob((prev: any) => ({ ...prev, match_score: Math.min(Math.max(newScore, 0), 100) }));
-          setJobs(prev => prev.map(j => j.id === selectedJob.id ? { ...j, match_score: Math.min(Math.max(newScore, 0), 100) } : j));
-        }
-      }
-    } catch (err) {
-      toast.error("Failed to add skill");
-      setProfile(originalProfile);
-    } finally {
-      setUpdatingSkill(null);
     }
   };
 
@@ -381,9 +323,9 @@ function SearchJobPageContent() {
                 <JobListItem
                   key={job.id}
                   job={job}
-                  isSelected={selectedJob?.id === job.id}
+                  isSelected={false}
                   savingId={savingId}
-                  onSelect={() => setSelectedJob(job)}
+                  onSelect={() => router.push(`/jobs/${generateJobSlug(job)}`)}
                   onToggleSave={handleToggleSave}
                 />
               ))}
@@ -400,19 +342,6 @@ function SearchJobPageContent() {
           )}
         </div>
       </div>
-
-      {/* Floating Interactive Detail Drawer Component */}
-      <JobDetailPanel
-        selectedJob={selectedJob}
-        profile={profile}
-        savingId={savingId}
-        applyingId={applyingId}
-        updatingSkill={updatingSkill}
-        onClose={() => setSelectedJob(null)}
-        onToggleSave={handleToggleSave}
-        onApply={handleApply}
-        onAddSkill={handleAddSkill}
-      />
 
       {/* Floating Bottom Drawer / Modal - Mobile Filters overlay */}
       {isFilterDrawerOpen && (

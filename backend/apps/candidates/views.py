@@ -61,10 +61,30 @@ class SavedJobViewSet(viewsets.ModelViewSet):
             return SavedJobs.objects.none()
         
     def list(self, request):
+        import uuid
         queryset = self.get_queryset()
         jobs = [sj.job for sj in queryset]
         serializer = JobSerializer(jobs, many=True)
-        return Response(serializer.data)
+        response_data = serializer.data
+        
+        if request.user.is_authenticated and request.user.account_type == 'CANDIDATE':
+            try:
+                job_seeker = JobSeekers.objects.get(user=request.user)
+                applied_job_ids = set(Applications.objects.filter(job_seeker=job_seeker).values_list('job_id', flat=True))
+                for job_data in response_data:
+                    job_uuid = uuid.UUID(job_data['id'])
+                    job_data['is_saved'] = True
+                    job_data['has_applied'] = job_uuid in applied_job_ids
+            except JobSeekers.DoesNotExist:
+                for job_data in response_data:
+                    job_data['is_saved'] = True
+                    job_data['has_applied'] = False
+        else:
+            for job_data in response_data:
+                job_data['is_saved'] = False
+                job_data['has_applied'] = False
+                
+        return Response(response_data)
 
     def create(self, request):
         job_id = request.data.get('job')

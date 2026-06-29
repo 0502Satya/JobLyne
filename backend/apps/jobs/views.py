@@ -10,7 +10,6 @@ from django.utils import timezone
 
 from apps.jobs.models import Jobs, JobSkills, Applications
 from apps.candidates.models import JobSeekers, JobSeekerSkills, SavedJobs, CandidateShortlists, CandidateProfileViews
-from apps.commerce.models import AdvertiserAccounts
 from apps.companies.models import Recruiters, Companies
 from apps.taxonomy.models import Skills
 from apps.jobs.serializers import JobSerializer, ApplicationSerializer
@@ -39,10 +38,9 @@ class JobListView(APIView):
         my_jobs = request.query_params.get('my_jobs', '')
         if my_jobs == 'true':
             if request.user.is_authenticated and request.user.account_type == 'COMPANY':
-                try:
-                    adv_account = AdvertiserAccounts.objects.get(user=request.user)
-                    jobs = jobs.filter(company=adv_account.company)
-                except AdvertiserAccounts.DoesNotExist:
+                if request.user.company:
+                    jobs = jobs.filter(company=request.user.company)
+                else:
                     jobs = jobs.none()
             elif request.user.is_authenticated and request.user.account_type == 'RECRUITER':
                 try:
@@ -101,11 +99,13 @@ class JobListView(APIView):
             try:
                 job_seeker = JobSeekers.objects.get(user=request.user)
                 saved_job_ids = set(SavedJobs.objects.filter(job_seeker=job_seeker).values_list('job_id', flat=True))
+                applied_job_ids = set(Applications.objects.filter(job_seeker=job_seeker).values_list('job_id', flat=True))
                 candidate_skills = set(JobSeekerSkills.objects.filter(job_seeker=job_seeker).values_list('skill__name', flat=True))
                 
                 for job_data in response_data:
                     job_uuid = uuid.UUID(job_data['id'])
                     job_data['is_saved'] = job_uuid in saved_job_ids
+                    job_data['has_applied'] = job_uuid in applied_job_ids
                     
                     job_skills = set(name.lower() for name in job_data.get('skills', []))
                     cand_skills = set(name.lower() for name in candidate_skills)
@@ -125,10 +125,12 @@ class JobListView(APIView):
             except JobSeekers.DoesNotExist:
                 for job_data in response_data:
                     job_data['is_saved'] = False
+                    job_data['has_applied'] = False
                     job_data['match_score'] = 60
         else:
             for job_data in response_data:
                 job_data['is_saved'] = False
+                job_data['has_applied'] = False
                 job_data['match_score'] = 60
 
         if page is not None:
@@ -157,18 +159,16 @@ class JobListView(APIView):
         recruiter = None
 
         if request.user.account_type == 'COMPANY':
-            try:
-                adv_account = AdvertiserAccounts.objects.get(user=request.user)
-                company = adv_account.company
-                if company.verification_status != 'verified':
-                    return Response(
-                        {"error": "Your company profile is not verified yet. Job posting is gated until admin review is complete."},
-                        status=status.HTTP_403_FORBIDDEN
-                    )
-            except AdvertiserAccounts.DoesNotExist:
+            company = request.user.company
+            if not company:
                 return Response(
-                    {"error": "No advertiser account associated with this company user. Please complete company profile onboarding first."},
+                    {"error": "No company profile associated with this company user. Please complete company profile onboarding first."},
                     status=status.HTTP_400_BAD_REQUEST
+                )
+            if company.verification_status != 'verified':
+                return Response(
+                    {"error": "Your company profile is not verified yet. Job posting is gated until admin review is complete."},
+                    status=status.HTTP_403_FORBIDDEN
                 )
         elif request.user.account_type == 'RECRUITER':
             try:
@@ -266,12 +266,8 @@ class JobDetailView(APIView):
 
         is_authorized = False
         if request.user.account_type == 'COMPANY':
-            try:
-                adv_account = AdvertiserAccounts.objects.get(user=request.user)
-                if job.company == adv_account.company:
-                    is_authorized = True
-            except AdvertiserAccounts.DoesNotExist:
-                pass
+            if request.user.company and job.company == request.user.company:
+                is_authorized = True
         elif request.user.account_type == 'RECRUITER':
             try:
                 recruiter = Recruiters.objects.get(user=request.user)
@@ -516,12 +512,8 @@ class CloneJobView(APIView):
 
         is_authorized = False
         if request.user.account_type == 'COMPANY':
-            try:
-                adv_account = AdvertiserAccounts.objects.get(user=request.user)
-                if job.company == adv_account.company:
-                    is_authorized = True
-            except AdvertiserAccounts.DoesNotExist:
-                pass
+            if request.user.company and job.company == request.user.company:
+                is_authorized = True
         elif request.user.account_type == 'RECRUITER':
             try:
                 recruiter = Recruiters.objects.get(user=request.user)

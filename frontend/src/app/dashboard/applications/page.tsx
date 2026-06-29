@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { getApplicationsAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
 import { Calendar, ClipboardCheck } from "lucide-react";
+import Link from "next/link";
 import { Breadcrumbs, LoadingState } from "@/shared/ui";
+import { generateJobSlug } from "@/shared/utils/slug";
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -90,9 +92,12 @@ export default function ApplicationsPage() {
               </div>
 
               <div className="flex justify-end pt-1">
-                <button className="type-ui text-primary hover:underline text-xs min-h-[40px] px-3 flex items-center font-bold">
+                <Link 
+                  href={`/jobs/${generateJobSlug({ id: app.job, title: app.job_title, company_name: app.company_name, location: app.location })}`}
+                  className="type-ui text-primary hover:underline text-xs min-h-[40px] px-3 flex items-center font-bold"
+                >
                   View Details
-                </button>
+                </Link>
               </div>
             </div>
           ))}
@@ -145,9 +150,12 @@ export default function ApplicationsPage() {
                     </span>
                   </td>
                   <td className="py-4 px-6">
-                    <button className="type-ui text-primary hover:underline font-bold min-h-[36px] px-3 flex items-center">
+                    <Link 
+                      href={`/jobs/${generateJobSlug({ id: app.job, title: app.job_title, company_name: app.company_name, location: app.location })}`}
+                      className="type-ui text-primary hover:underline font-bold min-h-[36px] px-3 flex items-center"
+                    >
                       View Details
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
