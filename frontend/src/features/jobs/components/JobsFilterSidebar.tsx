@@ -158,23 +158,35 @@ export default function JobsFilterSidebar({
 
       {/* Experience Required Range Selector */}
       <div className="gap-2 flex flex-col">
-        <span className="uppercase tracking-wider type-caption text-muted font-bold">Experience Level</span>
-        <div className="gap-2 grid-cols-2 grid">
-          {["All", "Entry", "Mid", "Senior"].map((level) => (
-            <button
-              key={level}
-              type="button"
-              onClick={() => setExperienceLevel(level)}
-              className={`transition-all py-2 type-caption rounded-xl border font-semibold ${
-                experienceLevel === level
-                  ? "text-primary border-primary bg-primary/10"
-                  : "bg-bg text-muted border-border/60 hover:text-text cursor-pointer"
-              }`}
-            >
-              {level === "Entry" ? "0-1 Years" : level === "Mid" ? "2-4 Years" : level === "Senior" ? "5+ Years" : "All"}
-            </button>
-          ))}
+        <div className="flex type-caption justify-between">
+          <label htmlFor="filter-experience" className="uppercase text-muted tracking-wider font-bold">Experience Required</label>
+          <span className="text-primary font-bold">
+            {(() => {
+              if (experienceLevel === "All" || experienceLevel === "30") return "Any";
+              const years = Number(experienceLevel);
+              if (isNaN(years)) return experienceLevel;
+              if (years === 0) return "0 Years";
+              if (years >= 1 && years <= 2) return "1 - 2 Years";
+              if (years >= 3 && years <= 5) return "3 - 5 Years";
+              if (years >= 6 && years <= 9) return "6 - 9 Years";
+              if (years >= 10 && years <= 14) return "10 - 14 Years";
+              return "15+ Years";
+            })()}
+          </span>
         </div>
+        <input
+          id="filter-experience"
+          type="range"
+          min="0"
+          max="30"
+          step="1"
+          value={experienceLevel === "All" ? 30 : Number(experienceLevel)}
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            setExperienceLevel(val === 30 ? "All" : val.toString());
+          }}
+          className="w-full h-1.5 appearance-none rounded-lg bg-border/40 cursor-pointer accent-primary"
+        />
       </div>
 
       {/* Salary Bounds Limits */}

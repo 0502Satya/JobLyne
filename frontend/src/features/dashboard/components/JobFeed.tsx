@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Button, LoadingState, EmptyState, toast } from "@/shared/ui";
 import { Sparkles, Coins, Bookmark, BookmarkPlus, Clock } from "lucide-react";
 import type { Job } from "@/types/job";
+import { generateJobSlug } from "@/shared/utils/slug";
 
 export default function JobFeed() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -50,7 +51,10 @@ export default function JobFeed() {
     try {
       const res = await applyToJobAction(jobId);
       if (res.error) toast.error(res.error);
-      else toast.success("Application submitted successfully!");
+      else {
+        toast.success("Application submitted successfully!");
+        setJobs(prev => prev.map(j => j.id === jobId ? { ...j, has_applied: true } : j));
+      }
     } catch {
       toast.error("Failed to submit application");
     } finally {
@@ -124,7 +128,8 @@ export default function JobFeed() {
 
       {jobs.length > 0 ? jobs.map((job) => (
         <div key={job.id}
-          className="border-border group shadow-sm transition-shadow p-6 bg-surface rounded-xl border hover:shadow-md"
+          onClick={() => router.push(`/jobs/${generateJobSlug(job)}`)}
+          className="border-border group shadow-sm transition-shadow p-6 bg-surface rounded-xl border hover:shadow-md cursor-pointer text-left"
         >
           <div className="mb-4 flex items-start justify-between">
             <div className="gap-4 flex">
@@ -182,14 +187,20 @@ export default function JobFeed() {
                   {job.match_score}% Match
                 </span>
               )}
-              <Button
-                size="sm"
-                variant="primary"
-                isLoading={applying === job.id}
-                onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleApply(job.id); }}
-              >
-                Apply now
-              </Button>
+              {job.has_applied ? (
+                <Button size="sm" variant="secondary" disabled className="bg-success-bg border border-success/20 text-success">
+                  Applied
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  isLoading={applying === job.id}
+                  onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleApply(job.id); }}
+                >
+                  Apply now
+                </Button>
+              )}
             </div>
           </div>
         </div>

@@ -21,7 +21,6 @@ from apps.users.serializers import (
 from apps.users.models import CustomUser, EmailVerificationOTP, PasswordResetToken
 from apps.companies.models import Companies, Recruiters
 from apps.candidates.models import JobSeekers
-from apps.commerce.models import AdvertiserAccounts
 from apps.users.social_auth_utils import verify_google_token, verify_linkedin_token
 from apps.users.utils import send_otp_email, send_password_reset_email
 

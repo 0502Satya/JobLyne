@@ -5,7 +5,6 @@ from django.db import transaction
 
 from apps.companies.models import Companies, Recruiters
 from apps.candidates.models import JobSeekers
-from apps.commerce.models import AdvertiserAccounts
 
 User = get_user_model()
 
@@ -201,12 +200,6 @@ class CompanySignupSerializer(serializers.Serializer):
             )
             user.set_password(validated_data['password'])
             user.save()
-            
-            AdvertiserAccounts.objects.update_or_create(
-                user=user,
-                company=company,
-                defaults={'advertiser_type': 'COMPANY_ADMIN'}
-            )
             
         return user
 

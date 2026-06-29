@@ -110,6 +110,11 @@ export default function JobListItem({
         </div>
 
         <div className="flex gap-3 items-center">
+          {job.has_applied && (
+            <div className="py-1 type-badge uppercase px-3 items-center rounded-full tracking-wider flex font-semibold text-success bg-success-bg border-success/20 border">
+              Applied
+            </div>
+          )}
           {/* Match Indicator Pill */}
           <div
             className={`py-1 type-badge gap-1.5 uppercase px-3 items-center rounded-full tracking-wider flex font-semibold ${
