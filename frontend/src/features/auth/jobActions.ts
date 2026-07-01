@@ -2,6 +2,7 @@
 
 import { authenticatedFetch } from "./apiClient";
 import { API_BASE_URL } from "./config";
+import { revalidatePath } from "next/cache";
 
 export async function getJobsAction(params: { 
   query?: string; 
@@ -68,6 +69,9 @@ export async function saveJobAction(jobId: string) {
 
     const data = await res.json();
     if (!res.ok) return { error: data.error || "Failed to save job" };
+    
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/saved-jobs");
     return data;
   } catch (err) {
     return { error: "Network error" };
@@ -81,6 +85,9 @@ export async function unsaveJobAction(jobId: string) {
     });
 
     if (!res.ok) return { error: "Failed to unsave job" };
+    
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/saved-jobs");
     return { success: true };
   } catch (err) {
     return { error: "Network error" };

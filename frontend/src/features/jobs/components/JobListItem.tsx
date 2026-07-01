@@ -3,12 +3,15 @@
 import React from "react";
 import { Briefcase, Bookmark, BookmarkPlus, Clock, Sparkles } from "lucide-react";
 
+import { Job } from "@/types/job";
+import { calculateTrustScore, getBadgeDetails } from "@/shared/utils/trustScore";
+
 interface JobListItemProps {
-  job: any;
+  job: Job;
   isSelected: boolean;
   savingId: string | null;
   onSelect: () => void;
-  onToggleSave: (e: React.MouseEvent, job: any) => void;
+  onToggleSave: (e: React.MouseEvent, job: Job) => void;
 }
 
 export default function JobListItem({
@@ -47,9 +50,29 @@ export default function JobListItem({
             <h4 className="text-text type-card-title transition-colors line-clamp-1 leading-tight group-hover:text-primary font-semibold">
               {job.title}
             </h4>
-            <p className="type-label mt-0.5 text-muted">
-              {job.company_name} • {job.location}
-            </p>
+            <div className="text-xs text-muted mt-0.5 flex flex-wrap items-center gap-1.5 font-medium leading-none">
+              <span className="font-bold text-text/90">{job.company_name}</span>
+              {(() => {
+                const companyDataForScore = {
+                  official_email: job.company_name ? `info@${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                  phone_number: "+919999999999",
+                  website: job.company_name ? `https://${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                  verification_status: job.company_verification_status || "pending",
+                  social_links: job.company_social_links || {}
+                };
+                const trustResult = calculateTrustScore(companyDataForScore);
+                if (trustResult.badge === "UNVERIFIED") return null;
+                const details = getBadgeDetails(trustResult.badge);
+                return (
+                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-extrabold border uppercase tracking-wider ${details.color}`}>
+                    <span>{details.indicator}</span>
+                    <span>{details.label.split(" ")[0]}</span>
+                  </span>
+                );
+              })()}
+              <span>&bull;</span>
+              <span>{job.location}</span>
+            </div>
           </div>
         </div>
 
@@ -103,10 +126,17 @@ export default function JobListItem({
       </div>
 
       {/* Meta section */}
-      <div className="border-border/40 border-t items-center flex justify-between type-caption text-muted pt-4 text-xs">
-        <div className="flex gap-1.5 items-center">
-          <Clock size={14} className="text-muted" aria-hidden="true" />
-          Posted {new Date(job.posted_at).toLocaleDateString()}
+      <div className="border-border/40 border-t items-center flex justify-between type-caption text-muted pt-4 text-xs font-medium">
+        <div className="flex gap-3 items-center flex-wrap">
+          <span className="flex gap-1.5 items-center">
+            <Clock size={14} className="text-muted" aria-hidden="true" />
+            Posted {new Date(job.posted_at || job.created_at).toLocaleDateString()}
+          </span>
+          <span>&bull;</span>
+          <span className="flex gap-1.5 items-center">
+            <Briefcase size={14} className="text-muted" aria-hidden="true" />
+            {job.experience_required != null ? `${job.experience_required} Yrs Experience` : "Any Experience"}
+          </span>
         </div>
 
         <div className="flex gap-3 items-center">

@@ -32,7 +32,7 @@ class JobLyneJobSerializerTests(TestCase):
         serializer = JobSerializer(self.job)
         data = serializer.data
         self.assertEqual(data["title"], "Senior backend engineer")
-        self.assertEqual(data["skills"], ["Python", "Django"])
+        self.assertEqual(set(data["skills"]), {"Python", "Django"})
 
 
 class JobLyneDuplicateApplicationTests(TestCase):

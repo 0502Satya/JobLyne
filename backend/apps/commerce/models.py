@@ -146,7 +146,7 @@ class RevenueDistributions(models.Model):
 
 class Wallets(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=True, blank=True, related_name='wallets_user')
+    user = models.OneToOneField('users.CustomUser', on_delete=models.CASCADE, null=True, blank=True, related_name='wallets_user')
     wallet_type = models.CharField(max_length=255, null=True, blank=True)
     balance = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     currency = models.CharField(max_length=255, null=True, blank=True)
@@ -188,6 +188,7 @@ class CreditBalances(models.Model):
 
     class Meta:
         db_table = 'credit_balances'
+        unique_together = [['user', 'credit_type']]
 
 class CreditTransactions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

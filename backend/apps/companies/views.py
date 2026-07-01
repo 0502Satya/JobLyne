@@ -12,6 +12,7 @@ from apps.jobs.models import Jobs, Applications, ApplicationStatusHistory
 from apps.companies.models import Companies, Recruiters
 from apps.companies.serializers import CompanyProfileSerializer, RecruiterProfileSerializer
 from apps.users.pagination import StandardPagination
+from apps.users.permissions import IsCompany, IsRecruiter
 from django.db import IntegrityError, transaction
 
 def get_or_create_recruiter(user, agency_name):
@@ -42,14 +43,12 @@ def get_gradient_for_id(seeker_id: str) -> str:
     return gradients[hash_val % len(gradients)]
 
 class CompanyProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompany]
 
     def get_company(self, user):
         return getattr(user, 'company', None)
 
     def get(self, request):
-        if request.user.account_type != 'COMPANY':
-            raise PermissionDenied("Only company accounts can access this endpoint.")
         company = self.get_company(request.user)
         if not company:
             return Response({"error": "No company associated with this user."}, status=status.HTTP_404_NOT_FOUND)
@@ -58,8 +57,6 @@ class CompanyProfileView(APIView):
         return Response(serializer.data)
 
     def patch(self, request):
-        if request.user.account_type != 'COMPANY':
-            raise PermissionDenied("Only company accounts can access this endpoint.")
         if request.user.team_role not in ['ADMIN', 'HIRING_MANAGER']:
             return Response({"error": "You do not have permission to modify company profile details (Admins/Managers only)."}, status=status.HTTP_403_FORBIDDEN)
         company = self.get_company(request.user)
@@ -469,10 +466,10 @@ from django.db import transaction
 User = get_user_model()
 
 class CompanyTeamListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompany]
 
     def get(self, request):
-        if request.user.account_type != 'COMPANY' or not request.user.company:
+        if not request.user.company:
             return Response({"error": "Access denied. Company members only."}, status=status.HTTP_403_FORBIDDEN)
         
         team_members = User.objects.filter(company=request.user.company)
@@ -489,7 +486,7 @@ class CompanyTeamListView(APIView):
         return Response(members_data)
 
     def delete(self, request, member_id=None):
-        if request.user.account_type != 'COMPANY' or not request.user.company:
+        if not request.user.company:
             return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         if request.user.team_role not in ['ADMIN', 'HIRING_MANAGER']:
             return Response({"error": "Only admins and hiring managers can manage team members."}, status=status.HTTP_403_FORBIDDEN)
@@ -514,10 +511,10 @@ class CompanyTeamListView(APIView):
         return Response({"message": "Team member removed successfully."})
 
 class CompanyTeamInviteView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompany]
 
     def get(self, request):
-        if request.user.account_type != 'COMPANY' or not request.user.company:
+        if not request.user.company:
             return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
 
         invites = CompanyTeamInvitations.objects.filter(company=request.user.company).order_by('-invited_at')
@@ -531,7 +528,7 @@ class CompanyTeamInviteView(APIView):
         return Response(invites_data)
 
     def post(self, request):
-        if request.user.account_type != 'COMPANY' or not request.user.company:
+        if not request.user.company:
             return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         if request.user.team_role not in ['ADMIN', 'HIRING_MANAGER']:
             return Response({"error": "Only admins and hiring managers can send invitations."}, status=status.HTTP_403_FORBIDDEN)
@@ -640,7 +637,7 @@ class PublicCompanyProfileView(APIView):
 from apps.companies.serializers import RecruiterProfileSerializer
 
 class RecruiterProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsRecruiter]
 
     def get_recruiter(self, user):
         agency_default = "Recruiter Agency"
@@ -651,8 +648,6 @@ class RecruiterProfileView(APIView):
         return recruiter
 
     def get(self, request):
-        if request.user.account_type != 'RECRUITER':
-            raise PermissionDenied("Only recruiter accounts can access this endpoint.")
         recruiter = self.get_recruiter(request.user)
         
         initial_data = {
@@ -667,8 +662,6 @@ class RecruiterProfileView(APIView):
         return Response(serializer.data)
 
     def patch(self, request):
-        if request.user.account_type != 'RECRUITER':
-            raise PermissionDenied("Only recruiter accounts can access this endpoint.")
         recruiter = self.get_recruiter(request.user)
         
         serializer = RecruiterProfileSerializer(data=request.data, partial=True)
@@ -725,6 +718,26 @@ class CompanyFileUploadView(APIView):
         if ext not in ['.pdf', '.jpg', '.jpeg', '.png']:
             return Response({"error": "Invalid file type. Only PDF, JPG, and PNG are allowed."}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Verify content integrity
+        if ext in ['.jpg', '.jpeg', '.png']:
+            from PIL import Image
+            try:
+                img = Image.open(uploaded_file)
+                img.verify()
+                # reset file pointer
+                uploaded_file.seek(0)
+            except Exception:
+                return Response({"error": "Uploaded image is corrupted or invalid."}, status=status.HTTP_400_BAD_REQUEST)
+        elif ext == '.pdf':
+            # Check for PDF header signature '%PDF-'
+            try:
+                header = uploaded_file.read(4)
+                uploaded_file.seek(0)
+                if header != b'%PDF':
+                    return Response({"error": "Uploaded PDF file structure is invalid."}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception:
+                return Response({"error": "Uploaded PDF file cannot be read."}, status=status.HTTP_400_BAD_REQUEST)
+        
         # Save to local media uploads
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
         os.makedirs(upload_dir, exist_ok=True)
@@ -748,6 +761,9 @@ class CompanySubmitVerificationView(APIView):
         company = self.get_company(request.user)
         if not company:
             return Response({"error": "No company associated with this user."}, status=status.HTTP_404_NOT_FOUND)
+            
+        if company.verification_status == 'verified':
+            return Response({"message": "Company is already verified."}, status=status.HTTP_200_OK)
         
         # Check required fields
         required_fields = [

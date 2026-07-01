@@ -19,14 +19,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { Job } from "@/types/job";
+import { Profile } from "@/types/profile";
+
 interface JobDetailPanelProps {
-  selectedJob: any;
-  profile: any;
+  selectedJob: Job | null;
+  profile: Profile | null;
   savingId: string | null;
   applyingId: string | null;
   updatingSkill: string | null;
   onClose: () => void;
-  onToggleSave: (e: React.MouseEvent, job: any) => void;
+  onToggleSave: (e: React.MouseEvent, job: Job) => void;
   onApply: (jobId: string) => void;
   onAddSkill: (skillName: string) => void;
 }

@@ -37,8 +37,16 @@ class UserSignupSerializer(serializers.ModelSerializer):
              raise serializers.ValidationError({"account_type": f"Invalid role. Must be one of: {', '.join(valid_choices)}"})
              
         existing_user = User.objects.filter(email=email).first()
-        if existing_user and existing_user.is_verified:
-            raise serializers.ValidationError({"email": "User with this email already exists and is verified."})
+        if existing_user:
+            if existing_user.is_verified:
+                raise serializers.ValidationError({"email": "User with this email already exists and is verified."})
+            
+            # Check for cooldown to prevent silent overwriting/harassment
+            from django.utils import timezone
+            import datetime
+            time_threshold = timezone.now() - datetime.timedelta(minutes=15)
+            if existing_user.created_at and existing_user.created_at > time_threshold:
+                raise serializers.ValidationError({"email": "A registration request was recently submitted for this email. Please verify using the OTP sent or try again in 15 minutes."})
             
         return attrs
 
@@ -51,32 +59,33 @@ class UserSignupSerializer(serializers.ModelSerializer):
         
         account_type = validated_data.get('account_type', 'CANDIDATE')
         
-        user, created = User.objects.update_or_create(
-            email=email,
-            defaults={
-                'account_type': account_type,
-                'first_name': first_name,
-                'last_name': last_name,
-                'marketing_consent': validated_data.get('marketing_consent', False),
-                'data_processing_consent': validated_data.get('data_processing_consent', False),
-                'is_active': False
-            }
-        )
-        
-        user.set_password(password)
-        user.save()
-        
-        if account_type == 'CANDIDATE':
-            full_name = f"{first_name} {last_name}".strip()
-            JobSeekers.objects.update_or_create(
-                user=user,
-                defaults={'full_name': full_name}
+        with transaction.atomic():
+            user, created = User.objects.update_or_create(
+                email=email,
+                defaults={
+                    'account_type': account_type,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'marketing_consent': validated_data.get('marketing_consent', False),
+                    'data_processing_consent': validated_data.get('data_processing_consent', False),
+                    'is_active': False
+                }
             )
-        elif account_type == 'RECRUITER':
-            Recruiters.objects.update_or_create(
-                user=user,
-                defaults={'agency_name': f"{first_name} {last_name}".strip() or "Recruiter"}
-            )
+            
+            user.set_password(password)
+            user.save()
+            
+            if account_type == 'CANDIDATE':
+                full_name = f"{first_name} {last_name}".strip()
+                JobSeekers.objects.update_or_create(
+                    user=user,
+                    defaults={'full_name': full_name}
+                )
+            elif account_type == 'RECRUITER':
+                Recruiters.objects.update_or_create(
+                    user=user,
+                    defaults={'agency_name': f"{first_name} {last_name}".strip() or "Recruiter"}
+                )
             
         return user
 

@@ -1,14 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AlertCircle } from 'lucide-react';
 
 export default function RecruiterError({ error, reset }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
+
   return (
-    <div className="justify-center min-h-[400px] mx-auto my-12 border border-border items-center text-center shadow-sm rounded-[24px] max-w-md flex gap-6 p-8 bg-surface flex-col">
+    <div 
+      ref={containerRef}
+      tabIndex={-1}
+      className="justify-center min-h-[400px] mx-auto my-12 border border-border items-center text-center shadow-sm rounded-[24px] max-w-md flex gap-6 p-8 bg-surface flex-col focus:outline-none"
+    >
       <div className="justify-center h-16 w-16 items-center text-error rounded-full flex bg-error-bg">
         <AlertCircle size={30} aria-hidden="true" />
       </div>

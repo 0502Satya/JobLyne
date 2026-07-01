@@ -73,11 +73,9 @@ export default function ProfileInfoCard({ profile, onEdit }: ProfileInfoCardProp
                 <div className="flex gap-1.5 items-center">
                   <span className="h-2 shrink-0 w-2 rounded-full bg-success"></span>
                   <span>
-                    {profile?.work_mode && Array.isArray(profile.work_mode) && profile.work_mode.length > 0
+                    {profile?.work_mode && profile.work_mode.length > 0
                       ? `Open to ${profile.work_mode.join(" & ").toLowerCase()}`
-                      : profile?.work_mode && typeof profile.work_mode === "string"
-                        ? `Open to ${profile.work_mode.toLowerCase()}`
-                        : "Open to remote & hybrid"}
+                      : "Open to remote & hybrid"}
                   </span>
                 </div>
               </div>

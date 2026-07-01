@@ -9,9 +9,10 @@ from apps.jobs.models import Jobs, Applications
 from apps.jobs.serializers import JobSerializer
 from apps.candidates.serializers import CandidateProfileSerializer
 from apps.candidates.utils import calculate_profile_completeness
+from apps.users.permissions import IsCandidate
 
 class CandidateProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCandidate]
 
     def get_job_seeker(self, user):
         try:
@@ -28,8 +29,6 @@ class CandidateProfileView(APIView):
             return None
 
     def get(self, request):
-        if request.user.account_type != 'CANDIDATE':
-            raise PermissionDenied("Only candidates can access candidate profiles.")
         job_seeker = self.get_job_seeker(request.user)
         if not job_seeker:
             return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)
@@ -38,8 +37,6 @@ class CandidateProfileView(APIView):
         return Response(serializer.data)
 
     def patch(self, request):
-        if request.user.account_type != 'CANDIDATE':
-            raise PermissionDenied("Only candidates can access candidate profiles.")
         job_seeker = self.get_job_seeker(request.user)
         if not job_seeker:
             return Response({"error": "No profile found for this user."}, status=status.HTTP_404_NOT_FOUND)

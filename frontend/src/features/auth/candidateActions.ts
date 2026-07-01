@@ -2,6 +2,7 @@
 
 import { authenticatedFetch } from "./apiClient";
 import { API_BASE_URL } from "./config";
+import { revalidatePath } from "next/cache";
 
 export async function getCandidateProfileAction() {
   try {
@@ -33,6 +34,7 @@ export async function updateCandidateProfileAction(data: any) {
       return { error: errorData.error || "Update failed" };
     }
 
+    revalidatePath("/dashboard", "layout");
     return { success: true, data: await res.json() };
   } catch (err) {
     return { error: "Network error" };
@@ -51,6 +53,8 @@ export async function applyToJobAction(jobId: string) {
 
     const data = await res.json();
     if (!res.ok) return { error: data.error || "Failed to apply" };
+    
+    revalidatePath("/dashboard", "layout");
     return data;
   } catch (err) {
     return { error: "Network error" };

@@ -11,7 +11,7 @@ export default function LoadingState({ variant = "card", rows = 3, className = "
 
   if (variant === "text") {
     return (
-      <div className={`space-y-3 w-full ${className}`}>
+      <div className={`space-y-3 w-full ${className}`} aria-busy="true" aria-live="polite" role="status" aria-label="Loading text content">
         <div className={`h-6 w-1/3 ${shimmer}`} />
         <div className="space-y-2">
           <div className={`h-4 w-full ${shimmer}`} />
@@ -24,7 +24,7 @@ export default function LoadingState({ variant = "card", rows = 3, className = "
 
   if (variant === "list") {
     return (
-      <div className={`space-y-4 w-full ${className}`}>
+      <div className={`space-y-4 w-full ${className}`} aria-busy="true" aria-live="polite" role="status" aria-label="Loading list items">
         {Array.from({ length: rows }).map((_, i) => (
           <div key={i} className="flex gap-4 items-center">
             <div className={`h-12 w-12 rounded-full ${shimmer} shrink-0`} />
@@ -40,7 +40,7 @@ export default function LoadingState({ variant = "card", rows = 3, className = "
 
   if (variant === "table") {
     return (
-      <div className={`space-y-4 w-full overflow-hidden ${className}`}>
+      <div className={`space-y-4 w-full overflow-hidden ${className}`} aria-busy="true" aria-live="polite" role="status" aria-label="Loading table details">
         <div className="flex gap-4 border-b border-border/40 pb-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className={`h-5 w-20 ${shimmer}`} />
@@ -59,7 +59,7 @@ export default function LoadingState({ variant = "card", rows = 3, className = "
 
   // default card layout
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full ${className}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full ${className}`} aria-busy="true" aria-live="polite" role="status" aria-label="Loading data cards">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="p-6 rounded-lg border border-border/40 bg-card-bg space-y-4 shadow-sm">
           <div className="flex justify-between items-start">

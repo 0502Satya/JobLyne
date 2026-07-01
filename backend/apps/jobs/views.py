@@ -7,12 +7,14 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django.utils import timezone
+from django.db import transaction
 
 from apps.jobs.models import Jobs, JobSkills, Applications
 from apps.candidates.models import JobSeekers, JobSeekerSkills, SavedJobs, CandidateShortlists, CandidateProfileViews
 from apps.companies.models import Recruiters, Companies
 from apps.taxonomy.models import Skills
 from apps.jobs.serializers import JobSerializer, ApplicationSerializer
+from apps.users.permissions import IsCorporate
 
 class JobPagination(PageNumberPagination):
     page_size = 10
@@ -23,7 +25,7 @@ class JobListView(APIView):
     def get_permissions(self):
         if self.request.method == 'GET':
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAuthenticated(), IsCorporate()]
 
     def get(self, request):
         query = request.query_params.get('query', '')
@@ -138,9 +140,6 @@ class JobListView(APIView):
         return Response(response_data)
 
     def post(self, request):
-        if request.user.account_type not in ['COMPANY', 'RECRUITER']:
-            return Response({"error": "Access denied. Corporate accounts only."}, status=status.HTTP_403_FORBIDDEN)
-
         title = request.data.get('title')
         description = request.data.get('description', '')
         requirements = request.data.get('requirements', '')
@@ -154,38 +153,6 @@ class JobListView(APIView):
 
         if not title:
             return Response({"error": "Job title is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        company = None
-        recruiter = None
-
-        if request.user.account_type == 'COMPANY':
-            company = request.user.company
-            if not company:
-                return Response(
-                    {"error": "No company profile associated with this company user. Please complete company profile onboarding first."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            if company.verification_status != 'verified':
-                return Response(
-                    {"error": "Your company profile is not verified yet. Job posting is gated until admin review is complete."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-        elif request.user.account_type == 'RECRUITER':
-            try:
-                recruiter = Recruiters.objects.get(user=request.user)
-                company, _ = Companies.objects.get_or_create(
-                    name=recruiter.agency_name or "Recruiting Agency",
-                    defaults={"industry": "Staffing"}
-                )
-            except Recruiters.DoesNotExist:
-                recruiter = Recruiters.objects.create(
-                    user=request.user,
-                    agency_name="Staffing Solutions"
-                )
-                company, _ = Companies.objects.get_or_create(
-                    name="Staffing Solutions",
-                    defaults={"industry": "Staffing"}
-                )
 
         try:
             exp_val = int(experience_required) if experience_required is not None else None
@@ -202,30 +169,63 @@ class JobListView(APIView):
         except (ValueError, TypeError):
             s_max = None
 
-        job = Jobs.objects.create(
-            company=company,
-            recruiter=recruiter,
-            title=title,
-            description=description,
-            requirements=requirements,
-            raw_location=raw_location,
-            employment_type=employment_type,
-            experience_required=exp_val,
-            salary_min=s_min,
-            salary_max=s_max,
-            currency=currency,
-            status='OPEN',
-            posted_at=timezone.now()
-        )
+        with transaction.atomic():
+            company = None
+            recruiter = None
 
-        if skills_list:
-            for skill_name in skills_list:
-                if skill_name:
-                    clean_name = skill_name.strip()
-                    skill = Skills.objects.filter(name__iexact=clean_name).first()
-                    if not skill:
-                        skill = Skills.objects.create(name=clean_name)
-                    JobSkills.objects.create(job=job, skill=skill, is_required=True)
+            if request.user.account_type == 'COMPANY':
+                company = request.user.company
+                if not company:
+                    return Response(
+                        {"error": "No company profile associated with this company user. Please complete company profile onboarding first."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                if company.verification_status != 'verified':
+                    return Response(
+                        {"error": "Your company profile is not verified yet. Job posting is gated until admin review is complete."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            elif request.user.account_type == 'RECRUITER':
+                try:
+                    recruiter = Recruiters.objects.get(user=request.user)
+                    company, _ = Companies.objects.get_or_create(
+                        name=recruiter.agency_name or "Recruiting Agency",
+                        defaults={"industry": "Staffing"}
+                    )
+                except Recruiters.DoesNotExist:
+                    recruiter = Recruiters.objects.create(
+                        user=request.user,
+                        agency_name="Staffing Solutions"
+                    )
+                    company, _ = Companies.objects.get_or_create(
+                        name="Staffing Solutions",
+                        defaults={"industry": "Staffing"}
+                    )
+
+            job = Jobs.objects.create(
+                company=company,
+                recruiter=recruiter,
+                title=title,
+                description=description,
+                requirements=requirements,
+                raw_location=raw_location,
+                employment_type=employment_type,
+                experience_required=exp_val,
+                salary_min=s_min,
+                salary_max=s_max,
+                currency=currency,
+                status='OPEN',
+                posted_at=timezone.now()
+            )
+
+            if skills_list:
+                for skill_name in skills_list:
+                    if skill_name:
+                        clean_name = skill_name.strip()
+                        skill = Skills.objects.filter(name__iexact=clean_name).first()
+                        if not skill:
+                            skill = Skills.objects.create(name=clean_name)
+                        JobSkills.objects.create(job=job, skill=skill, is_required=True)
 
         serializer = JobSerializer(job)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -310,6 +310,30 @@ class JobDetailView(APIView):
         job.save()
         serializer = JobSerializer(job)
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        try:
+            job = Jobs.objects.get(pk=pk)
+        except Jobs.DoesNotExist:
+            return Response({"error": "Job not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        is_authorized = False
+        if request.user.account_type == 'COMPANY':
+            if request.user.company and job.company == request.user.company:
+                is_authorized = True
+        elif request.user.account_type == 'RECRUITER':
+            try:
+                recruiter = Recruiters.objects.get(user=request.user)
+                if job.recruiter == recruiter:
+                    is_authorized = True
+            except Recruiters.DoesNotExist:
+                pass
+
+        if not is_authorized and not request.user.is_staff:
+            return Response({"error": "You do not have permission to delete this job."}, status=status.HTTP_403_FORBIDDEN)
+
+        job.delete()
+        return Response({"success": "Job deleted successfully"}, status=status.HTTP_200_OK)
 
 class ApplicationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -424,7 +448,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         if new_status not in ['PENDING', 'INTERVIEW', 'OFFER', 'PLACED', 'REJECTED']:
             return Response({"error": f"Invalid status: {new_status}."}, status=status.HTTP_400_BAD_REQUEST)
 
-        applications = Applications.objects.filter(id__in=application_ids)
+        applications = Applications.objects.filter(id__in=application_ids).select_related('job__company', 'recruiter__user')
         updated_count = 0
         for app in applications:
             is_owner = False
@@ -502,7 +526,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         })
 
 class CloneJobView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCorporate]
 
     def post(self, request, pk):
         try:
@@ -525,43 +549,42 @@ class CloneJobView(APIView):
         if not is_authorized and not request.user.is_staff:
             return Response({"error": "You do not have permission to clone this job."}, status=status.HTTP_403_FORBIDDEN)
 
-        new_job = Jobs.objects.create(
-            company=job.company,
-            recruiter=job.recruiter,
-            title=f"Copy of {job.title}",
-            description=job.description,
-            requirements=job.requirements,
-            raw_location=job.raw_location,
-            location=job.location,
-            job_category=job.job_category,
-            industry=job.industry,
-            employment_type=job.employment_type,
-            experience_required=job.experience_required,
-            salary_min=job.salary_min,
-            salary_max=job.salary_max,
-            currency=job.currency,
-            status='DRAFT',
-            posted_at=timezone.now()
-        )
-
-        from apps.jobs.models import JobSkills
-        skills = JobSkills.objects.filter(job=job)
-        for s in skills:
-            JobSkills.objects.create(
-                job=new_job,
-                skill=s.skill,
-                is_required=s.is_required
+        with transaction.atomic():
+            new_job = Jobs.objects.create(
+                company=job.company,
+                recruiter=job.recruiter,
+                title=f"Copy of {job.title}",
+                description=job.description,
+                requirements=job.requirements,
+                raw_location=job.raw_location,
+                location=job.location,
+                job_category=job.job_category,
+                industry=job.industry,
+                employment_type=job.employment_type,
+                experience_required=job.experience_required,
+                salary_min=job.salary_min,
+                salary_max=job.salary_max,
+                currency=job.currency,
+                status='DRAFT',
+                posted_at=timezone.now()
             )
+
+            from apps.jobs.models import JobSkills
+            skills = JobSkills.objects.filter(job=job)
+            for s in skills:
+                JobSkills.objects.create(
+                    job=new_job,
+                    skill=s.skill,
+                    is_required=s.is_required
+                )
 
         serializer = JobSerializer(new_job)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class GenerateJDView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCorporate]
 
     def post(self, request):
-        if request.user.account_type not in ['COMPANY', 'RECRUITER']:
-            return Response({"error": "Access denied. Corporate accounts only."}, status=status.HTTP_403_FORBIDDEN)
 
         title = request.data.get('title', 'Software Engineer')
         skills = request.data.get('skills', [])
