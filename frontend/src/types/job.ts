@@ -15,4 +15,9 @@ export interface Job {
   match_score?: number;
   description?: string;
   requirements?: string;
+  experience_required?: number | string;
+  employment_type?: string;
+  company_verification_status?: string;
+  company_social_links?: any;
+  raw_location?: string;
 }

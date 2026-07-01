@@ -12,6 +12,17 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r backend/requirements.txt
+      - name: Run dependency security audit
+        run: |
+          pip install pip-audit
+          pip-audit -r backend/requirements.txt
+      - name: Run migrations safety check
+        run: |
+          python backend/manage.py makemigrations --check
+        env:
+          SECRET_KEY: ci-secret-key-do-not-use-in-production-12345
+          DATABASE_URL: sqlite:///:memory:
+          JWT_SECRET: ci-jwt-secret-for-testing-only
       - name: Run tests
         run: |
           python backend/manage.py test apps
@@ -30,6 +41,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
+        working-directory: frontend
+      - name: Dependency security audit
+        run: |
+          npm audit --audit-level=high
         working-directory: frontend
       - name: Type check
         run: |

@@ -31,6 +31,10 @@ def verify_google_token(token):
         if not client_id:
             return None
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id, clock_skew_in_seconds=60)
+        if not idinfo.get('email_verified'):
+            logger.error("Google login failed: Email is not verified by Google.")
+            return None
+            
         return {
             'email': idinfo.get('email'),
             'first_name': idinfo.get('given_name'),
@@ -77,7 +81,8 @@ def verify_linkedin_token(access_token):
                 'client_id': client_id,
                 'client_secret': client_secret,
             },
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            timeout=10
         )
         if introspect_res.status_code == 200:
             introspect_data = introspect_res.json()
@@ -90,14 +95,16 @@ def verify_linkedin_token(access_token):
         # Get basic profile info
         profile_res = requests.get(
             'https://api.linkedin.com/v2/me',
-            headers={'Authorization': f'Bearer {access_token}'}
+            headers={'Authorization': f'Bearer {access_token}'},
+            timeout=10
         )
         profile_data = profile_res.json()
 
         # Get email address
         email_res = requests.get(
             'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))',
-            headers={'Authorization': f'Bearer {access_token}'}
+            headers={'Authorization': f'Bearer {access_token}'},
+            timeout=10
         )
         email_data = email_res.json()
 

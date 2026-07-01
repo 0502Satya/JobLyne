@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   // Secure session check - relies strictly on JWT tokens
   const token = request.cookies.get('jwt_access')?.value;
   const refreshToken = request.cookies.get('jwt_refresh')?.value;
-  const userRole = request.cookies.get('joblyne_role')?.value;
+  let userRole = request.cookies.get('joblyne_role')?.value;
   let isLoggedIn = false;
 
   const jwtSecret = process.env.JWT_SECRET;
@@ -26,14 +26,20 @@ export async function middleware(request: NextRequest) {
   if (secret) {
     if (token) {
       try {
-        await jwtVerify(token, secret);
+        const { payload } = await jwtVerify(token, secret);
         isLoggedIn = true;
+        if (payload && payload.role) {
+          userRole = payload.role as string;
+        }
       } catch {
         // Access token invalid/expired, check refresh token
         if (refreshToken) {
           try {
-            await jwtVerify(refreshToken, secret);
+            const { payload } = await jwtVerify(refreshToken, secret);
             isLoggedIn = true;
+            if (payload && payload.role) {
+              userRole = payload.role as string;
+            }
           } catch {
             isLoggedIn = false;
           }
@@ -41,8 +47,11 @@ export async function middleware(request: NextRequest) {
       }
     } else if (refreshToken) {
       try {
-        await jwtVerify(refreshToken, secret);
+        const { payload } = await jwtVerify(refreshToken, secret);
         isLoggedIn = true;
+        if (payload && payload.role) {
+          userRole = payload.role as string;
+        }
       } catch {
         isLoggedIn = false;
       }
@@ -55,16 +64,19 @@ export async function middleware(request: NextRequest) {
                      pathname.includes('/auth/');
 
   // Detect if we are on the main domain (not a known subdomain)
-  const isMainDomain = !host.startsWith('recruiter.') && !host.startsWith('company.');
+  const isMainDomain = !host.startsWith('recruiter.') && !host.startsWith('company.') && !host.toLowerCase().startsWith('admin');
 
   // Strict role and subdomain verification
   if (isLoggedIn && userRole) {
     const isRecruiterSubdomain = host.startsWith('recruiter.');
     const isCompanySubdomain = host.startsWith('company.');
+    const isAdminSubdomain = host.toLowerCase().startsWith('admin');
     
     if (isRecruiterSubdomain && userRole !== 'RECRUITER') {
       isLoggedIn = false;
     } else if (isCompanySubdomain && userRole !== 'COMPANY') {
+      isLoggedIn = false;
+    } else if (isAdminSubdomain && userRole !== 'ADMIN') {
       isLoggedIn = false;
     } else if (isMainDomain && userRole !== 'CANDIDATE') {
       // Automatic cross-subdomain routing for non-candidate roles landing on main domain
@@ -77,6 +89,12 @@ export async function middleware(request: NextRequest) {
       if (userRole === 'COMPANY') {
         const redirectUrl = request.nextUrl.clone();
         redirectUrl.host = `company.${host}`;
+        redirectUrl.pathname = pathname === '/' ? '/dashboard' : pathname;
+        return NextResponse.redirect(redirectUrl);
+      }
+      if (userRole === 'ADMIN') {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.host = `admin.${host}`;
         redirectUrl.pathname = pathname === '/' ? '/dashboard' : pathname;
         return NextResponse.redirect(redirectUrl);
       }
@@ -96,6 +114,12 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.host = `company.${host}`;
       redirectUrl.pathname = pathname.replace('/company', '') || '/';
+      return NextResponse.redirect(redirectUrl);
+    }
+    if (pathname.startsWith('/admin')) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.host = `admin.${host}`;
+      redirectUrl.pathname = pathname.replace('/admin', '') || '/';
       return NextResponse.redirect(redirectUrl);
     }
   }
@@ -149,7 +173,30 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Main Domain fallback (Candidates/Marketing)
+  // 4. Admin Subdomain Logic (matches startsWith('admin') e.g. admin. or admindataminerz.)
+  if (host.toLowerCase().startsWith('admin')) {
+    // Redirect if it starts with /admin to keep URLs clean
+    if (pathname.startsWith('/admin')) {
+      url.pathname = pathname.replace('/admin', '') || '/';
+      return NextResponse.redirect(url);
+    }
+
+    const isAdminAuthPage = pathname.startsWith('/login') || pathname.startsWith('/auth/');
+    
+    // If not logged in and not on login/auth pages, redirect to login
+    if (!isLoggedIn && !isAdminAuthPage) {
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+
+    // Rewrite internally to the /admin directory
+    if (!pathname.startsWith('/admin')) {
+      url.pathname = `/admin${pathname === '/' ? '' : pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // 5. Main Domain fallback (Candidates/Marketing)
   // If not logged in and attempting to access private dashboard pages, redirect to sign-in
   if (isMainDomain && !isLoggedIn && (pathname === '/dashboard' || pathname.startsWith('/dashboard/'))) {
     url.pathname = '/auth/signin';

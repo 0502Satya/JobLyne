@@ -44,7 +44,6 @@ export default function SocialLogin() {
   }, []);
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    console.log("Google Login Success:", credentialResponse);
     if (credentialResponse.credential) {
       const result = await socialLoginAction("google", credentialResponse.credential);
       
@@ -65,7 +64,6 @@ export default function SocialLogin() {
     }
 
     // LinkedIn login (placeholder for now)
-    console.log(`Initiating ${provider} login...`);
     alert(`${provider} login is coming soon. Please use Google for now.`);
   };
 

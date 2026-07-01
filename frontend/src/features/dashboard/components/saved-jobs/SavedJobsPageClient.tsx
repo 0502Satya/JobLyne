@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { unsaveJobAction, applyToJobAction } from "@/features/auth/actions";
+import { unsaveJobAction, applyToJobAction, getCandidateProfileAction } from "@/features/auth/actions";
 import { toast } from "react-hot-toast";
 import { Button, Breadcrumbs } from "@/shared/ui";
 import { Briefcase, Bookmark, Clock, Banknote } from "lucide-react";
 import { generateJobSlug } from "@/shared/utils/slug";
 import { Job } from "@/types/job";
+import JobDetailPanel from "@/features/jobs/components/JobDetailPanel";
 
 interface SavedJobsPageClientProps {
   initialJobs: Job[];
@@ -16,6 +17,18 @@ interface SavedJobsPageClientProps {
 export default function SavedJobsPageClient({ initialJobs }: SavedJobsPageClientProps) {
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [applying, setApplying] = useState<string | null>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const res = await getCandidateProfileAction();
+      if (res && !res.error) {
+        setProfile(res);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   // Active timers ref to support concurrent unsaves safely
   const activeTimers = useRef<Record<string, { timer: NodeJS.Timeout; undone: boolean }>>({});
@@ -178,10 +191,9 @@ export default function SavedJobsPageClient({ initialJobs }: SavedJobsPageClient
             {/* Actions */}
             <div className="border-t mt-auto items-center gap-2 border-border flex pt-4">
               <Button 
-                as={Link}
-                href={`/jobs/${generateJobSlug({ id: job.id, title: job.title, company_name: job.company_name, location: job.location })}`}
+                onClick={() => setSelectedJob(job)}
                 variant="ghost" 
-                className="flex-1 py-2 min-h-0"
+                className="flex-1 py-2 min-h-0 cursor-pointer"
               >
                 View Details
               </Button>
@@ -217,6 +229,26 @@ export default function SavedJobsPageClient({ initialJobs }: SavedJobsPageClient
           </div>
         )}
       </div>
+
+      <JobDetailPanel
+        selectedJob={selectedJob}
+        profile={profile}
+        savingId={null}
+        applyingId={applying}
+        updatingSkill={null}
+        onClose={() => setSelectedJob(null)}
+        onToggleSave={(e) => {
+          if (selectedJob) {
+            handleUnsave(selectedJob.id);
+            setSelectedJob(null);
+          }
+        }}
+        onApply={(id) => {
+          handleApply(id);
+          setSelectedJob(null);
+        }}
+        onAddSkill={() => {}}
+      />
     </div>
   );
 }

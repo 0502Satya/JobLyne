@@ -16,6 +16,8 @@ import { Compass, SlidersHorizontal } from "lucide-react";
 import JobsFilterSidebar from "@/features/jobs/components/JobsFilterSidebar";
 import JobListItem from "@/features/jobs/components/JobListItem";
 import { generateJobSlug } from "@/shared/utils/slug";
+import { Job } from "@/types/job";
+import { Profile } from "@/types/profile";
 
 /**
  * High-fidelity, real-time Job Search & AI Skill-Matching Dashboard.
@@ -24,8 +26,8 @@ import { generateJobSlug } from "@/shared/utils/slug";
 function SearchJobPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [profile, setProfile] = useState<any>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
@@ -77,10 +79,12 @@ function SearchJobPageContent() {
 
   // Load initial candidate profile & job list (handling filters in query params) ONCE on mount
   useEffect(() => {
+    let isMounted = true;
     async function initData() {
       setLoading(true);
       try {
         const profileData = await getCandidateProfileAction();
+        if (!isMounted) return;
         if (profileData && !profileData.error) {
           setProfile(profileData);
         }
@@ -89,16 +93,22 @@ function SearchJobPageContent() {
         const query = params.get("query") || "";
         const location = params.get("location") || "";
         const jobsData = await getJobsAction({ query, location });
+        if (!isMounted) return;
         if (jobsData && !jobsData.error) {
           setJobs(Array.isArray(jobsData) ? jobsData : (jobsData.results || []));
         }
       } catch (err) {
         console.error("Failed to initialize jobs data:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
     initData();
+    return () => {
+      isMounted = false;
+    };
   }, []); // Run exactly once on mount
 
   // Fetch jobs dynamically based on primary search query & location keywords
@@ -161,7 +171,7 @@ function SearchJobPageContent() {
     // 2. Experience Level filter
     if (experienceLevel !== "All" && experienceLevel !== "30") {
       result = result.filter(job => {
-        const req = job.experience_required ?? 0;
+        const req = Number(job.experience_required ?? 0);
         
         // Determine category range based on selected years
         const years = Number(experienceLevel);
@@ -204,7 +214,7 @@ function SearchJobPageContent() {
 
     // 5. Sorting
     if (sortBy === "recent") {
-      result.sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime());
+      result.sort((a, b) => new Date(b.posted_at || b.created_at).getTime() - new Date(a.posted_at || a.created_at).getTime());
     } else if (sortBy === "match") {
       result.sort((a, b) => (b.match_score ?? 60) - (a.match_score ?? 60));
     }
@@ -213,7 +223,7 @@ function SearchJobPageContent() {
   }, [jobs, selectedEmpTypes, experienceLevel, salaryMin, salaryMax, matchThreshold, sortBy]);
 
   // Handle direct job bookmarking
-  const handleToggleSave = async (e: React.MouseEvent, job: any) => {
+  const handleToggleSave = async (e: React.MouseEvent, job: Job) => {
     e.stopPropagation();
     if (!profile) {
       setSignUpActionText("to bookmark this job opportunity");

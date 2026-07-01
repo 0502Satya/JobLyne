@@ -139,6 +139,7 @@ class JobSeekerSkills(models.Model):
 
     class Meta:
         db_table = 'job_seeker_skills'
+        unique_together = [['job_seeker', 'skill']]
 
 class SavedJobs(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

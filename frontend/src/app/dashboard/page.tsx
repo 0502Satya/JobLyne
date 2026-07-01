@@ -36,9 +36,9 @@ export default async function CandidateDashboardPage() {
       <DashboardStats stats={stats} />
 
       {/* Main Grid: Feed + Side Column */}
-      <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
         {/* Left: Job Feed */}
-        <div className="lg:col-span-2">
+        <div className="flex-1 min-w-0">
           <React.Suspense fallback={
             <LoadingState variant="list" rows={3} />
           }>
@@ -46,8 +46,8 @@ export default async function CandidateDashboardPage() {
           </React.Suspense>
         </div>
 
-        {/* Right: Side Widgets */}
-        <aside className="lg:sticky lg:top-[calc(var(--height-header)+16px)]">
+        {/* Right: Side Widgets — sticky to top of viewport */}
+        <aside className="w-full lg:w-80 xl:w-96 shrink-0 sticky top-[calc(var(--height-header)+16px)] self-start">
           <DashboardRightSidebar />
         </aside>
       </div>

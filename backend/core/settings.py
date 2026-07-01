@@ -8,6 +8,8 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Load environment variables from .env file
 load_dotenv(BASE_DIR / '.env')
 
@@ -15,7 +17,7 @@ load_dotenv(BASE_DIR / '.env')
 def get_env(name):
     value = os.environ.get(name)
     if not value:
-        raise Exception(f"{name} is missing in environment variables. Please check your .env file.")
+        raise ImproperlyConfigured(f"{name} is missing in environment variables. Please check your .env file.")
     return value
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -23,6 +25,17 @@ SECRET_KEY = get_env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# Enforce strict startup environment validation in production
+if not DEBUG and not ('test' in sys.argv or 'test_coverage' in sys.argv):
+    get_env('DATABASE_URL')
+    get_env('JWT_SECRET')
+    if 'ALLOWED_HOSTS' not in os.environ:
+        raise ImproperlyConfigured("ALLOWED_HOSTS environment variable is required in production.")
+    if 'CORS_ALLOWED_ORIGINS' not in os.environ:
+        raise ImproperlyConfigured("CORS_ALLOWED_ORIGINS environment variable is required in production.")
+    if 'CSRF_TRUSTED_ORIGINS' not in os.environ:
+        raise ImproperlyConfigured("CSRF_TRUSTED_ORIGINS environment variable is required in production.")
 
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.localhost').split(',')]
 

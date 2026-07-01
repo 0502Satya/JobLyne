@@ -189,7 +189,6 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   try {
     const targetUrl = `${API_BASE_URL}/api/auth/login/`;
-    console.log("[DIAGNOSTIC] loginAction attempting fetch to:", targetUrl);
     const res = await fetch(targetUrl, {
       method: "POST",
       headers: {
@@ -232,7 +231,6 @@ export async function loginAction(prevState: any, formData: FormData) {
 export async function socialLoginAction(provider: "google" | "linkedin", token: string) {
   try {
     const targetUrl = `${API_BASE_URL}/api/auth/social/login/`;
-    console.log("[DIAGNOSTIC] socialLoginAction attempting fetch to:", targetUrl);
     const res = await fetch(targetUrl, {
       method: "POST",
       headers: {

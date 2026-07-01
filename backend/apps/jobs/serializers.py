@@ -4,6 +4,8 @@ from apps.jobs.models import Jobs, Applications
 class JobSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.name', read_only=True)
     company_logo = serializers.CharField(source='company.logo_url', read_only=True)
+    company_verification_status = serializers.CharField(source='company.verification_status', read_only=True)
+    company_social_links = serializers.JSONField(source='company.social_links', read_only=True)
     skills = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     applicant_count = serializers.SerializerMethodField()
@@ -14,7 +16,7 @@ class JobSerializer(serializers.ModelSerializer):
             'id', 'title', 'company_name', 'company_logo', 'description', 
             'requirements', 'location', 'employment_type', 'experience_required',
             'salary_min', 'salary_max', 'currency', 'posted_at', 'status', 'skills',
-            'applicant_count'
+            'applicant_count', 'company_verification_status', 'company_social_links'
         ]
 
     def get_skills(self, obj):

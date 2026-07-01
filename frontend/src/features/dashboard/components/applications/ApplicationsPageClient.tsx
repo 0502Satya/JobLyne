@@ -1,17 +1,50 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { CandidateApplication } from "@/types/application";
-import { Calendar, ClipboardCheck } from "lucide-react";
+import { Calendar, ClipboardCheck, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Breadcrumbs } from "@/shared/ui";
 import { generateJobSlug } from "@/shared/utils/slug";
+import { getJobDetailAction, getCandidateProfileAction } from "@/features/auth/actions";
+import { toast } from "react-hot-toast";
+import JobDetailPanel from "@/features/jobs/components/JobDetailPanel";
 
 interface ApplicationsPageClientProps {
   initialApplications: CandidateApplication[];
 }
 
 export default function ApplicationsPageClient({ initialApplications }: ApplicationsPageClientProps) {
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [fetchingJobId, setFetchingJobId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const res = await getCandidateProfileAction();
+      if (res && !res.error) {
+        setProfile(res);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleViewDetails = async (jobId: string) => {
+    setFetchingJobId(jobId);
+    try {
+      const res = await getJobDetailAction(jobId);
+      if (res.error) {
+        toast.error("Failed to load job details.");
+      } else {
+        setSelectedJob(res);
+      }
+    } catch (e) {
+      toast.error("Failed to fetch details.");
+    } finally {
+      setFetchingJobId(null);
+    }
+  };
+
   const getStatusClass = (status: string) => {
     const s = status?.toUpperCase() || "";
     if (s === "APPLIED") return "text-info bg-info-bg border-info/20";
@@ -61,12 +94,14 @@ export default function ApplicationsPageClient({ initialApplications }: Applicat
               </div>
 
               <div className="flex justify-end pt-1">
-                <Link 
-                  href={`/jobs/${generateJobSlug({ id: app.job, title: app.job_title, company_name: app.company_name, location: app.location || "" })}`}
-                  className="type-ui text-primary hover:underline text-xs min-h-[40px] px-3 flex items-center font-bold"
+                <button 
+                  onClick={() => handleViewDetails(app.job)}
+                  disabled={fetchingJobId === app.job}
+                  className="type-ui text-primary hover:underline text-xs min-h-[40px] px-3 flex items-center font-bold cursor-pointer disabled:opacity-50 gap-1.5"
                 >
+                  {fetchingJobId === app.job && <Loader2 size={12} className="animate-spin" />}
                   View Details
-                </Link>
+                </button>
               </div>
             </div>
           ))}
@@ -119,12 +154,14 @@ export default function ApplicationsPageClient({ initialApplications }: Applicat
                     </span>
                   </td>
                   <td className="py-4 px-6">
-                    <Link 
-                      href={`/jobs/${generateJobSlug({ id: app.job, title: app.job_title, company_name: app.company_name, location: app.location || "" })}`}
-                      className="type-ui text-primary hover:underline font-bold min-h-[36px] px-3 flex items-center"
+                    <button 
+                      onClick={() => handleViewDetails(app.job)}
+                      disabled={fetchingJobId === app.job}
+                      className="type-ui text-primary hover:underline font-bold min-h-[36px] px-3 flex items-center cursor-pointer disabled:opacity-50 gap-1.5"
                     >
+                      {fetchingJobId === app.job && <Loader2 size={12} className="animate-spin" />}
                       View Details
-                    </Link>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -147,6 +184,18 @@ export default function ApplicationsPageClient({ initialApplications }: Applicat
         </div>
 
       </div>
+
+      <JobDetailPanel
+        selectedJob={selectedJob}
+        profile={profile}
+        savingId={null}
+        applyingId={null}
+        updatingSkill={null}
+        onClose={() => setSelectedJob(null)}
+        onToggleSave={() => {}}
+        onApply={() => {}}
+        onAddSkill={() => {}}
+      />
     </div>
   );
 }

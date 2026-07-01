@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Container, ThemeToggle, Input } from "@/shared/ui";
+import { Button, Container, ThemeToggle } from "@/shared/ui";
 import { Search, Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import NotificationCenter from "@/features/dashboard/components/NotificationCenter";
 import UserMenu from "@/features/auth/components/UserMenu";
@@ -13,7 +14,9 @@ interface NavbarProps {
 }
 
 export default function Navbar({ isLoggedIn = false }: NavbarProps) {
+    const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [navSearchQuery, setNavSearchQuery] = useState("");
     const [recruiterUrl, setRecruiterUrl] = useState("/recruiter");
     const [companyUrl, setCompanyUrl] = useState("/company");
     const [profile, setProfile] = useState<any>(null);
@@ -59,6 +62,19 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
         : "AL";
     const profileImage = profile?.profile_image;
 
+    const handleNavSearch = useCallback(
+        (e: React.FormEvent) => {
+            e.preventDefault();
+            const q = navSearchQuery.trim();
+            if (q) {
+                router.push(`/jobs?query=${encodeURIComponent(q)}`);
+            } else {
+                router.push("/jobs");
+            }
+        },
+        [navSearchQuery, router]
+    );
+
     const navLinks = [
         { name: "Job", href: "/jobs" },
         { name: "Recruiter", href: `${recruiterUrl}/auth/signin` },
@@ -67,7 +83,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
 
     return (
         <header className="w-full border-b border-border bg-surface/80 backdrop-blur-md sticky transition-colors z-50 overflow-visible top-0">
-            <Container size="xl" className="h-[var(--height-header)] items-center flex justify-between">
+            <Container size="xl" className="h-[var(--height-header)] items-center flex justify-between relative">
                 {/* Left side: Logo and main links */}
                 <div className="gap-4 flex items-center sm:gap-8">
                     <Link href="/" className="shrink-0 group items-center gap-2 flex">
@@ -98,22 +114,38 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                             </Link>
                         ))}
                     </nav>
-                    {isLoggedIn && (
-                        <div className="w-80 hidden md:block ml-4">
-                            <label htmlFor="navbar-search" className="sr-only">Search Jobs, Skills, and Companies</label>
-                            <Input
-                                id="navbar-search"
-                                aria-label="Search Jobs, Skills, and Companies"
-                                icon="search"
-                                placeholder="Search Jobs, Skills, and Companies"
-                                className="h-10 py-1 bg-bg border-none"
-                            />
-                        </div>
-                    )}
                 </div>
+
+                {/* Centre: Search bar — absolutely centred so it doesn't shift left/right content */}
+                {isLoggedIn && (
+                    <form
+                        onSubmit={handleNavSearch}
+                        role="search"
+                        className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 w-[420px] xl:w-[500px]"
+                    >
+                        <label htmlFor="navbar-search" className="sr-only">Search Jobs, Skills, and Companies</label>
+                        <input
+                            id="navbar-search"
+                            type="text"
+                            value={navSearchQuery}
+                            onChange={(e) => setNavSearchQuery(e.target.value)}
+                            placeholder="Search Jobs, Skills, and Companies"
+                            className="w-full h-10 pl-4 pr-11 text-sm rounded-xl border border-border/60 bg-bg focus:outline-none focus:border-primary transition-colors placeholder:text-muted"
+                        />
+                        <button
+                            type="submit"
+                            aria-label="Search"
+                            className="absolute right-0 top-0 h-10 w-11 flex items-center justify-center rounded-r-xl bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+                        >
+                            <Search size={16} aria-hidden="true" />
+                        </button>
+                    </form>
+                )}
 
                 {/* Right side: Actions */}
                 <div className="gap-2 flex items-center sm:gap-3">
+
+
                     <ThemeToggle />
 
                     {!isLoggedIn && (

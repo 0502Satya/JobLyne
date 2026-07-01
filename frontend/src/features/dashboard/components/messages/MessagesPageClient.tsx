@@ -193,7 +193,7 @@ export default function MessagesPageClient({
     <div className="max-w-full box-sizing overflow-hidden flex gap-6 flex-col text-left">
       <div>
         <h1 className="text-text type-h1 font-bold text-3xl mb-1">Messages</h1>
-        <p className="type-label text-muted">Communicate with recruiters and hiring managers in real time.</p>
+        <p className="type-label text-muted">Communicate with recruiters in real time.</p>
       </div>
 
       <div className="w-full max-w-full border-border rounded-3xl relative overflow-hidden h-[calc(100vh-224px)] shadow-sm flex bg-surface border md:h-[648px]">

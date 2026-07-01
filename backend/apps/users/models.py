@@ -29,7 +29,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     profile_completeness_score = models.IntegerField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True, db_column='last_login_at')
     last_active = models.DateTimeField(null=True, blank=True)
-    failed_login_attempts = models.IntegerField(null=True, blank=True)
+    failed_login_attempts = models.IntegerField(default=0, null=True, blank=True)
+    last_failed_login_at = models.DateTimeField(null=True, blank=True)
     marketing_consent = models.BooleanField(default=False)
     data_processing_consent = models.BooleanField(default=False)
     data_export_requested = models.BooleanField(default=False)
@@ -154,4 +155,19 @@ class PasswordResetToken(models.Model):
 
     class Meta:
         db_table = 'password_reset_tokens'
+
+
+class SupportReport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reporter = models.ForeignKey('CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='reports_sent')
+    target_type = models.CharField(max_length=50) # 'company', 'candidate', 'job'
+    target_id = models.UUIDField()
+    subject = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(max_length=20, default='unresolved') # 'resolved', 'unresolved'
+    assigned_to = models.ForeignKey('CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_reports')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'support_reports'
 

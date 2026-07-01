@@ -84,6 +84,13 @@ export default function CompanyApplicantsPage() {
 
   useEffect(() => {
     loadData();
+
+    // Check search params on mount
+    const searchParams = new URLSearchParams(window.location.search);
+    const jobTitle = searchParams.get("job_title");
+    if (jobTitle) {
+      setJobFilter(jobTitle);
+    }
   }, []);
 
   // Bulk Actions
