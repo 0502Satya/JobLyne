@@ -2,6 +2,7 @@
 
 import { authenticatedFetch } from "./apiClient";
 import { API_BASE_URL } from "./config";
+import { revalidatePath } from "next/cache";
 
 /**
  * Fetch all notifications for the active authenticated user
@@ -25,6 +26,8 @@ export async function markAllNotificationsReadAction() {
       method: "POST",
     });
     if (!res.ok) return { error: "Failed to mark all as read" };
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/alerts");
     return await res.json();
   } catch (err) {
     return { error: "Network error" };
@@ -40,6 +43,8 @@ export async function markNotificationReadAction(notificationId: string) {
       method: "POST",
     });
     if (!res.ok) return { error: "Failed to mark notification as read" };
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/alerts");
     return await res.json();
   } catch (err) {
     return { error: "Network error" };
@@ -72,6 +77,9 @@ export async function updatePreferencesAction(data: any) {
       body: JSON.stringify(data),
     });
     if (!res.ok) return { error: "Failed to update notification preferences" };
+    
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/alerts");
     return await res.json();
   } catch (err) {
     return { error: "Network error" };
@@ -105,6 +113,9 @@ export async function createSavedSearchAction(data: any) {
     });
     const responseData = await res.json();
     if (!res.ok) return { error: responseData.error || "Failed to create saved search" };
+    
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/alerts");
     return responseData;
   } catch (err) {
     return { error: "Network error" };
@@ -120,6 +131,9 @@ export async function deleteSavedSearchAction(alertId: string) {
       method: "DELETE",
     });
     if (!res.ok) return { error: "Failed to delete saved search" };
+    
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/alerts");
     return { success: true };
   } catch (err) {
     return { error: "Network error" };

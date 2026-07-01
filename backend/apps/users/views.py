@@ -11,6 +11,7 @@ import hashlib
 import random
 import string
 import uuid
+import secrets
 
 from apps.users.serializers import (
     UserSignupSerializer, UserResponseSerializer, 
@@ -18,11 +19,14 @@ from apps.users.serializers import (
     RecruiterSignupSerializer, VerifyOTPSerializer,
     UserProfileSerializer
 )
-from apps.users.models import CustomUser, EmailVerificationOTP, PasswordResetToken
+from apps.users.models import CustomUser, EmailVerificationOTP, PasswordResetToken, AuditLogs
 from apps.companies.models import Companies, Recruiters
 from apps.candidates.models import JobSeekers
 from apps.users.social_auth_utils import verify_google_token, verify_linkedin_token
 from apps.users.utils import send_otp_email, send_password_reset_email
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -36,6 +40,29 @@ def get_tokens_for_user(user):
 def hash_otp(otp_code: str) -> str:
     return hashlib.sha256(otp_code.encode()).hexdigest()
 
+def log_security_event(user, action, ip_address="127.0.0.1", details=None):
+    try:
+        AuditLogs.objects.create(
+            actor_user=user,
+            target_entity_type='user',
+            target_entity_id=user.id if user else None,
+            action=action,
+            old_values={},
+            new_values=details or {},
+            ip_address=ip_address
+        )
+    except Exception:
+        pass
+
+def revoke_user_tokens(user):
+    try:
+        from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+        tokens = OutstandingToken.objects.filter(user=user)
+        for token in tokens:
+            BlacklistedToken.objects.get_or_create(token=token)
+    except Exception:
+        pass
+
 class SignupView(APIView):
     permission_classes = [AllowAny]
     throttle_scope = 'signup'
@@ -43,13 +70,19 @@ class SignupView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = UserSignupSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            
-            otp_code = ''.join(random.choices(string.digits, k=6))
-            otp_hash = hash_otp(otp_code)
-            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
-            
-            send_otp_email(user.email, otp_code)
+            try:
+                with transaction.atomic():
+                    user = serializer.save()
+                    
+                    otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+                    otp_hash = hash_otp(otp_code)
+                    EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
+                    
+                    send_otp_email(user.email, otp_code)
+            except Exception as e:
+                logger.exception("Transactional signup failed during user registration")
+                return Response({'error': 'Registration failed due to a system email delivery issue. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             user_data = UserResponseSerializer(user).data
             
             return Response({
@@ -69,25 +102,49 @@ class LoginView(APIView):
         password = request.data.get('password')
 
         if not email or not password:
-            return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get client IP for audit log
+        ip_addr = request.META.get('REMOTE_ADDR', '127.0.0.1')
 
         try:
             user_obj = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
             user_obj = None
 
-        if user_obj and user_obj.failed_login_attempts and user_obj.failed_login_attempts >= 10:
-            return Response({'error': 'Account is locked due to too many failed login attempts. Please contact support.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
-
+        # Authenticate first to verify credentials (and consume same time/hashing for non-existent users)
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
             if not user.is_active:
-                return Response({'error': 'This account is inactive.'}, status=status.HTTP_401_UNAUTHORIZED)
+                log_security_event(user, 'USER_LOGIN_FAILED_INACTIVE', ip_address=ip_addr, details={'reason': 'Account is inactive'})
+                return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            if user.failed_login_attempts != 0:
-                user.failed_login_attempts = 0
-                user.save(update_fields=['failed_login_attempts'])
+            # Check lockout
+            if user.failed_login_attempts and user.failed_login_attempts >= 10:
+                if user.last_failed_login_at:
+                    locked_delta = timezone.now() - user.last_failed_login_at
+                    if locked_delta.total_seconds() < 15 * 60:
+                        time_remaining = int(15 - (locked_delta.total_seconds() / 60))
+                        log_security_event(user, 'USER_LOGIN_FAILED_LOCKED', ip_address=ip_addr, details={'reason': 'Account is locked'})
+                        return Response({
+                            'error': f'Account is locked. Please try again in {time_remaining if time_remaining > 0 else 1} minutes.'
+                        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+                    else:
+                        # Lockout window passed, reset attempts count
+                        user.failed_login_attempts = 0
+                        user.last_failed_login_at = None
+                else:
+                    log_security_event(user, 'USER_LOGIN_FAILED_LOCKED', ip_address=ip_addr, details={'reason': 'Account is locked indefinitely'})
+                    return Response({'error': 'Account is locked. Please contact support.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+            # Successful Authentication & active & not locked!
+            user.failed_login_attempts = 0
+            user.last_failed_login_at = None
+            user.last_login = timezone.now()
+            user.save(update_fields=['failed_login_attempts', 'last_failed_login_at', 'last_login'])
+            
+            log_security_event(user, 'USER_LOGIN_SUCCESS', ip_address=ip_addr)
             
             tokens = get_tokens_for_user(user)
             user_data = UserResponseSerializer(user).data
@@ -101,10 +158,15 @@ class LoginView(APIView):
             if user_obj:
                 attempts = user_obj.failed_login_attempts or 0
                 user_obj.failed_login_attempts = attempts + 1
-                user_obj.save(update_fields=['failed_login_attempts'])
                 if user_obj.failed_login_attempts >= 10:
-                    return Response({'error': 'Account is locked due to too many failed login attempts. Please contact support.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+                    user_obj.last_failed_login_at = timezone.now()
+                    log_security_event(user_obj, 'USER_ACCOUNT_LOCK', ip_address=ip_addr, details={'reason': 'Lockout threshold reached'})
+                user_obj.save(update_fields=['failed_login_attempts', 'last_failed_login_at'])
+                log_security_event(user_obj, 'USER_LOGIN_FAILED', ip_address=ip_addr, details={'reason': 'Incorrect password'})
+            else:
+                log_security_event(None, 'USER_LOGIN_FAILED', ip_address=ip_addr, details={'email': email, 'reason': 'User does not exist'})
+
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CompanySignupView(APIView):
     permission_classes = [AllowAny]
@@ -113,13 +175,19 @@ class CompanySignupView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CompanySignupSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            
-            otp_code = ''.join(random.choices(string.digits, k=6))
-            otp_hash = hash_otp(otp_code)
-            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
-            
-            send_otp_email(user.email, otp_code)
+            try:
+                with transaction.atomic():
+                    user = serializer.save()
+                    
+                    otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+                    otp_hash = hash_otp(otp_code)
+                    EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
+                    
+                    send_otp_email(user.email, otp_code)
+            except Exception as e:
+                logger.exception("Transactional company signup failed")
+                return Response({'error': 'Registration failed due to a system email delivery issue. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             user_data = UserResponseSerializer(user).data
             
             return Response({
@@ -137,13 +205,19 @@ class RecruiterSignupView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = RecruiterSignupSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            
-            otp_code = ''.join(random.choices(string.digits, k=6))
-            otp_hash = hash_otp(otp_code)
-            EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
-            
-            send_otp_email(user.email, otp_code)
+            try:
+                with transaction.atomic():
+                    user = serializer.save()
+                    
+                    otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+                    otp_hash = hash_otp(otp_code)
+                    EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
+                    
+                    send_otp_email(user.email, otp_code)
+            except Exception as e:
+                logger.exception("Transactional recruiter signup failed")
+                return Response({'error': 'Registration failed due to a system email delivery issue. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             user_data = UserResponseSerializer(user).data
             
             return Response({
@@ -222,47 +296,60 @@ class VerifyOTPView(APIView):
 
         email = serializer.validated_data['email']
         otp_code = serializer.validated_data['otp_code']
+        ip_addr = request.META.get('REMOTE_ADDR', '127.0.0.1')
 
         try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
-            return Response({'error': 'Invalid OTP or email.'}, status=status.HTTP_400_BAD_REQUEST)
+            with transaction.atomic():
+                try:
+                    user = CustomUser.objects.select_for_update().get(email=email)
+                except CustomUser.DoesNotExist:
+                    log_security_event(None, 'OTP_VERIFICATION_FAILED', ip_address=ip_addr, details={'email': email, 'reason': 'User does not exist'})
+                    return Response({'error': 'Invalid OTP or email.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            otp_record = EmailVerificationOTP.objects.filter(user=user).latest('created_at')
-        except EmailVerificationOTP.DoesNotExist:
-            return Response({'error': 'No active OTP found for this email.'}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    otp_record = EmailVerificationOTP.objects.select_for_update().filter(user=user).latest('created_at')
+                except EmailVerificationOTP.DoesNotExist:
+                    log_security_event(user, 'OTP_VERIFICATION_FAILED', ip_address=ip_addr, details={'reason': 'No active OTP record'})
+                    return Response({'error': 'No active OTP found for this email.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if otp_record.attempts >= 5:
-            return Response({'error': 'This OTP is locked due to too many failed attempts. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+                if otp_record.attempts >= 5:
+                    log_security_event(user, 'OTP_VERIFICATION_FAILED', ip_address=ip_addr, details={'reason': 'OTP attempts locked'})
+                    return Response({'error': 'This OTP is locked due to too many failed attempts. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if (timezone.now() - otp_record.created_at).total_seconds() > 600:
-            return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+                if (timezone.now() - otp_record.created_at).total_seconds() > 600:
+                    log_security_event(user, 'OTP_VERIFICATION_FAILED', ip_address=ip_addr, details={'reason': 'OTP expired'})
+                    return Response({'error': 'OTP has expired.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        otp_hash_attempt = hash_otp(otp_code)
-        if otp_record.otp_hash != otp_hash_attempt:
-            otp_record.attempts += 1
-            otp_record.save()
-            remaining = 5 - otp_record.attempts
-            if remaining <= 0:
-                return Response({'error': 'Too many failed attempts. This OTP has been locked. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({'error': f'Invalid OTP code. {remaining} attempts remaining.'}, status=status.HTTP_400_BAD_REQUEST)
+                otp_hash_attempt = hash_otp(otp_code)
+                if otp_record.otp_hash != otp_hash_attempt:
+                    otp_record.attempts += 1
+                    otp_record.save()
+                    remaining = 5 - otp_record.attempts
+                    log_security_event(user, 'OTP_VERIFICATION_FAILED', ip_address=ip_addr, details={'reason': 'Invalid OTP code', 'attempts_remaining': remaining})
+                    if remaining <= 0:
+                        return Response({'error': 'Too many failed attempts. This OTP has been locked. Please request a new OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({'error': f'Invalid OTP code. {remaining} attempts remaining.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.is_verified = True
-        user.is_active = True
-        user.save()
-        
-        EmailVerificationOTP.objects.filter(user=user).delete()
-        
-        tokens = get_tokens_for_user(user)
-        user_data = UserResponseSerializer(user).data
-        
-        return Response({
-            'message': 'Email verified successfully.',
-            'user': user_data,
-            'tokens': tokens
-        }, status=status.HTTP_200_OK)
+                user.is_verified = True
+                user.is_active = True
+                user.save()
+                
+                EmailVerificationOTP.objects.filter(user=user).delete()
+                
+                log_security_event(user, 'OTP_VERIFICATION_SUCCESS', ip_address=ip_addr)
+                
+                tokens = get_tokens_for_user(user)
+                user_data = UserResponseSerializer(user).data
+                
+                return Response({
+                    'message': 'Email verified successfully.',
+                    'user': user_data,
+                    'tokens': tokens
+                }, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception("Transactional OTP verification failed")
+            return Response({'error': 'Verification failed due to a system error. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ThrottledTokenRefreshView(TokenRefreshView):
     throttle_scope = 'token_refresh'
@@ -302,10 +389,10 @@ class ResendOTPView(APIView):
         EmailVerificationOTP.objects.filter(user=user).delete()
 
         # Generate new OTP
-        otp_code = ''.join(random.choices(string.digits, k=6))
+        otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
         otp_hash = hash_otp(otp_code)
         EmailVerificationOTP.objects.create(user=user, otp_hash=otp_hash)
-
+        
         send_otp_email(user.email, otp_code)
 
         return Response({'message': 'If the email exists, a new OTP has been sent.'}, status=status.HTTP_200_OK)
@@ -373,6 +460,12 @@ class ResetPasswordView(APIView):
             reset_token_obj.save()
 
             PasswordResetToken.objects.filter(user=user, is_used=False).update(is_used=True)
+            
+            # Immediately revoke existing refresh tokens on password reset
+            revoke_user_tokens(user)
+            
+            ip_addr = request.META.get('REMOTE_ADDR', '127.0.0.1')
+            log_security_event(user, 'USER_PASSWORD_RESET', ip_address=ip_addr)
 
         return Response({'message': 'Password reset successful.'}, status=status.HTTP_200_OK)
 
@@ -394,8 +487,15 @@ class ChangePasswordView(APIView):
         if not user.check_password(current_password):
             return Response({'error': 'Incorrect current password.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.set_password(new_password)
-        user.save()
+        with transaction.atomic():
+            user.set_password(new_password)
+            user.save()
+            
+            # Immediately revoke existing refresh tokens on password change
+            revoke_user_tokens(user)
+            
+            ip_addr = request.META.get('REMOTE_ADDR', '127.0.0.1')
+            log_security_event(user, 'USER_PASSWORD_CHANGE', ip_address=ip_addr)
 
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
 

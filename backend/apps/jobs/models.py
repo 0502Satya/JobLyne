@@ -63,6 +63,7 @@ class JobSkills(models.Model):
 
     class Meta:
         db_table = 'job_skills'
+        unique_together = [['job', 'skill']]
 
 class JobStatusHistory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1,50 +1,44 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { getCandidateProfileAction } from "@/features/auth/actions";
+import React from "react";
+import { redirect } from "next/navigation";
+import { getProfile } from "@/services/profile.server";
+import { getDashboardStats } from "@/services/dashboard.server";
 import DashboardStats from "@/features/dashboard/components/DashboardStats";
 import JobFeed from "@/features/dashboard/components/JobFeed";
 import DashboardRightSidebar from "@/features/dashboard/components/DashboardRightSidebar";
 import { LoadingState } from "@/shared/ui";
 
-export default function CandidateDashboardPage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default async function CandidateDashboardPage() {
+  let profile = null;
+  let stats = null;
 
-  useEffect(() => {
-    async function fetchData() {
-      const profileData = await getCandidateProfileAction();
-      if (!profileData.error) setProfile(profileData);
-      setLoading(false);
-    }
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-8">
-        <LoadingState variant="card" rows={3} />
-      </div>
-    );
+  try {
+    [profile, stats] = await Promise.all([
+      getProfile(),
+      getDashboardStats()
+    ]);
+  } catch (error) {
+    redirect("/auth/signin");
   }
+
+  const firstName = profile?.full_name?.split(' ')[0] || "User";
 
   return (
     <div className="flex gap-8 flex-col">
       {/* Welcome Header */}
-      <div className="mb-2">
-        <h1 className="text-text type-h1 mb-2">
-          Welcome back, {profile?.full_name?.split(' ')[0] || "Alex"}! 👋
+      <div className="mb-2 text-left">
+        <h1 className="text-text type-h1 mb-2 font-extrabold tracking-tight text-3xl">
+          Welcome back, <span className="bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">{firstName}</span>! 👋
         </h1>
-        <p className="text-muted">Here&apos;s what&apos;s happening with your job search today.</p>
+        <p className="text-muted text-sm">Here&apos;s what&apos;s happening with your job search today.</p>
       </div>
 
       {/* Stats Grid */}
-      <DashboardStats />
+      <DashboardStats stats={stats} />
 
       {/* Main Grid: Feed + Side Column */}
-      <div className="items-start grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
         {/* Left: Job Feed */}
-        <div className="lg:col-span-2">
+        <div className="flex-1 min-w-0">
           <React.Suspense fallback={
             <LoadingState variant="list" rows={3} />
           }>
@@ -52,8 +46,8 @@ export default function CandidateDashboardPage() {
           </React.Suspense>
         </div>
 
-        {/* Right: Side Widgets */}
-        <aside className="lg:sticky lg:top-[calc(var(--height-header)+16px)]">
+        {/* Right: Side Widgets — sticky to top of viewport */}
+        <aside className="w-full lg:w-80 xl:w-96 shrink-0 sticky top-[calc(var(--height-header)+16px)] self-start">
           <DashboardRightSidebar />
         </aside>
       </div>

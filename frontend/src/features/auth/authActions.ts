@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { API_BASE_URL } from "./config";
 import { setAuthCookies, authenticatedFetch } from "./apiClient";
 
@@ -188,7 +189,6 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   try {
     const targetUrl = `${API_BASE_URL}/api/auth/login/`;
-    console.log("[DIAGNOSTIC] loginAction attempting fetch to:", targetUrl);
     const res = await fetch(targetUrl, {
       method: "POST",
       headers: {
@@ -231,7 +231,6 @@ export async function loginAction(prevState: any, formData: FormData) {
 export async function socialLoginAction(provider: "google" | "linkedin", token: string) {
   try {
     const targetUrl = `${API_BASE_URL}/api/auth/social/login/`;
-    console.log("[DIAGNOSTIC] socialLoginAction attempting fetch to:", targetUrl);
     const res = await fetch(targetUrl, {
       method: "POST",
       headers: {
@@ -324,6 +323,8 @@ export async function updateUserProfileAction(data: any) {
     });
     const responseData = await res.json();
     if (!res.ok) return { error: responseData.error || "Failed to update profile details" };
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/settings");
     return responseData;
   } catch (err) {
     return { error: "Network error" };

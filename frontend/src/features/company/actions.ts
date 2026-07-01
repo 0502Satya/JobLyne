@@ -64,7 +64,7 @@ export async function updateJobAction(jobId: string, data: {
 
 export async function getApplicantsAction() {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/applications/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export async function getApplicantsAction() {
 
 export async function bulkUpdateApplicantStatusAction(applicationIds: string[], status: string, reason = "") {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/applications/bulk-status-update/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/bulk-status-update/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +107,7 @@ export async function bulkUpdateApplicantStatusAction(applicationIds: string[], 
 
 export async function scheduleInterviewAction(applicationId: string, interviewSchedule: string) {
   try {
-    const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/applications/${applicationId}/schedule-interview/`, {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/applications/${applicationId}/schedule-interview/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -323,6 +323,26 @@ export async function verifyCompanyAction(companyId: string, action: "approve" |
       return { error: data.error || "Failed to process verification action" };
     }
     return { success: true, ...data };
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function deleteJobAction(jobId: string) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/${jobId}/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      return { error: data.error || "Failed to delete job" };
+    }
+
+    return { success: true };
   } catch (err) {
     return { error: "Network error" };
   }

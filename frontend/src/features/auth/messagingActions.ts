@@ -2,6 +2,7 @@
 
 import { authenticatedFetch } from "./apiClient";
 import { API_BASE_URL } from "./config";
+import { revalidatePath } from "next/cache";
 
 export async function getThreadsAction() {
   try {
@@ -48,6 +49,8 @@ export async function sendMessageAction(threadId: string, content: string) {
       return { error: data.error || "Failed to transmit message" };
     }
 
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/messages");
     return data;
   } catch (err) {
     return { error: "Network connection error" };
@@ -65,6 +68,8 @@ export async function markThreadReadAction(threadId: string) {
       return { error: data.error || "Failed to mark thread as read" };
     }
 
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/messages");
     return data;
   } catch (err) {
     return { error: "Network connection error" };
@@ -86,6 +91,8 @@ export async function startThreadAction(recipientId: string) {
       return { error: data.error || "Failed to initialize message thread" };
     }
 
+    revalidatePath("/dashboard", "layout");
+    revalidatePath("/dashboard/messages");
     return data;
   } catch (err) {
     return { error: "Network connection error" };

@@ -16,6 +16,8 @@ import { Compass, SlidersHorizontal } from "lucide-react";
 import JobsFilterSidebar from "@/features/jobs/components/JobsFilterSidebar";
 import JobListItem from "@/features/jobs/components/JobListItem";
 import { generateJobSlug } from "@/shared/utils/slug";
+import { Job } from "@/types/job";
+import { Profile } from "@/types/profile";
 
 /**
  * High-fidelity, real-time Job Search & AI Skill-Matching Dashboard.
@@ -24,8 +26,8 @@ import { generateJobSlug } from "@/shared/utils/slug";
 function SearchJobPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [profile, setProfile] = useState<any>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
@@ -54,10 +56,10 @@ function SearchJobPageContent() {
   const [signUpActionText, setSignUpActionText] = useState("to perform this action");
 
   // Sync state changes with URL Search Params
-  useEffect(() => {
+  const syncParamsToUrl = (currentSearch: string, currentLocation: string) => {
     const params = new URLSearchParams();
-    if (searchQuery) params.set("query", searchQuery);
-    if (locationQuery) params.set("location", locationQuery);
+    if (currentSearch) params.set("query", currentSearch);
+    if (currentLocation) params.set("location", currentLocation);
     if (experienceLevel !== "All") params.set("experience", experienceLevel);
     if (salaryMin) params.set("salaryMin", salaryMin);
     if (salaryMax) params.set("salaryMax", salaryMax);
@@ -68,32 +70,46 @@ function SearchJobPageContent() {
     const queryString = params.toString();
     const newUrl = `/jobs${queryString ? `?${queryString}` : ""}`;
     window.history.replaceState(null, "", newUrl);
-  }, [searchQuery, locationQuery, experienceLevel, salaryMin, salaryMax, selectedEmpTypes, matchThreshold, sortBy]);
+  };
 
-  // Load initial candidate profile & job list (handling filters in query params)
+  // Sync non-keyword state changes with URL Search Params dynamically
   useEffect(() => {
+    syncParamsToUrl(searchQuery, locationQuery);
+  }, [experienceLevel, salaryMin, salaryMax, selectedEmpTypes, matchThreshold, sortBy]);
+
+  // Load initial candidate profile & job list (handling filters in query params) ONCE on mount
+  useEffect(() => {
+    let isMounted = true;
     async function initData() {
       setLoading(true);
       try {
         const profileData = await getCandidateProfileAction();
+        if (!isMounted) return;
         if (profileData && !profileData.error) {
           setProfile(profileData);
         }
 
-        const query = searchParams.get("query") || "";
-        const location = searchParams.get("location") || "";
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get("query") || "";
+        const location = params.get("location") || "";
         const jobsData = await getJobsAction({ query, location });
+        if (!isMounted) return;
         if (jobsData && !jobsData.error) {
           setJobs(Array.isArray(jobsData) ? jobsData : (jobsData.results || []));
         }
       } catch (err) {
         console.error("Failed to initialize jobs data:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
     initData();
-  }, [searchParams]);
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Run exactly once on mount
 
   // Fetch jobs dynamically based on primary search query & location keywords
   const handleKeywordSearch = async (e: React.FormEvent) => {
@@ -109,6 +125,7 @@ function SearchJobPageContent() {
       } else {
         setJobs([]);
       }
+      syncParamsToUrl(searchQuery, locationQuery);
     } catch (err) {
       toast.error("Failed to reload jobs");
     } finally {
@@ -126,7 +143,7 @@ function SearchJobPageContent() {
     setSelectedEmpTypes([]);
     setMatchThreshold(0);
     setSortBy("recent");
-    // Reload unmodified job stream
+    // Reload unmodified job stream and reset URL
     startTransition(async () => {
       setLoading(true);
       const data = await getJobsAction();
@@ -134,6 +151,7 @@ function SearchJobPageContent() {
         setJobs(Array.isArray(data) ? data : (data.results || []));
       }
       setLoading(false);
+      window.history.replaceState(null, "", "/jobs");
     });
   };
 
@@ -153,7 +171,7 @@ function SearchJobPageContent() {
     // 2. Experience Level filter
     if (experienceLevel !== "All" && experienceLevel !== "30") {
       result = result.filter(job => {
-        const req = job.experience_required ?? 0;
+        const req = Number(job.experience_required ?? 0);
         
         // Determine category range based on selected years
         const years = Number(experienceLevel);
@@ -196,7 +214,7 @@ function SearchJobPageContent() {
 
     // 5. Sorting
     if (sortBy === "recent") {
-      result.sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime());
+      result.sort((a, b) => new Date(b.posted_at || b.created_at).getTime() - new Date(a.posted_at || a.created_at).getTime());
     } else if (sortBy === "match") {
       result.sort((a, b) => (b.match_score ?? 60) - (a.match_score ?? 60));
     }
@@ -205,7 +223,7 @@ function SearchJobPageContent() {
   }, [jobs, selectedEmpTypes, experienceLevel, salaryMin, salaryMax, matchThreshold, sortBy]);
 
   // Handle direct job bookmarking
-  const handleToggleSave = async (e: React.MouseEvent, job: any) => {
+  const handleToggleSave = async (e: React.MouseEvent, job: Job) => {
     e.stopPropagation();
     if (!profile) {
       setSignUpActionText("to bookmark this job opportunity");
@@ -281,7 +299,7 @@ function SearchJobPageContent() {
       </div>
 
       {/* Main Grid Block */}
-      <div className="w-full gap-8 items-start grid grid-cols-1 lg:grid-cols-4">
+      <div className="w-full gap-8 items-start grid grid-cols-1 lg:grid-cols-[300px_1fr]">
         
         {/* Sidebar Filters - Desktop (Sticky) */}
         <JobsFilterSidebar
@@ -306,7 +324,7 @@ function SearchJobPageContent() {
         />
 
         {/* Results Feed Panel */}
-        <div className="lg:col-span-3 w-full max-w-full flex gap-6 flex-col">
+        <div className="w-full max-w-full flex gap-6 flex-col">
           {loading ? (
             <div className="flex gap-6 flex-col">
               {[1, 2, 3].map((i) => (

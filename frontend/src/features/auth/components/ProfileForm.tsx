@@ -5,8 +5,10 @@ import { updateCandidateProfileAction } from "@/features/auth/actions";
 import { Input } from "@/shared/ui";
 import { CheckCircle, AlertCircle, Save, Loader2 } from "lucide-react";
 
+import { Profile } from "@/types/profile";
+
 interface ProfileFormProps {
-  initialData: any;
+  initialData: Profile | null;
 }
 
 export default function ProfileForm({ initialData }: ProfileFormProps) {

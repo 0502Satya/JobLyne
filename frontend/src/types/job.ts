@@ -13,4 +13,11 @@ export interface Job {
   created_at: string;
   posted_at?: string;
   match_score?: number;
+  description?: string;
+  requirements?: string;
+  experience_required?: number | string;
+  employment_type?: string;
+  company_verification_status?: string;
+  company_social_links?: any;
+  raw_location?: string;
 }

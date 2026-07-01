@@ -12,6 +12,11 @@ import {
   unsaveJobAction,
   updateCandidateProfileAction
 } from "@/features/auth/actions";
+import { getJobsAction } from "@/features/auth/jobActions";
+import { Job } from "@/types/job";
+import { Profile } from "@/types/profile";
+import { CandidateApplication } from "@/types/application";
+import { calculateTrustScore, getBadgeDetails } from "@/shared/utils/trustScore";
 import { 
   Button, 
   Breadcrumbs, 
@@ -32,7 +37,6 @@ import {
   ClipboardCheck, 
   Bookmark, 
   BookmarkPlus, 
-  Rocket,
   FileText,
   User,
   Mail,
@@ -40,7 +44,11 @@ import {
   Calendar,
   AlertTriangle,
   ArrowLeft,
-  BriefcaseBusiness
+  BriefcaseBusiness,
+  Rocket,
+  ChevronRight,
+  TrendingUp,
+  Banknote
 } from "lucide-react";
 import { extractJobId } from "@/shared/utils/slug";
 
@@ -50,20 +58,23 @@ export default function JobDetailPage() {
   const rawId = params?.id as string;
   const jobId = React.useMemo(() => extractJobId(rawId), [rawId]);
 
-  const [job, setJob] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [application, setApplication] = useState<any>(null);
+  const [job, setJob] = useState<Job | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [application, setApplication] = useState<CandidateApplication | null>(null);
+  const [relatedJobs, setRelatedJobs] = useState<Job[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingSkill, setUpdatingSkill] = useState<string | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
   
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
   const [signUpActionText, setSignUpActionText] = useState("");
 
   useEffect(() => {
     if (!jobId) return;
+    let isMounted = true;
 
     const fetchData = async () => {
       setLoading(true);
@@ -73,6 +84,8 @@ export default function JobDetailPage() {
           getCandidateProfileAction(),
           getApplicationsAction()
         ]);
+
+        if (!isMounted) return;
 
         if (jobData && !jobData.error) {
           setJob(jobData);
@@ -85,17 +98,37 @@ export default function JobDetailPage() {
         }
 
         if (appListData && !appListData.error && Array.isArray(appListData)) {
-          const app = appListData.find((a: any) => a.job === jobId);
+          const app = appListData.find((a: CandidateApplication) => a.job === jobId);
           if (app) setApplication(app);
         }
+
+        // Fetch related jobs
+        const allJobsData = await getJobsAction();
+        if (!isMounted) return;
+        if (allJobsData && !allJobsData.error) {
+          const list = Array.isArray(allJobsData) ? allJobsData : (allJobsData.results || []);
+          const filtered = list
+            .filter((item: Job) => item.id !== jobId && (
+              item.employment_type === jobData.employment_type ||
+              item.location === jobData.location ||
+              item.title.toLowerCase().includes(jobData.title.toLowerCase())
+            ))
+            .slice(0, 3);
+          setRelatedJobs(filtered);
+        }
       } catch {
-        // No console.error in production (Issue #11)
+        // Safe fail
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, [jobId]);
 
   // Set document title dynamically for SEO optimization
@@ -104,6 +137,19 @@ export default function JobDetailPage() {
       document.title = `${job.title} at ${job.company_name} | JobLyne`;
     }
   }, [job]);
+
+  // Track scroll position to show sticky Apply Now bar at the bottom
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowStickyBar(true);
+      } else {
+        setShowStickyBar(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Skills match analysis calculation
   const skillAnalysis = useMemo(() => {
@@ -122,6 +168,39 @@ export default function JobDetailPage() {
     return { matching, missing, percentage };
   }, [job, profile]);
 
+  // Parse structured markdown sections from description
+  const parsedSections = useMemo(() => {
+    if (!job) return null;
+    const desc = job.description || "";
+    
+    const extractSection = (header: string) => {
+      const match = desc.match(new RegExp(`### ${header}\\n([\\s\\S]*?)(?:\\n###|\\n---|$)`));
+      return match ? match[1].trim() : "";
+    };
+
+    const aboutCompany = extractSection("About Company");
+    const responsibilities = extractSection("Responsibilities");
+    const requirements = extractSection("Requirements");
+    const benefits = extractSection("Benefits");
+
+    if (aboutCompany || responsibilities || requirements || benefits) {
+      return {
+        aboutCompany,
+        responsibilities,
+        requirements,
+        benefits,
+        isStructured: true
+      };
+    }
+    return {
+      aboutCompany: "",
+      responsibilities: "",
+      requirements: "",
+      benefits: "",
+      isStructured: false
+    };
+  }, [job]);
+
   const matchVal = job?.match_score ?? skillAnalysis.percentage;
 
   const handleApply = async () => {
@@ -137,12 +216,11 @@ export default function JobDetailPage() {
         toast.error(res.error);
       } else {
         toast.success("Application submitted successfully!");
-        setJob((prev: any) => prev ? { ...prev, has_applied: true } : null);
+        setJob(prev => prev ? { ...prev, has_applied: true } : null);
         
-        // Load the updated applications list to populate applied info card
         const appListData = await getApplicationsAction();
         if (appListData && !appListData.error && Array.isArray(appListData)) {
-          const app = appListData.find((a: any) => a.job === jobId);
+          const app = appListData.find((a: CandidateApplication) => a.job === jobId);
           if (app) setApplication(app);
         }
       }
@@ -161,17 +239,17 @@ export default function JobDetailPage() {
     }
     setSaving(true);
     try {
-      if (job.is_saved) {
+      if (job && job.is_saved) {
         const res = await unsaveJobAction(job.id);
         if (!res.error) {
           toast.success("Removed from saved list");
-          setJob((prev: any) => prev ? { ...prev, is_saved: false } : null);
+          setJob(prev => prev ? { ...prev, is_saved: false } : null);
         }
-      } else {
+      } else if (job) {
         const res = await saveJobAction(job.id);
         if (!res.error) {
           toast.success("Opportunity bookmarked!");
-          setJob((prev: any) => prev ? { ...prev, is_saved: true } : null);
+          setJob(prev => prev ? { ...prev, is_saved: true } : null);
         }
       }
     } catch {
@@ -198,7 +276,7 @@ export default function JobDetailPage() {
         toast.error(res.error);
       } else {
         toast.success(`"${skillName}" successfully added to your profile!`);
-        setProfile((prev: any) => ({ ...prev, skills: updatedSkills }));
+        setProfile(prev => prev ? { ...prev, skills: updatedSkills } : null);
       }
     } catch {
       toast.error("Failed to add skill");
@@ -238,7 +316,8 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="w-full text-text max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex gap-6 flex-col">
+    <div className="w-full text-text max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex gap-6 flex-col pb-24 font-sans text-left">
+      
       {/* Dynamic SEO JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -273,7 +352,7 @@ export default function JobDetailPage() {
                 "unitText": "YEAR"
               }
             } : undefined
-          })
+          }).replace(/</g, '\\u003c')
         }}
       />
 
@@ -291,7 +370,7 @@ export default function JobDetailPage() {
             onClick={() => router.back()}
             variant="ghost" 
             size="sm"
-            className="flex items-center gap-1.5 px-3 min-h-[36px] text-muted hover:text-text"
+            className="flex items-center gap-1.5 px-3 min-h-[36px] text-muted hover:text-text cursor-pointer"
           >
             <ArrowLeft size={16} />
             Back
@@ -307,9 +386,9 @@ export default function JobDetailPage() {
       </div>
 
       {/* Hero Header Section */}
-      <div className="border-border rounded-2xl bg-surface p-6 sm:p-8 border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="border border-border/60 rounded-2xl bg-surface p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-start gap-5">
-          <div className="border-border/40 justify-center shrink-0 h-16 w-16 items-center p-3 bg-bg flex rounded-2xl border">
+          <div className="border border-border/40 justify-center shrink-0 h-16 w-16 items-center p-3 bg-bg flex rounded-2xl">
             {job.company_logo ? (
               <img
                 src={job.company_logo}
@@ -317,18 +396,36 @@ export default function JobDetailPage() {
                 className="w-full h-full object-contain"
               />
             ) : (
-              <Briefcase className="text-primary" size={32} aria-hidden="true" />
+              <Briefcase className="text-primary animate-pulse" size={32} aria-hidden="true" />
             )}
           </div>
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text leading-tight">{job.title}</h1>
-            <p className="text-base text-muted font-medium flex items-center gap-2 flex-wrap">
-              <span>{job.company_name}</span>
+          <div className="space-y-1 text-left">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text leading-tight">{job.title}</h1>
+            <div className="text-base text-muted font-medium flex items-center gap-2 flex-wrap leading-none">
+              <span className="font-bold text-text">{job.company_name}</span>
+              {(() => {
+                const companyDataForScore = {
+                  official_email: job.company_name ? `info@${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                  phone_number: "+919999999999",
+                  website: job.company_name ? `https://${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                  verification_status: job.company_verification_status || "pending",
+                  social_links: job.company_social_links || {}
+                };
+                const trustResult = calculateTrustScore(companyDataForScore);
+                if (trustResult.badge === "UNVERIFIED") return null;
+                const details = getBadgeDetails(trustResult.badge);
+                return (
+                  <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-extrabold border uppercase tracking-wider ${details.color}`}>
+                    <span>{details.indicator}</span>
+                    <span>{details.label}</span>
+                  </span>
+                );
+              })()}
               <span className="text-border">&bull;</span>
               <span className="flex items-center gap-1"><MapPin size={16} /> {job.location}</span>
               <span className="text-border">&bull;</span>
               <span className="flex items-center gap-1"><Clock size={16} /> {job.employment_type}</span>
-            </p>
+            </div>
           </div>
         </div>
 
@@ -336,14 +433,14 @@ export default function JobDetailPage() {
           <button
             onClick={handleToggleSave}
             disabled={saving}
-            className={`min-h-[48px] gap-2 px-5 items-center justify-center transition-all py-3 flex type-caption rounded-xl border cursor-pointer font-semibold shrink-0 ${
+            className={`min-h-[48px] gap-2 px-5 items-center justify-center transition-all py-3 flex type-caption rounded-xl border cursor-pointer font-bold shrink-0 ${
               job.is_saved
                 ? "text-primary border-primary bg-primary/10"
                 : "text-muted border-border/60 hover:bg-bg"
             }`}
           >
             {job.is_saved ? (
-              <Bookmark className="text-primary fill-primary" size={18} aria-hidden="true" />
+              <Bookmark className="text-primary fill-primary animate-bounce" size={18} aria-hidden="true" />
             ) : (
               <BookmarkPlus size={18} aria-hidden="true" />
             )}
@@ -353,7 +450,7 @@ export default function JobDetailPage() {
           {job.has_applied ? (
             <button
               disabled
-              className="border-success/30 px-8 min-h-[48px] gap-2 text-success items-center justify-center bg-success-bg py-3 type-ui flex rounded-xl border font-semibold select-none cursor-default"
+              className="border-success/30 px-8 min-h-[48px] gap-2 text-success items-center justify-center bg-success-bg py-3 type-ui flex rounded-xl border font-bold select-none cursor-default"
             >
               <CheckCircle2 size={18} aria-hidden="true" />
               Applied
@@ -363,13 +460,13 @@ export default function JobDetailPage() {
               onClick={handleApply}
               disabled={applying}
               variant="primary"
-              className="relative justify-center px-8 min-h-[48px] gap-2 items-center py-3"
+              className="relative justify-center px-8 min-h-[48px] gap-2 items-center py-3 font-bold"
             >
               {applying && (
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 border-2 rounded-full h-4 border-t-transparent w-4 animate-spin border-white"></span>
               )}
               <Rocket size={18} aria-hidden="true" />
-              Apply to opportunity
+              Apply Now
             </Button>
           )}
         </div>
@@ -406,38 +503,120 @@ export default function JobDetailPage() {
                 <h4 className="text-text gap-1 items-center text-base flex font-semibold">
                   AI Career Fit Score
                 </h4>
-                <p className="type-caption text-muted mt-0.5 max-w-sm">
+                <p className="type-caption text-muted mt-0.5 max-w-sm font-medium">
                   Evaluated by comparing your candidate profile against matching requirements in real time.
                 </p>
               </div>
             </div>
 
-            <div className="flex text-right items-end flex-col sm:items-end">
-              <span className="type-badge text-muted text-xs uppercase tracking-wider font-bold">Salary Bracket</span>
-              <span className="text-success mt-1 type-h3 font-semibold">
+            <div className="flex text-right items-end flex-col sm:items-end font-semibold">
+              <span className="type-badge text-muted text-[10px] uppercase tracking-wider font-bold">Salary Bracket</span>
+              <span className="text-success mt-1 type-h3 font-bold">
                 {job.salary_min
-                  ? `${job.currency}${job.salary_min.toLocaleString()} - ${job.salary_max?.toLocaleString()}`
+                  ? `${job.currency} ${Number(job.salary_min).toLocaleString()} - ${Number(job.salary_max || job.salary_min).toLocaleString()}`
                   : "Not Disclosed"}
               </span>
             </div>
           </div>
 
-          {/* Job Description Card */}
-          <div className="border-border bg-surface p-6 sm:p-8 rounded-2xl border shadow-sm space-y-4 text-left">
-            <h3 className="uppercase text-sm tracking-wider font-bold text-muted flex items-center gap-2">
-              <FileText size={18} />
-              Role Description
-            </h3>
-            <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line">
-              {job.description || "No description provided."}
-            </p>
-          </div>
+          {/* Render Sections (Overview, Responsibilities, Requirements, Benefits, About Company) */}
+          {parsedSections && parsedSections.isStructured ? (
+            <div className="space-y-6">
+              {/* 1. Overview Tab Widget */}
+              <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm text-left space-y-4">
+                <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                  <FileText size={16} /> Overview
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium">
+                  <div className="p-3 bg-bg/50 rounded-xl border border-border/30">
+                    <span className="text-[10px] text-muted uppercase font-bold block">Location Type</span>
+                    <span className="text-text font-bold block mt-1">{job.location} ({job.raw_location || "Remote"})</span>
+                  </div>
+                  <div className="p-3 bg-bg/50 rounded-xl border border-border/30">
+                    <span className="text-[10px] text-muted uppercase font-bold block">Employment Model</span>
+                    <span className="text-text font-bold block mt-1">{job.employment_type}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Responsibilities */}
+              {parsedSections.responsibilities && (
+                <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm text-left space-y-4">
+                  <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-success" /> Responsibilities
+                  </h3>
+                  <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium">
+                    {parsedSections.responsibilities}
+                  </p>
+                </div>
+              )}
+
+              {/* 3. Requirements & Skills */}
+              {parsedSections.requirements && (
+                <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm text-left space-y-4">
+                  <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                    <Sparkles size={16} className="text-primary" /> Core Requirements
+                  </h3>
+                  <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium mb-4">
+                    {parsedSections.requirements}
+                  </p>
+                </div>
+              )}
+
+              {/* 4. Benefits */}
+              {parsedSections.benefits && (
+                <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm text-left space-y-4">
+                  <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                    <TrendingUp size={16} className="text-success" /> Benefits & Compensation
+                  </h3>
+                  <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium">
+                    {parsedSections.benefits}
+                  </p>
+                </div>
+              )}
+
+              {/* 5. About Company */}
+              {parsedSections.aboutCompany && (
+                <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm text-left space-y-4">
+                  <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                    <Briefcase size={16} /> About Company
+                  </h3>
+                  <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium">
+                    {parsedSections.aboutCompany}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Fallback legacy text block styling */
+            <div className="space-y-6">
+              <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm space-y-4 text-left">
+                <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                  <FileText size={16} /> Role Description
+                </h3>
+                <p className="text-text/90 text-sm leading-relaxed whitespace-pre-line font-medium">
+                  {job.description || "No description provided."}
+                </p>
+              </div>
+
+              {job.requirements && (
+                <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm space-y-4 text-left">
+                  <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                    <ClipboardCheck size={16} /> Prerequisites & Requirements
+                  </h3>
+                  <p className="text-text/80 text-sm leading-relaxed whitespace-pre-line font-medium">
+                    {job.requirements}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Required Skills breakdown */}
-          <div className="border-border bg-surface p-6 sm:p-8 rounded-2xl border shadow-sm space-y-5 text-left">
+          <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm space-y-5 text-left font-semibold">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <h3 className="uppercase text-sm tracking-wider font-bold text-muted flex items-center gap-2">
-                <Sparkles className="text-primary" size={18} />
+              <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2 font-sans">
+                <Sparkles className="text-primary" size={16} />
                 Requested Qualifications
               </h3>
               <span className="type-caption text-muted text-xs font-semibold">
@@ -445,19 +624,18 @@ export default function JobDetailPage() {
               </span>
             </div>
 
-            <div className="gap-4 flex flex-col">
-              {/* Match section */}
+            <div className="gap-4 flex flex-col font-semibold">
               {skillAnalysis.matching.length > 0 && (
-                <div className="border-success/20 gap-2 flex-col flex bg-success-bg p-4 rounded-xl border">
-                  <div className="type-badge text-success uppercase items-center gap-2 tracking-wider flex font-semibold text-xs">
+                <div className="border border-success/20 gap-2 flex-col flex bg-success-bg p-4 rounded-xl">
+                  <div className="type-badge text-success uppercase items-center gap-2 tracking-wider flex font-semibold text-xs font-sans">
                     <CheckCircle2 size={16} aria-hidden="true" className="mr-1 inline-block" />
                     Satisfied Prerequisites
                   </div>
-                  <div className="gap-2 flex mt-1 flex-wrap">
+                  <div className="gap-2 flex mt-1 flex-wrap font-semibold">
                     {skillAnalysis.matching.map((skill: string) => (
                       <span
                         key={skill}
-                        className="py-1 gap-1.5 text-success border-success/20 items-center rounded-lg px-2.5 bg-success-bg flex type-caption border text-xs"
+                        className="py-1 gap-1.5 text-success border border-success/20 items-center rounded-lg px-2.5 bg-success-bg flex type-caption text-xs"
                       >
                         ✓ {skill}
                       </span>
@@ -466,24 +644,23 @@ export default function JobDetailPage() {
                 </div>
               )}
 
-              {/* Missing skills */}
               {skillAnalysis.missing.length > 0 ? (
-                <div className="gap-2 flex-col border-warning/20 flex p-4 bg-warning-bg rounded-xl border">
-                  <div className="type-badge uppercase text-warning items-center gap-2 tracking-wider flex font-semibold text-xs">
+                <div className="gap-2 flex-col border border-warning/20 flex p-4 bg-warning-bg rounded-xl font-semibold">
+                  <div className="type-badge uppercase text-warning items-center gap-2 tracking-wider flex font-semibold text-xs font-sans">
                     <Zap size={16} aria-hidden="true" className="mr-1 inline-block" />
                     Missing Credentials to Add
                   </div>
-                  <p className="type-caption text-muted text-xs">
+                  <p className="type-caption text-muted text-xs font-medium">
                     Add these missing elements to your candidate profile to match the employer's expectations.
                   </p>
 
-                  <div className="gap-2 flex mt-1 flex-wrap">
+                  <div className="gap-2 flex mt-1 flex-wrap font-semibold">
                     {skillAnalysis.missing.map((skill: string) => (
                       <button
                         key={skill}
                         onClick={() => handleAddSkill(skill)}
                         disabled={updatingSkill !== null}
-                        className="py-1 cursor-pointer gap-1.5 border-warning/30 text-warning items-center transition-all rounded-lg px-2.5 bg-warning-bg min-h-[36px] flex type-caption border text-xs hover:opacity-90"
+                        className="py-1 cursor-pointer gap-1.5 border border-warning/30 text-warning items-center transition-all rounded-lg px-2.5 bg-warning-bg min-h-[36px] flex type-caption text-xs hover:opacity-90 font-semibold"
                       >
                         {updatingSkill === skill ? (
                           <span className="h-3 mr-1 border-2 inline-block w-3 border-warning rounded-full border-t-transparent animate-spin"></span>
@@ -496,7 +673,7 @@ export default function JobDetailPage() {
                   </div>
                 </div>
               ) : (
-                <div className="justify-center border-success/20 text-success items-center gap-2 text-center flex bg-success-bg p-4 type-caption rounded-xl border text-xs">
+                <div className="justify-center border border-success/20 text-success items-center gap-2 text-center flex bg-success-bg p-4 type-caption rounded-xl text-xs font-semibold">
                   <BadgeCheck size={16} aria-hidden="true" />
                   <span>Verified: Your profile meets 100% of the requested skill constraints.</span>
                 </div>
@@ -504,33 +681,45 @@ export default function JobDetailPage() {
             </div>
           </div>
 
-          {/* Job Requirements prerequisites */}
-          {job.requirements && (
-            <div className="border-border bg-surface p-6 sm:p-8 rounded-2xl border shadow-sm space-y-4 text-left">
-              <h3 className="uppercase text-sm tracking-wider font-bold text-muted flex items-center gap-2">
-                <ClipboardCheck size={18} />
-                Prerequisites & Requirements
+          {/* Related Jobs Section */}
+          {relatedJobs.length > 0 && (
+            <div className="border border-border/60 bg-surface p-6 sm:p-8 rounded-2xl shadow-sm space-y-6 text-left">
+              <h3 className="uppercase text-xs tracking-wider font-bold text-muted flex items-center gap-2">
+                <BriefcaseBusiness size={16} /> Related Jobs
               </h3>
-              <p className="text-text/80 text-sm leading-relaxed whitespace-pre-line">
-                {job.requirements}
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedJobs.map((item) => (
+                  <Link 
+                    key={item.id} 
+                    href={`/jobs/${item.id}`}
+                    className="p-4 bg-bg/40 hover:bg-bg border border-border/30 hover:border-primary/20 rounded-xl space-y-2.5 block transition-all group hover:scale-[1.01]"
+                  >
+                    <h4 className="text-xs font-bold text-text truncate group-hover:text-primary transition-colors">{item.title}</h4>
+                    <p className="text-[10px] text-muted truncate">{item.company_name} &bull; {item.location}</p>
+                    <div className="flex justify-between items-center pt-1 border-t border-border/20 text-[10px] font-bold text-success font-semibold">
+                      <span>{item.currency} {Number(item.salary_min).toLocaleString()}</span>
+                      <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[9px]">{item.match_score ?? 60}% Fit</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
 
         </div>
 
         {/* Right Side Sticky: Application Status & Filled Details */}
-        <div className="space-y-6 lg:sticky lg:top-[calc(var(--height-header)+16px)]">
+        <div className="space-y-6 lg:sticky lg:top-[calc(var(--height-header)+16px)] z-10">
           {application ? (
             /* Filled Application Details Card */
-            <div className="border-border bg-surface p-6 rounded-2xl border shadow-sm text-left space-y-6">
+            <div className="border border-border/60 bg-surface p-6 rounded-2xl shadow-sm text-left space-y-6">
               <div className="border-b border-border/40 pb-4">
                 <h3 className="type-card-title font-semibold text-text mb-2">Application Tracking</h3>
-                <div className="flex items-center gap-2.5 flex-wrap">
+                <div className="flex items-center gap-2.5 flex-wrap font-semibold">
                   <span className={`py-1 text-[11px] font-bold uppercase tracking-wider px-3 rounded-full border ${getStatusClass(application.status)}`}>
                     {application.status}
                   </span>
-                  <span className="text-xs text-muted flex items-center gap-1">
+                  <span className="text-xs text-muted flex items-center gap-1 font-medium">
                     <Calendar size={14} />
                     Applied {new Date(application.applied_at).toLocaleDateString()}
                   </span>
@@ -609,7 +798,7 @@ export default function JobDetailPage() {
                   </h4>
                   <p className="text-xs text-text/95">
                     An interview is scheduled for this opportunity on:
-                    <strong className="block mt-1 font-semibold text-text">
+                    <strong className="block mt-1 font-semibold text-text font-bold">
                       {new Date(application.interview_schedule).toLocaleString()}
                     </strong>
                   </p>
@@ -618,49 +807,81 @@ export default function JobDetailPage() {
             </div>
           ) : (
             /* Sidebar Sizing Sourcing info / CTA when not applied */
-            <div className="border-border bg-surface p-6 rounded-2xl border shadow-sm text-left space-y-5">
+            <div className="border border-border/60 bg-surface p-6 rounded-2xl shadow-sm text-left space-y-5">
               <h3 className="type-card-title font-semibold text-text">Sourcing Status</h3>
               
               <div className="space-y-3.5 text-sm text-muted">
-                <p>This recruiter requisition accepts talent applications directly on JobLyne.</p>
+                <p className="font-medium">This recruiter requisition accepts talent applications directly on JobLyne.</p>
                 <div className="h-px bg-border/40 w-full"></div>
                 <div className="space-y-1.5">
                   <p className="text-xs font-semibold text-text">How it works:</p>
-                  <ul className="list-disc pl-4 space-y-1 text-xs">
+                  <ul className="list-disc pl-4 space-y-1 text-xs font-medium">
                     <li>Submit your profile with one click.</li>
                     <li>Employers match your details instantly.</li>
                     <li>Saves are preserved in your bookmarks.</li>
                   </ul>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
 
+      </div>
+
+      {/* Sticky floating Apply Now bottom bar */}
+      {showStickyBar && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-md border-t border-border/60 shadow-2xl p-4 animate-in slide-in-from-bottom duration-300">
+          <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="text-left min-w-0 pr-4 flex flex-col justify-center">
+              <h4 className="text-sm font-extrabold text-text truncate max-w-xs sm:max-w-md">{job.title}</h4>
+              <div className="text-[10px] text-muted font-medium truncate mt-0.5 flex items-center gap-1">
+                <span>{job.company_name}</span>
+                {(() => {
+                  const companyDataForScore = {
+                    official_email: job.company_name ? `info@${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                    phone_number: "+919999999999",
+                    website: job.company_name ? `https://${job.company_name.toLowerCase().replace(/\s+/g, "")}.com` : "",
+                    verification_status: job.company_verification_status || "pending",
+                    social_links: job.company_social_links || {}
+                  };
+                  const trustResult = calculateTrustScore(companyDataForScore);
+                  if (trustResult.badge === "UNVERIFIED") return null;
+                  const details = getBadgeDetails(trustResult.badge);
+                  return (
+                    <span className="inline-block" title={details.label}>{details.indicator}</span>
+                  );
+                })()}
+                <span>&bull;</span>
+                <span>{job.location}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 shrink-0">
               {job.has_applied ? (
                 <button
                   disabled
-                  className="w-full min-h-[48px] gap-2 text-success items-center justify-center bg-success-bg py-3 type-ui flex rounded-xl border border-success/30 font-semibold"
+                  className="border-success/30 px-6 py-2.5 text-xs text-success bg-success-bg rounded-xl border font-bold select-none cursor-default flex items-center gap-1.5"
                 >
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  Applied to Sourcing
+                  <CheckCircle2 size={14} /> Applied
                 </button>
               ) : (
                 <Button
                   onClick={handleApply}
                   disabled={applying}
                   variant="primary"
-                  className="w-full relative justify-center min-h-[48px] gap-2 items-center py-3"
+                  className="px-6 py-2.5 text-xs font-bold min-h-0 flex items-center gap-1.5"
                 >
                   {applying && (
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 border-2 rounded-full h-4 border-t-transparent w-4 animate-spin border-white"></span>
+                    <span className="h-3 w-3 border-2 rounded-full border-t-transparent animate-spin border-white"></span>
                   )}
-                  <Rocket size={18} aria-hidden="true" />
-                  Apply now
+                  <Rocket size={14} /> Apply Now
                 </Button>
               )}
             </div>
-          )}
+          </div>
         </div>
+      )}
 
-      </div>
     </div>
   );
 }
