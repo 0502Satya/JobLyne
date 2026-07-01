@@ -50,6 +50,7 @@ class JobSeekers(models.Model):
     open_to_relocation = models.BooleanField(default=False)
     open_to_international = models.BooleanField(default=False)
     privacy_settings = models.JSONField(null=True, blank=True)
+    profile_view_count = models.IntegerField(default=0, null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
@@ -181,8 +182,11 @@ class CandidateProfileViews(models.Model):
     """Records each time a recruiter/company user views a candidate's profile."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job_seeker = models.ForeignKey('JobSeekers', on_delete=models.CASCADE, null=False, blank=False, related_name='profile_views')
+    company = models.ForeignKey('companies.Companies', on_delete=models.CASCADE, null=True, blank=True, related_name='profile_views_company')
+    job = models.ForeignKey('jobs.Jobs', on_delete=models.SET_NULL, null=True, blank=True, related_name='profile_views_job')
     viewer = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='viewed_profiles')
     viewed_at = models.DateTimeField(auto_now_add=True)
+    last_viewed_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         db_table = 'candidate_profile_views'

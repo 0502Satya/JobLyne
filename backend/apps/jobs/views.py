@@ -150,6 +150,7 @@ class JobListView(APIView):
         salary_max = request.data.get('salary_max')
         currency = request.data.get('currency', 'USD')
         skills_list = request.data.get('skills', [])
+        expires_at = request.data.get('expires_at')
 
         if not title:
             return Response({"error": "Job title is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -214,6 +215,7 @@ class JobListView(APIView):
                 salary_min=s_min,
                 salary_max=s_max,
                 currency=currency,
+                expires_at=expires_at,
                 status='OPEN',
                 posted_at=timezone.now()
             )
@@ -307,7 +309,53 @@ class JobDetailView(APIView):
         if location is not None:
             job.raw_location = location
 
+        employment_type = request.data.get('employment_type')
+        if employment_type is not None:
+            job.employment_type = employment_type
+
+        experience_required = request.data.get('experience_required')
+        if experience_required is not None:
+            try:
+                job.experience_required = int(experience_required)
+            except (ValueError, TypeError):
+                pass
+
+        salary_min = request.data.get('salary_min')
+        if salary_min is not None:
+            try:
+                job.salary_min = float(salary_min)
+            except (ValueError, TypeError):
+                pass
+
+        salary_max = request.data.get('salary_max')
+        if salary_max is not None:
+            try:
+                job.salary_max = float(salary_max)
+            except (ValueError, TypeError):
+                pass
+
+        currency = request.data.get('currency')
+        if currency is not None:
+            job.currency = currency
+
+        expires_at = request.data.get('expires_at')
+        if expires_at is not None:
+            job.expires_at = expires_at if expires_at else None
+
         job.save()
+
+        skills_list = request.data.get('skills')
+        if skills_list is not None:
+            with transaction.atomic():
+                JobSkills.objects.filter(job=job).delete()
+                for skill_name in skills_list:
+                    if skill_name:
+                        clean_name = skill_name.strip()
+                        skill = Skills.objects.filter(name__iexact=clean_name).first()
+                        if not skill:
+                            skill = Skills.objects.create(name=clean_name)
+                        JobSkills.objects.create(job=job, skill=skill, is_required=True)
+
         serializer = JobSerializer(job)
         return Response(serializer.data)
 

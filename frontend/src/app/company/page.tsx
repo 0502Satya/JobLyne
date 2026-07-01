@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCompanyProfileAction, logoutAction, updateCompanyProfileAction } from "@/features/auth/actions";
 import { getJobsAction } from "@/features/auth/jobActions";
 import { createJobAction, updateJobAction, deleteJobAction, uploadCompanyDocAction } from "@/features/company/actions";
@@ -79,14 +79,26 @@ interface Candidate {
   interviewStatus?: "Invited" | "None";
 }
 
-export default function CompanyDashboardPage() {
+export function CompanyDashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
   // Navigation Section State
   const [activeSection, setActiveSection] = useState<"dashboard" | "jobs" | "candidates" | "analytics" | "profile" | "settings" | "verification" | "applicants">("dashboard");
   const [applicantsJobFilter, setApplicantsJobFilter] = useState<string>("ALL");
+
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (section) {
+      setActiveSection(section as any);
+      const jobFilter = searchParams.get("jobFilter");
+      if (jobFilter) {
+        setApplicantsJobFilter(jobFilter);
+      }
+    }
+  }, [searchParams]);
   
   // Jobs List & Filters State
   const [jobs, setJobs] = useState<JobPost[]>([]);
@@ -378,11 +390,11 @@ Cover Letter Optional: ${jobForm.coverLetterOptional ? "Yes" : "No"}
 
   // Job Listing actions
   const handleEditJob = (job: JobPost) => {
-    window.open(`/create-job?id=${job.id}`, "_blank");
+    window.open(`/company/create-job?id=${job.id}`, "_blank");
   };
 
   const handleDuplicateJob = (job: JobPost) => {
-    window.open(`/create-job?duplicateId=${job.id}`, "_blank");
+    window.open(`/company/create-job?duplicateId=${job.id}`, "_blank");
   };
 
   const handleToggleArchive = async (id: string, currentStatus: "Active" | "Closed" | "Draft") => {
@@ -579,7 +591,7 @@ Cover Letter Optional: ${jobForm.coverLetterOptional ? "Yes" : "No"}
                 if (profile?.verification_status !== "verified") {
                   toast.error("Organization not verified yet. Submit credentials in settings to unlock job posting.");
                 } else {
-                  window.open("/create-job", "_blank");
+                  window.open("/company/create-job", "_blank");
                 }
               }}
               className="px-5 py-3 rounded-2xl bg-primary text-white font-bold items-center gap-2 flex shadow-lg shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer"
@@ -1887,5 +1899,20 @@ Cover Letter Optional: ${jobForm.coverLetterOptional ? "Yes" : "No"}
       </Dialog>
 
     </div>
+  );
+}
+
+export default function CompanyDashboardPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen bg-bg flex items-center justify-center text-muted text-left">
+        <div className="flex flex-col items-center gap-3">
+          <div className="border-t-primary size-10 border-primary/20 rounded-full border-4 animate-spin"></div>
+          <p className="text-xs font-bold uppercase tracking-wider">Loading dashboard workspace...</p>
+        </div>
+      </div>
+    }>
+      <CompanyDashboardContent />
+    </React.Suspense>
   );
 }

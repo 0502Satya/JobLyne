@@ -4,7 +4,7 @@ import React, { useEffect, useState, useTransition, useMemo, Suspense } from "re
 import { useSearchParams, useRouter } from "next/navigation";
 import { 
   getJobsAction, 
-  applyToJobAction, 
+  applyToJobAction,
   saveJobAction, 
   unsaveJobAction, 
   getCandidateProfileAction, 

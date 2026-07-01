@@ -26,7 +26,9 @@ export {
   applyToJobAction,
   getDashboardStatsAction,
   getActionPlanAction,
-  getApplicationsAction
+  getApplicationsAction,
+  recordProfileViewAction,
+  getProfileAnalyticsAction
 } from "./candidateActions";
 
 export {

@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+import datetime
+from django.utils import timezone
 
 from apps.candidates.models import SavedJobs, JobSeekers, JobSeekerSkills, CandidateProfileViews
 from apps.jobs.models import Jobs, Applications
@@ -10,6 +12,7 @@ from apps.jobs.serializers import JobSerializer
 from apps.candidates.serializers import CandidateProfileSerializer
 from apps.candidates.utils import calculate_profile_completeness
 from apps.users.permissions import IsCandidate
+from apps.companies.models import Companies, CompanyRecruiterRelations
 
 class CandidateProfileView(APIView):
     permission_classes = [IsAuthenticated, IsCandidate]
@@ -202,22 +205,128 @@ class CandidateComparisonView(APIView):
         return Response(data)
 
 
+def get_company_for_user(user):
+    if user.account_type == 'COMPANY':
+        return user.company
+    elif user.account_type == 'RECRUITER':
+        relation = CompanyRecruiterRelations.objects.filter(recruiter__user=user).select_related('company').first()
+        if relation:
+            return relation.company
+    return None
+
+
 class RecordProfileViewView(APIView):
     """Called when a recruiter/company opens a candidate's profile page.
-    POST /api/candidate/profile/<job_seeker_id>/view/
+    POST /api/profile/view/
     """
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, job_seeker_id):
-        # Only recruiters/companies can record views
+    def post(self, request, *args, **kwargs):
         if request.user.account_type not in ['RECRUITER', 'COMPANY']:
-            return Response({"error": "Only recruiters and companies can view candidate profiles."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"error": "Only recruiters and companies can record profile views."}, status=status.HTTP_403_FORBIDDEN)
+
+        candidate_id = request.data.get('candidateId')
+        company_id = request.data.get('companyId')
+        job_id = request.data.get('jobId')
+
+        if not candidate_id:
+            return Response({"error": "candidateId is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        company = get_company_for_user(request.user)
+        if not company:
+            return Response({"error": "Authenticated user is not associated with any company profile."}, status=status.HTTP_403_FORBIDDEN)
+
+        if company_id and str(company.id) != str(company_id):
+            return Response({"error": "Unauthorized action on behalf of this company."}, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            job_seeker = JobSeekers.objects.get(id=job_seeker_id)
+            candidate = JobSeekers.objects.get(id=candidate_id)
         except JobSeekers.DoesNotExist:
             return Response({"error": "Candidate not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Record the view event
-        CandidateProfileViews.objects.create(job_seeker=job_seeker, viewer=request.user)
-        return Response({"message": "Profile view recorded."}, status=status.HTTP_201_CREATED)
+        now = timezone.now()
+        should_increment = False
+
+        view_record = CandidateProfileViews.objects.filter(
+            job_seeker=candidate,
+            company=company
+        ).first()
+
+        if not view_record:
+            CandidateProfileViews.objects.create(
+                job_seeker=candidate,
+                company=company,
+                job_id=job_id,
+                viewer=request.user
+            )
+            should_increment = True
+        else:
+            last_view = view_record.last_viewed_at or view_record.viewed_at
+            time_diff = now - last_view
+            if time_diff.total_seconds() > 24 * 3600:
+                view_record.job_id = job_id
+                view_record.viewer = request.user
+                view_record.save()
+                should_increment = True
+
+        if should_increment:
+            candidate.profile_view_count = (candidate.profile_view_count or 0) + 1
+            candidate.save(update_fields=['profile_view_count'])
+
+        return Response({"message": "Profile view recorded successfully.", "incremented": should_increment}, status=status.HTTP_200_OK)
+
+
+class CandidateAnalyticsView(APIView):
+    """Provides view analytics for a candidate's own dashboard.
+    GET /api/candidate/profile-analytics/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if request.user.account_type != 'CANDIDATE':
+            return Response({"error": "Only candidates can access profile analytics."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            job_seeker = JobSeekers.objects.get(user=request.user)
+        except JobSeekers.DoesNotExist:
+            return Response({"error": "Candidate profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        now = timezone.now()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        thirty_days_ago = now - datetime.timedelta(days=30)
+
+        total_views = job_seeker.profile_view_count or 0
+        weekly_views = CandidateProfileViews.objects.filter(
+            job_seeker=job_seeker,
+            viewed_at__gte=seven_days_ago
+        ).count()
+        monthly_views = CandidateProfileViews.objects.filter(
+            job_seeker=job_seeker,
+            viewed_at__gte=thirty_days_ago
+        ).count()
+
+        latest_view = CandidateProfileViews.objects.filter(job_seeker=job_seeker).order_by('-viewed_at').first()
+        last_viewed = (latest_view.last_viewed_at or latest_view.viewed_at).isoformat() if latest_view else None
+
+        recent_views = CandidateProfileViews.objects.filter(
+            job_seeker=job_seeker,
+            company__isnull=False
+        ).select_related('company').order_by('-viewed_at')[:15]
+
+        seen_companies = []
+        recent_companies = []
+        for rv in recent_views:
+            company_name = rv.company.name
+            if company_name and company_name not in seen_companies:
+                seen_companies.append(company_name)
+                recent_companies.append(company_name)
+            if len(recent_companies) >= 5:
+                break
+
+        return Response({
+            "totalViews": total_views,
+            "weeklyViews": weekly_views,
+            "monthlyViews": monthly_views,
+            "lastViewed": last_viewed,
+            "recentCompanies": recent_companies
+        }, status=status.HTTP_200_OK)

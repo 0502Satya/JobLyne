@@ -15,6 +15,8 @@ import {
   scheduleInterviewAction, 
   compareCandidatesAction 
 } from "@/features/company/actions";
+import { recordProfileViewAction } from "@/features/auth/actions";
+import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { Button, Breadcrumbs, Dialog } from "@/shared/ui";
 
@@ -38,6 +40,7 @@ interface Application {
   candidate_phone: string;
   candidate_experience: number;
   candidate_resume?: string;
+  candidate_avatar?: string;
 }
 
 interface CompanyApplicantsSectionProps {
@@ -65,6 +68,40 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
   const [schedulingAppId, setSchedulingAppId] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState("");
   const [showSchedulerModal, setShowSchedulerModal] = useState(false);
+
+  // Candidate Profile View Modal
+  const [selectedProfile, setSelectedProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [sessionViewedIds, setSessionViewedIds] = useState<string[]>([]);
+
+  const handleViewProfile = async (candidateId: string, jobId: string) => {
+    setProfileLoading(true);
+    setShowProfileModal(true);
+    try {
+      const data = await compareCandidatesAction([candidateId]);
+      if (data && !data.error && data.length > 0) {
+        setSelectedProfile(data[0]);
+        // Trigger record view API once per session for this candidate
+        if (!sessionViewedIds.includes(candidateId)) {
+          setSessionViewedIds(prev => [...prev, candidateId]);
+          await recordProfileViewAction({
+            candidateId,
+            companyId: "", // Securely resolved by backend
+            jobId
+          });
+        }
+      } else {
+        toast.error(data?.error || "Profile details not found.");
+        setShowProfileModal(false);
+      }
+    } catch (err) {
+      toast.error("Failed to load candidate profile details.");
+      setShowProfileModal(false);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -350,13 +387,29 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
                       />
                     </td>
                     <td className="p-4">
-                      <div className="space-y-1">
-                        <h4 className="text-text type-ui leading-tight">{app.candidate_name}</h4>
-                        <p className="text-xs leading-normal truncate max-w-xs text-muted">{app.candidate_headline || "Software Engineer"}</p>
-                        <div className="text-muted text-xs gap-2 flex">
-                          <a href={`mailto:${app.candidate_email}`} className="hover:underline">{app.candidate_email}</a>
-                          <span>&bull;</span>
-                          <span>{app.candidate_phone || "Not provided"}</span>
+                      <div className="flex items-center gap-3">
+                        {app.candidate_avatar ? (
+                          <Image 
+                            src={app.candidate_avatar} 
+                            alt={app.candidate_name} 
+                            width={40}
+                            height={40}
+                            unoptimized
+                            className="size-10 rounded-full object-cover border border-border/60 shrink-0" 
+                          />
+                        ) : (
+                          <div className="size-10 rounded-full bg-gradient-primary text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                            {app.candidate_name?.substring(0, 2).toUpperCase() || "CN"}
+                          </div>
+                        )}
+                        <div className="space-y-1 min-w-0">
+                          <h4 className="text-text type-ui leading-tight font-bold">{app.candidate_name}</h4>
+                          <p className="text-xs leading-normal truncate max-w-xs text-muted">{app.candidate_headline || "Software Engineer"}</p>
+                          <div className="text-muted text-xs gap-2 flex">
+                            <a href={`mailto:${app.candidate_email}`} className="hover:underline">{app.candidate_email}</a>
+                            <span>&bull;</span>
+                            <span>{app.candidate_phone || "Not provided"}</span>
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -383,6 +436,14 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
                       )}
                     </td>
                     <td className="p-4 whitespace-nowrap space-x-1.5 text-right">
+                      <Button
+                        onClick={() => handleViewProfile(app.candidate_id, app.job)}
+                        variant="secondary"
+                        size="sm"
+                        className="text-xs uppercase min-h-0 py-2"
+                      >
+                        View Profile
+                      </Button>
                       <Button
                         onClick={() => {
                           setSchedulingAppId(app.id);
@@ -453,11 +514,27 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
                 <div className="space-y-3 min-h-[248px]">
                   {stageApps.map(app => (
                     <div key={app.id} className="group rounded-2xl relative border-border/80 bg-bg transition-all shadow-sm space-y-3 p-4 border hover:border-primary/40">
-                      <div className="space-y-1">
-                        <h5 className="text-text type-ui leading-tight font-bold">{app.candidate_name}</h5>
-                        <p className="text-xs truncate text-muted leading-tight">{app.candidate_headline || "Candidate"}</p>
-                        <p className="text-muted type-badge font-medium">{app.job_title.split(" ")[0]}</p>
+                      <div className="flex items-center gap-3">
+                        {app.candidate_avatar ? (
+                          <Image 
+                            src={app.candidate_avatar} 
+                            alt={app.candidate_name} 
+                            width={32}
+                            height={32}
+                            unoptimized
+                            className="size-8 rounded-full object-cover border border-border/60 shrink-0" 
+                          />
+                        ) : (
+                          <div className="size-8 rounded-full bg-gradient-primary text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                            {app.candidate_name?.substring(0, 2).toUpperCase() || "CN"}
+                          </div>
+                        )}
+                        <div className="min-w-0 space-y-0.5">
+                          <h5 className="text-text type-ui leading-tight font-bold">{app.candidate_name}</h5>
+                          <p className="text-xs truncate text-muted leading-none">{app.candidate_headline || "Candidate"}</p>
+                        </div>
                       </div>
+                      <p className="text-muted type-badge font-medium">{app.job_title.split(" ")[0]}</p>
                       {app.candidate_skills.length > 0 && (
                         <div className="gap-1 flex flex-wrap">
                           {app.candidate_skills.slice(0, 2).map((s, idx) => (
@@ -467,11 +544,18 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
                       )}
                       <div className="border-t border-border/50 items-center pt-2 flex justify-between">
                         <button
+                          onClick={() => handleViewProfile(app.candidate_id, app.job)}
+                          className="text-primary text-xs hover:underline cursor-pointer font-bold"
+                        >
+                          View Profile
+                        </button>
+                        
+                        <button
                           onClick={() => {
                             setSchedulingAppId(app.id);
                             setShowSchedulerModal(true);
                           }}
-                          className="text-primary text-xs hover:underline cursor-pointer font-bold"
+                          className="text-muted hover:text-text text-xs cursor-pointer font-bold"
                         >
                           Schedule
                         </button>
@@ -622,6 +706,182 @@ export default function CompanyApplicantsSection({ initialJobFilter = "ALL" }: C
             />
           </div>
         </form>
+      </Dialog>
+
+      {/* MODAL 3: Candidate Full Profile View */}
+      <Dialog
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setSelectedProfile(null);
+        }}
+        title="Candidate Profile Details"
+        size="lg"
+      >
+        {profileLoading ? (
+          <div className="py-20 text-center text-muted">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-xs">Loading candidate profile data securely...</p>
+          </div>
+        ) : selectedProfile ? (
+          <div className="space-y-6 text-left max-h-[75vh] overflow-y-auto pr-2">
+            
+            {/* Header section */}
+            <div className="flex gap-4 items-center border-b border-border/60 pb-5">
+              {selectedProfile.user?.profile_photo_url ? (
+                <Image 
+                  src={selectedProfile.user.profile_photo_url} 
+                  alt={selectedProfile.full_name} 
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="size-16 rounded-full object-cover border border-border" 
+                />
+              ) : (
+                <div className="size-16 rounded-full bg-gradient-primary text-white flex items-center justify-center font-bold text-lg uppercase">
+                  {selectedProfile.full_name?.substring(0, 2).toUpperCase() || "CN"}
+                </div>
+              )}
+              <div className="min-w-0">
+                <h3 className="text-xl font-extrabold text-text leading-tight">{selectedProfile.full_name}</h3>
+                <p className="text-sm text-muted mt-1 font-medium">{selectedProfile.headline || "Software Engineer"}</p>
+                <p className="text-xs text-muted mt-0.5">{selectedProfile.location || selectedProfile.city || "Remote"}</p>
+              </div>
+            </div>
+
+            {/* Profile Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Left Column: Personal info & contact */}
+              <div className="space-y-5 lg:col-span-1 border-r border-border/40 pr-0 lg:pr-6">
+                <div className="space-y-3">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Personal & Contact</h4>
+                  <div className="space-y-2.5 text-xs text-text">
+                    <div><span className="text-muted block">Email Address</span> <span className="font-semibold">{selectedProfile.user?.email}</span></div>
+                    <div><span className="text-muted block">Phone Contact</span> <span className="font-semibold">{selectedProfile.phone || "Not provided"}</span></div>
+                    {selectedProfile.whatsapp_number && (
+                      <div><span className="text-muted block">WhatsApp</span> <span className="font-semibold">{selectedProfile.whatsapp_number}</span></div>
+                    )}
+                    <div><span className="text-muted block">Experience</span> <span className="font-semibold">{selectedProfile.experience_years ?? 3} Years</span></div>
+                    <div><span className="text-muted block">Current / Expected Salary</span> <span className="font-semibold">{selectedProfile.current_salary || "N/A"} / {selectedProfile.expected_salary || "N/A"} {selectedProfile.currency || ""}</span></div>
+                    {selectedProfile.notice_period && (
+                      <div><span className="text-muted block">Notice Period</span> <span className="font-semibold">{selectedProfile.notice_period}</span></div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-3 border-t border-border/40">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Links & Portfolios</h4>
+                  <div className="space-y-2 text-xs">
+                    {selectedProfile.social_links && Object.entries(selectedProfile.social_links).map(([platform, url]: any) => (
+                      <div key={platform}>
+                        <span className="text-muted uppercase text-[10px] font-bold block">{platform}</span>
+                        <a href={url} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold truncate block">{url}</a>
+                      </div>
+                    ))}
+                    {(!selectedProfile.social_links || Object.keys(selectedProfile.social_links).length === 0) && (
+                      <span className="text-xs text-muted font-medium">No social media links connected.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-3 border-t border-border/40">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Curriculum Vitae</h4>
+                  {selectedProfile.resume_file_url ? (
+                    <a
+                      href={selectedProfile.resume_file_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full h-10 border border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                    >
+                      View Resume PDF
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted font-medium block">No resume document uploaded.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Experience, Education, Projects, Skills */}
+              <div className="space-y-6 lg:col-span-2">
+                
+                {/* Work Experience */}
+                <div className="space-y-3">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Work Experience</h4>
+                  <div className="space-y-4">
+                    {selectedProfile.candidate_experience_job_seeker && selectedProfile.candidate_experience_job_seeker.map((exp: any) => (
+                      <div key={exp.id} className="border-l-2 border-primary/30 pl-3.5 space-y-1">
+                        <h5 className="text-sm font-bold text-text">{exp.designation}</h5>
+                        <p className="text-xs font-semibold text-muted">{exp.company_name} &bull; {exp.start_date} - {exp.is_current ? "Present" : exp.end_date}</p>
+                        {exp.responsibilities && (
+                          <p className="text-xs text-muted leading-relaxed whitespace-pre-line mt-1">{exp.responsibilities}</p>
+                        )}
+                      </div>
+                    ))}
+                    {(!selectedProfile.candidate_experience_job_seeker || selectedProfile.candidate_experience_job_seeker.length === 0) && (
+                      <span className="text-xs text-muted font-medium">No work experiences added.</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="space-y-3 pt-4 border-t border-border/40">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Education</h4>
+                  <div className="space-y-4">
+                    {selectedProfile.candidate_education_job_seeker && selectedProfile.candidate_education_job_seeker.map((edu: any) => (
+                      <div key={edu.id} className="border-l-2 border-warning/30 pl-3.5 space-y-1">
+                        <h5 className="text-sm font-bold text-text">{edu.degree} in {edu.field_of_study}</h5>
+                        <p className="text-xs font-semibold text-muted">{edu.institution} &bull; {edu.start_year} - {edu.end_year}</p>
+                      </div>
+                    ))}
+                    {(!selectedProfile.candidate_education_job_seeker || selectedProfile.candidate_education_job_seeker.length === 0) && (
+                      <span className="text-xs text-muted font-medium">No education records added.</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Projects */}
+                <div className="space-y-3 pt-4 border-t border-border/40">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Projects</h4>
+                  <div className="space-y-4">
+                    {selectedProfile.candidate_projects_job_seeker && selectedProfile.candidate_projects_job_seeker.map((proj: any) => (
+                      <div key={proj.id} className="border-l-2 border-indigo-400/30 pl-3.5 space-y-1">
+                        <div className="flex justify-between items-start gap-2">
+                          <h5 className="text-sm font-bold text-text">{proj.title}</h5>
+                          {proj.project_url && (
+                            <a href={proj.project_url} target="_blank" rel="noreferrer" className="text-primary hover:underline text-xs">Link</a>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted leading-relaxed">{proj.description}</p>
+                      </div>
+                    ))}
+                    {(!selectedProfile.candidate_projects_job_seeker || selectedProfile.candidate_projects_job_seeker.length === 0) && (
+                      <span className="text-xs text-muted font-medium">No projects added.</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Skills */}
+                <div className="space-y-3 pt-4 border-t border-border/40">
+                  <h4 className="text-xs uppercase font-extrabold tracking-wider text-muted">Skills Inventory</h4>
+                  <div className="gap-2 flex flex-wrap">
+                    {selectedProfile.job_seeker_skills_job_seeker && selectedProfile.job_seeker_skills_job_seeker.map((s: any) => (
+                      <span key={s.id} className="text-text px-2.5 border-border uppercase text-xs rounded-xl py-1 bg-surface border font-bold">
+                        {s.skill?.name} {s.years_of_experience ? `(${s.years_of_experience} yrs)` : ""}
+                      </span>
+                    ))}
+                    {(!selectedProfile.job_seeker_skills_job_seeker || selectedProfile.job_seeker_skills_job_seeker.length === 0) && (
+                      <span className="text-xs text-muted font-medium">No skills listed.</span>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        ) : null}
       </Dialog>
 
     </div>

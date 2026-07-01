@@ -100,7 +100,7 @@ export default function CreateJobPage() {
         responsibilities: extractSection("Responsibilities") || "",
         requirements: extractSection("Requirements") || "",
         benefits: extractSection("Benefits") || "",
-        deadline: parsedReqs.deadline || "",
+        deadline: res.expires_at ? res.expires_at.split('T')[0] : (parsedReqs.deadline || ""),
         openings: parsedReqs.openings || 1,
         resumeRequired: parsedReqs.resumeRequired !== false,
         coverLetterOptional: parsedReqs.coverLetterOptional !== false,
@@ -200,6 +200,7 @@ Cover Letter Optional: ${jobForm.coverLetterOptional ? "Yes" : "No"}
       salary_max: jobForm.salaryMax ? parseFloat(jobForm.salaryMax) : undefined,
       skills: jobForm.skills,
       currency: jobForm.currency,
+      expires_at: jobForm.deadline || undefined,
       status: status
     };
 

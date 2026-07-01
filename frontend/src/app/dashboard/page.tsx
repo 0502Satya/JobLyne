@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/services/profile.server";
 import { getDashboardStats } from "@/services/dashboard.server";
 import DashboardStats from "@/features/dashboard/components/DashboardStats";
+import ProfileAnalytics from "@/features/dashboard/components/ProfileAnalytics";
 import JobFeed from "@/features/dashboard/components/JobFeed";
 import DashboardRightSidebar from "@/features/dashboard/components/DashboardRightSidebar";
 import { LoadingState } from "@/shared/ui";
@@ -34,6 +35,9 @@ export default async function CandidateDashboardPage() {
 
       {/* Stats Grid */}
       <DashboardStats stats={stats} />
+
+      {/* Profile Analytics Analytics Display */}
+      <ProfileAnalytics />
 
       {/* Main Grid: Feed + Side Column */}
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">

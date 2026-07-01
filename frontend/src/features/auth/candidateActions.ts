@@ -93,3 +93,32 @@ export async function getApplicationsAction() {
     return { error: "Network error" };
   }
 }
+
+export async function recordProfileViewAction(data: { candidateId: string; companyId: string; jobId?: string | null }) {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/profile/view/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const resData = await res.json();
+    if (!res.ok) return { error: resData.error || "Failed to record view" };
+    return resData;
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}
+
+export async function getProfileAnalyticsAction() {
+  try {
+    const res = await authenticatedFetch(`${API_BASE_URL}/api/candidate/profile-analytics/`);
+
+    if (!res.ok) return { error: "Failed to fetch profile analytics" };
+    return await res.json();
+  } catch (err) {
+    return { error: "Network error" };
+  }
+}

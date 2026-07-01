@@ -15,7 +15,7 @@ class JobSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'company_name', 'company_logo', 'description', 
             'requirements', 'location', 'employment_type', 'experience_required',
-            'salary_min', 'salary_max', 'currency', 'posted_at', 'status', 'skills',
+            'salary_min', 'salary_max', 'currency', 'posted_at', 'expires_at', 'status', 'skills',
             'applicant_count', 'company_verification_status', 'company_social_links'
         ]
 
@@ -45,6 +45,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     candidate_phone = serializers.CharField(source='job_seeker.phone', read_only=True)
     candidate_experience = serializers.IntegerField(source='job_seeker.experience_years', read_only=True)
     candidate_resume = serializers.CharField(source='job_seeker.resume_file_url', read_only=True)
+    candidate_avatar = serializers.CharField(source='job_seeker.user.profile_photo_url', read_only=True)
 
     class Meta:
         model = Applications
@@ -53,7 +54,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'applied_at', 'updated_at', 'interview_schedule', 'cover_letter', 
             'rejection_reason', 'candidate_id', 'candidate_user_id', 'candidate_name', 
             'candidate_headline', 'candidate_skills', 'candidate_email', 
-            'candidate_phone', 'candidate_experience', 'candidate_resume'
+            'candidate_phone', 'candidate_experience', 'candidate_resume', 'candidate_avatar'
         ]
         read_only_fields = ['id', 'applied_at', 'updated_at']
 

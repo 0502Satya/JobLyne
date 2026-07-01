@@ -14,6 +14,7 @@ export async function createJobAction(data: {
   salary_max?: number | string;
   skills?: string[];
   currency?: string;
+  expires_at?: string;
 }) {
   try {
     const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/`, {
@@ -41,6 +42,13 @@ export async function updateJobAction(jobId: string, data: {
   description?: string;
   requirements?: string;
   location?: string;
+  employment_type?: string;
+  experience_required?: number | string;
+  salary_min?: number | string;
+  salary_max?: number | string;
+  skills?: string[];
+  currency?: string;
+  expires_at?: string;
 }) {
   try {
     const res = await authenticatedFetch(`${API_BASE_URL}/api/jobs/${jobId}/`, {

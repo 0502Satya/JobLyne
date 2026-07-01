@@ -133,3 +133,116 @@ class JobLyneRoleGuardTests(TestCase):
         self.assertEqual(response.status_code, 403)
         response_patch = self.client.patch(reverse('company_profile'), {"company_name": "New Name"})
         self.assertEqual(response_patch.status_code, 403)
+
+
+class JobLyneProfileViewTrackingTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        # Candidate setup
+        self.candidate_user = CustomUser.objects.create_user(
+            email="candidate_test@example.com",
+            password="Password123",
+            account_type="CANDIDATE",
+            is_verified=True,
+            is_active=True
+        )
+        self.candidate = JobSeekers.objects.create(
+            user=self.candidate_user,
+            full_name="Candidate Analytic User",
+            profile_view_count=0
+        )
+
+        # Company setup
+        from apps.companies.models import Companies
+        self.company = Companies.objects.create(
+            name="Test Employer Corp",
+            verification_status="verified"
+        )
+        self.company_user = CustomUser.objects.create_user(
+            email="employer@example.com",
+            password="Password123",
+            account_type="COMPANY",
+            company=self.company,
+            is_verified=True,
+            is_active=True
+        )
+
+    def test_record_profile_view_success(self):
+        self.client.force_authenticate(user=self.company_user)
+        payload = {
+            "candidateId": str(self.candidate.id),
+            "companyId": str(self.company.id)
+        }
+        url = reverse('record_profile_view')
+        response = self.client.post(url, payload, format='json')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["incremented"])
+        
+        self.candidate.refresh_from_db()
+        self.assertEqual(self.candidate.profile_view_count, 1)
+
+    def test_record_profile_view_duplicate_prevention(self):
+        self.client.force_authenticate(user=self.company_user)
+        payload = {
+            "candidateId": str(self.candidate.id),
+            "companyId": str(self.company.id)
+        }
+        url = reverse('record_profile_view')
+        
+        # First view
+        res1 = self.client.post(url, payload, format='json')
+        self.assertEqual(res1.status_code, 200)
+        self.assertTrue(res1.data["incremented"])
+
+        # Second view (within 24 hours)
+        res2 = self.client.post(url, payload, format='json')
+        self.assertEqual(res2.status_code, 200)
+        self.assertFalse(res2.data["incremented"])
+        
+        self.candidate.refresh_from_db()
+        self.assertEqual(self.candidate.profile_view_count, 1)
+
+    def test_record_profile_view_after_24_hours(self):
+        from apps.candidates.models import CandidateProfileViews
+        from django.utils import timezone
+        
+        # Create a record that was viewed 25 hours ago
+        past_time = timezone.now() - timezone.timedelta(hours=25)
+        view_rec = CandidateProfileViews.objects.create(
+            job_seeker=self.candidate,
+            company=self.company,
+            viewer=self.company_user
+        )
+        # Manually force past dates to mock last_viewed_at
+        CandidateProfileViews.objects.filter(id=view_rec.id).update(
+            viewed_at=past_time,
+            last_viewed_at=past_time
+        )
+        self.candidate.profile_view_count = 1
+        self.candidate.save()
+
+        # View again
+        self.client.force_authenticate(user=self.company_user)
+        payload = {
+            "candidateId": str(self.candidate.id),
+            "companyId": str(self.company.id)
+        }
+        url = reverse('record_profile_view')
+        response = self.client.post(url, payload, format='json')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["incremented"])
+        
+        self.candidate.refresh_from_db()
+        self.assertEqual(self.candidate.profile_view_count, 2)
+
+    def test_candidate_analytics_endpoint(self):
+        self.client.force_authenticate(user=self.candidate_user)
+        url = reverse('candidate_profile_analytics')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["totalViews"], 0)
+        self.assertEqual(len(response.data["recentCompanies"]), 0)
+
